@@ -1,8 +1,4 @@
 <app-default-page-layout>
-  <!-- TODO: URL rewrite + render context vs. URL redirect + matrix params -->
-  <!-- @if (device.isMaxWidth(device.WIDTH.W1100)) {
-    <h1>1100 on SSR page</h1>
-  } -->
   <app-heading title="Planets" />
   @let data = collection.data();
   @if (data.items.length > 0) {
@@ -13,6 +9,7 @@
           [imageAlt]="imageTitle(item)"
           [label]="item.name"
           [linkUri]="linkUri(item)"
+          [index]="$index"
         >
           @if (item.climate) {
             <div class="g-truncate-1">Climate: {{ item.climate }}</div>

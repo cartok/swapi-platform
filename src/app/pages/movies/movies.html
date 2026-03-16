@@ -9,7 +9,7 @@
           [imageAlt]="imageTitle(item)"
           [label]="item.title"
           [linkUri]="linkUri(item)"
-          [priorityImage]="false"
+          [index]="$index"
         >
           @if (item.director) {
             <div class="g-truncate-1">Director: {{ item.director }}</div>

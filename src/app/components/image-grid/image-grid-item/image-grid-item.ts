@@ -1,9 +1,12 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core'
+import { NgOptimizedImage } from '@angular/common'
+import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core'
 import { RouterLink } from '@angular/router'
+
+import { DeviceService } from '@/app/services/DeviceService'
 
 @Component({
   selector: 'app-image-grid-item',
-  imports: [RouterLink],
+  imports: [NgOptimizedImage, RouterLink],
   templateUrl: './image-grid-item.html',
   styleUrl: './image-grid-item.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -13,5 +16,9 @@ export class ImageGridItem {
   readonly imageAlt = input.required<string>()
   readonly label = input.required<string>()
   readonly linkUri = input.required<RouterLink['routerLink']>()
-  readonly priorityImage = input<boolean>(false)
+  /**
+   * Index starts at 1.
+   */
+  readonly index = input.required<number>()
+  readonly device = inject(DeviceService)
 }

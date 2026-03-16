@@ -4,8 +4,11 @@
   grid-template-rows: 1fr 200px;
 }
 
+.image-wrapper {
+  position: relative;
+}
+
 .image {
-  height: 100%;
   object-fit: cover;
 }
 

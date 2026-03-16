@@ -1,7 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core'
 
-import { DeviceService } from '@/app/services/DeviceService'
-
 @Component({
   selector: 'app-home',
   imports: [],
@@ -9,6 +7,4 @@ import { DeviceService } from '@/app/services/DeviceService'
   styleUrl: './home.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Home {
-  readonly device = inject(DeviceService)
-}
+export class Home {}

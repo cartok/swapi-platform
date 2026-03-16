@@ -1,3 +1,4 @@
+import { NgOptimizedImage } from '@angular/common'
 import {
   ChangeDetectionStrategy,
   Component,
@@ -10,7 +11,7 @@ import { SwipeDirective } from '@/app/shared/directives/swipe/swipe'
 
 @Component({
   selector: 'app-image-slider',
-  imports: [SwipeDirective],
+  imports: [SwipeDirective, NgOptimizedImage],
   templateUrl: './image-slider.html',
   styleUrl: './image-slider.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -1,13 +1,21 @@
 <div class="image-grid-item">
-  <!-- WIP: Use `NgOptimizedImage` for images at some point -->
-  <img
-    class="image"
-    [src]="imageUrl()"
-    [alt]="imageAlt()"
-    [attr.loading]="priorityImage() ? 'eager' : 'lazy'"
-    [attr.fetchpriority]="priorityImage() ? 'high' : 'low'"
-    decoding="async"
-  />
+  <div class="image-wrapper">
+    @let i = index();
+    <img
+      class="image"
+      [ngSrc]="imageUrl()"
+      [alt]="imageAlt()"
+      decoding="async"
+      fill
+      [priority]="
+        device.isMaxWidth(device.WIDTH.W768)
+          ? i <= 1
+          : device.isMaxWidth(device.WIDTH.W1100)
+            ? i <= 2
+            : i <= 4
+      "
+    />
+  </div>
   <div class="description-container">
     <div class="g-title-3">
       <span class="g-truncate-1">

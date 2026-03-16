@@ -18,12 +18,11 @@
         <div class="slide">
           <img
             class="image"
-            [src]="image.url"
+            [ngSrc]="image.url"
             [alt]="image.alt"
             [width]="image.width"
             [height]="image.height"
-            [attr.loading]="$index === activeIndex() ? 'eager' : 'lazy'"
-            [attr.fetchpriority]="$index === activeIndex() ? 'high' : 'low'"
+            [priority]="$index === 0"
             decoding="async"
           />
         </div>

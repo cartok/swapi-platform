@@ -9,6 +9,7 @@
           [imageAlt]="imageTitle(item)"
           [label]="item.name"
           [linkUri]="linkUri(item)"
+          [index]="$index"
         >
           @if (item.gender) {
             <div class="g-truncate-1">Gender: {{ item.gender }}</div>
