@@ -72,24 +72,6 @@ function findClosestBreakpoint<T extends WidthBreakpoint | HeightBreakpoint>(
   return closestBreakpoint
 }
 
-export function findClosestBreakpoints({
-  width,
-  height,
-}: {
-  width?: number
-  height?: number
-}): {
-  widthBreakpoint: WidthBreakpoint | null
-  heightBreakpoint: HeightBreakpoint | null
-} {
-  const widthBreakpoint =
-    typeof width == 'undefined' ? null : findClosestWidthBreakpoint(width)
-  const heightBreakpoint =
-    typeof height == 'undefined' ? null : findClosestHeightBreakpoint(height)
-
-  return { widthBreakpoint, heightBreakpoint }
-}
-
 export function isDeviceFormatValid(format: unknown): format is DeviceFormat {
   if (typeof format !== 'string') {
     return false
@@ -116,12 +98,14 @@ export const isDeviceContextPathSegment = new RegExp(
  */
 export function deviceContextToPathSegment(deviceContext: DeviceContext): string {
   const matrixParams = [`format=${deviceContext.format}`]
-  const { widthBreakpoint, heightBreakpoint } = findClosestBreakpoints({
-    width: deviceContext.width,
-    height: deviceContext.height,
-  })
+  const widthBreakpoint = !deviceContext.width
+    ? null
+    : findClosestWidthBreakpoint(deviceContext.width)
+  const heightBreakpoint = !deviceContext.height
+    ? null
+    : findClosestHeightBreakpoint(deviceContext.height)
 
-  if (widthBreakpoint !== undefined) {
+  if (widthBreakpoint !== null) {
     matrixParams.push(`width=${widthBreakpoint}`)
   }
 
@@ -130,26 +114,6 @@ export function deviceContextToPathSegment(deviceContext: DeviceContext): string
   }
 
   return [DEVICE_CONTEXT_PATH_PARAM_PREFIX, ...matrixParams].join(';')
-}
-
-const urlSerializer = new DefaultUrlSerializer()
-
-export function extractDeviceContextMatrixParameters(
-  urlPath: string,
-): Record<string, string> | null {
-  const urlTree = urlSerializer.parse(urlPath)
-  if (!urlTree.root.hasChildren()) {
-    return null
-  }
-  const urlSegments = urlTree.root.children[PRIMARY_OUTLET].segments
-  if (!urlSegments.length) {
-    return null
-  }
-  const firstSegment = urlSegments[0]
-  if (firstSegment.path !== DEVICE_CONTEXT_PATH_PARAM_PREFIX) {
-    return null
-  }
-  return firstSegment.parameters
 }
 
 export function parseDeviceContext(

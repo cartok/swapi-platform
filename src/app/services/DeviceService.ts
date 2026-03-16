@@ -1,7 +1,7 @@
 import { PlatformLocation } from '@angular/common'
 import { computed, DestroyRef, DOCUMENT, inject, Injectable, signal } from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
-import { NavigationEnd, Router } from '@angular/router'
+import { NavigationEnd, PRIMARY_OUTLET, Router } from '@angular/router'
 import { distinctUntilChanged, filter, map } from 'rxjs'
 
 import { injectIsBrowser } from '@/app/shared/utils/platform'
@@ -9,9 +9,9 @@ import type { HeightBreakpoint, WidthBreakpoint } from '@/shared/device/context'
 import {
   BREAKPOINTS,
   DEFAULT_DEVICE_FORMAT,
+  DEVICE_CONTEXT_PATH_PARAM_PREFIX,
   type DeviceContext,
   DeviceContextSchema,
-  extractDeviceContextMatrixParameters,
   parseDeviceContext,
 } from '@/shared/device/context'
 
@@ -109,7 +109,8 @@ export class DeviceService {
   }
 
   private setDeviceContextFromUrlPath(urlPath: string): void {
-    const deviceContextMatrixParameters = extractDeviceContextMatrixParameters(urlPath)
+    const deviceContextMatrixParameters =
+      this.extractDeviceContextMatrixParameters(urlPath)
     const deviceContext = !deviceContextMatrixParameters
       ? null
       : parseDeviceContext(deviceContextMatrixParameters, DeviceContextSchema)
@@ -209,6 +210,24 @@ export class DeviceService {
         mediaQueryList.removeEventListener('change', listener)
       })
     }
+  }
+
+  private extractDeviceContextMatrixParameters(
+    urlPath: string,
+  ): Record<string, string> | null {
+    const urlTree = this.router.parseUrl(urlPath)
+    if (!urlTree.root.hasChildren()) {
+      return null
+    }
+    const urlSegments = urlTree.root.children[PRIMARY_OUTLET].segments
+    if (!urlSegments.length) {
+      return null
+    }
+    const firstSegment = urlSegments[0]
+    if (firstSegment.path !== DEVICE_CONTEXT_PATH_PARAM_PREFIX) {
+      return null
+    }
+    return firstSegment.parameters
   }
 }
 

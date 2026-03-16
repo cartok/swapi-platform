@@ -6,7 +6,6 @@ import {
   DEFAULT_DEVICE_FORMAT,
   DEVICE_CONTEXT_PATH_PARAM_PREFIX,
   deviceContextToPathSegment,
-  findClosestBreakpoints,
   findClosestHeightBreakpoint,
   findClosestWidthBreakpoint,
   isDeviceFormatValid,
