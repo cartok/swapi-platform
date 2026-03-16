@@ -1,4 +1,11 @@
-import { Component, computed, effect, inject, signal } from '@angular/core'
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+} from '@angular/core'
 import { toSignal } from '@angular/core/rxjs-interop'
 import { ActivatedRoute, Router } from '@angular/router'
 import { map } from 'rxjs'
@@ -31,6 +38,7 @@ import type { InputValue } from '@/app/shared/types/component.types'
   ],
   templateUrl: './character.html',
   styleUrl: './character.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Character {
   private readonly router = inject(Router)

@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common'
-import { Component, inject, signal } from '@angular/core'
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core'
 
 import type { Film } from '@/app/api/swapi/resources/films/films.model'
 import { FilmsService } from '@/app/api/swapi/resources/films/films.service'
@@ -14,6 +14,7 @@ import { DeviceService } from '@/app/services/DeviceService'
   imports: [DatePipe, Heading, ImageGrid, ImageGridItem, DefaultPageLayout],
   templateUrl: './movies.html',
   styleUrl: './movies.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Movies {
   readonly filmsService = inject(FilmsService)

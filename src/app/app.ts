@@ -1,4 +1,4 @@
-import { Component } from '@angular/core'
+import { ChangeDetectionStrategy, Component } from '@angular/core'
 import { RouterOutlet } from '@angular/router'
 
 import { Footer } from '@/app/blocks/footer/footer'
@@ -10,6 +10,7 @@ import { Separator } from '@/app/components/separator/separator'
   imports: [RouterOutlet, Header, Footer, Separator],
   templateUrl: './app.html',
   styleUrl: './app.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class App {
   title = 'Angular Signals-based SWAPI Frontend'

@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core'
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core'
 
 import type { Person } from '@/app/api/swapi/resources/people/people.model'
 import { PeopleService } from '@/app/api/swapi/resources/people/people.service'
@@ -12,6 +12,7 @@ import { DefaultPageLayout } from '@/app/layouts/default-page-layout/default-pag
   imports: [Heading, ImageGrid, ImageGridItem, DefaultPageLayout],
   templateUrl: './characters.html',
   styleUrl: './characters.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Characters {
   readonly peopleService = inject(PeopleService)

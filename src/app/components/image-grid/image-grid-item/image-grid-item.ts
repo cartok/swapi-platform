@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core'
+import { ChangeDetectionStrategy, Component, input } from '@angular/core'
 import { RouterLink } from '@angular/router'
 
 @Component({
@@ -6,6 +6,7 @@ import { RouterLink } from '@angular/router'
   imports: [RouterLink],
   templateUrl: './image-grid-item.html',
   styleUrl: './image-grid-item.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ImageGridItem {
   readonly imageUrl = input.required<string>()
