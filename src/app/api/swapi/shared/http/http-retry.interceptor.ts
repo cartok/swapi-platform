@@ -20,12 +20,7 @@ export interface RetryableHttpResourceMethodOptions {
   retryPolicy?: Partial<HttpRetryPolicy>
 }
 
-type RetryableHttpResourceMethodRequestBuilder = (
-  urlFactory: () => string | undefined,
-) => () => HttpResourceRequest | undefined
-
 const RETRYABLE_HTTP_METHODS = new Set<string>(['GET', 'HEAD'])
-
 const DEFAULT_HTTP_RETRY_POLICY: HttpRetryPolicy = {
   enabled: true,
   retryCount: 2,

@@ -1,12 +1,12 @@
 // @ts-check
-const eslint = require('@eslint/js')
-const { defineConfig } = require('eslint/config')
-const tseslint = require('typescript-eslint')
-const angular = require('angular-eslint')
-const eslintConfigPrettier = require('eslint-config-prettier')
-const simpleImportSort = require('eslint-plugin-simple-import-sort')
+import eslint from '@eslint/js'
+import { defineConfig } from 'eslint/config'
+import tseslint from 'typescript-eslint'
+import angular from 'angular-eslint'
+import eslintConfigPrettier from 'eslint-config-prettier'
+import simpleImportSort from 'eslint-plugin-simple-import-sort'
 
-module.exports = defineConfig([
+export default defineConfig([
   {
     files: ['**/*.ts'],
     extends: [
@@ -47,7 +47,7 @@ module.exports = defineConfig([
           fixStyle: 'separate-type-imports',
         },
       ],
-      '@typescript-eslint/no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': 'warn',
       '@typescript-eslint/no-empty-function': 'warn',
     },
   },

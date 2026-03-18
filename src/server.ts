@@ -12,7 +12,6 @@ import express from 'express'
 import { addDeviceContextHandler } from '@/server/device-context.handler'
 import { addDeviceCookieHandler } from '@/server/device-cookie.handler'
 import { addDeviceRedirectHandler } from '@/server/device-redirect.handler'
-import type { DeviceContext, RequestContext } from '@/shared/device/context'
 
 const serverDistFolder = dirname(fileURLToPath(import.meta.url))
 const browserDistFolder = resolve(serverDistFolder, '../browser')

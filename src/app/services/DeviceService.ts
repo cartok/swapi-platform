@@ -78,10 +78,6 @@ export class DeviceService {
   readonly isDesktop = computed(() => this.format() === this.FORMAT.DESKTOP)
 
   constructor() {
-    this.init()
-  }
-
-  init(): void {
     if (this.initialized) {
       return
     }

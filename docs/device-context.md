@@ -102,33 +102,29 @@ Entscheidung: Per prefix routes.
 
 #### TODOs
 
-- Device Context / Breakpoints
-  - DeviceService anwenden
+- Grundlegend
+  - CSR-Switch für Github Pages: Per branch name oder so
+  - Fallback Mechanimsus abschließen
+    - Grundlegend die device init page incl. redirect umsetzen
+    - Cookie und header daten vereinen
+    - Fallback Logik die über die device init seite entscheidet sollte gut und togglebar sein
+  - Touch/Hover Geschichte abschließen / bereinigen oder erstmal entfernen
+    - Sollte für touch prüfung js touchpoints check hinzugenommen werden?
+      ```js
+      const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0
+      ```
 
 ---
 
-- Fallback Mechanimsus
-  - Grundlegend die device init page incl. redirect umsetzen
-  - Cookie und header daten vereinen
-  - Fallback Logik die über die device init seite entscheidet sollte gut und togglebar sein
-- Touch/Hover Geschichte abschließen / bereinigen oder erstmal entfernen
-  - Sollte für touch prüfung js touchpoints check hinzugenommen werden?
-    ```js
-    const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0
-    ```
-
----
-
-- Grundlegende Finalisierungen
-  [] Image Grids sind optimiert
-  [] Link Lists sind optimiert
-  [] Github Pages ist wieder funktionsfähig
-
----
-
-- Eventuelle Verbesserungen
+- Eventuelle Verbesserungen:
+  - Wenn alle Header initial bereits vorhanden sind, könnte man theoretisch URL Rewrite statt HTTP redirect verweden um den Redirect zu sparen. Ist dann aber nach wie vor das Thema, dass man dann die Dokumente, falls sauber möglich über Header unterscheidbar machen müsste und wenn das implementiert ist, könnte man auch vollständig auf die HTTP Redirection verzichten.
   - Noch mal gegen prüfen ob man das nicht doch incl. SSG auch ohne URL parameter robust lösen kann, dann könnte man URL rewrite statt redirect verwenden und / sich den redirect sparen und hätte eine saubere URL. Caching muss passen.
+  - Ggf. die Express module etwas umgestalten, gucken wie das idr. gemacht wird.
   - Der Mix aus den unfertigen Schemas und der Definition der Breakpoints hier, ist nicht gut. Idee war ja grundlegend von der Architektur her mal zu gucken wie es aussehen würde möglichst Server- und Sprach-neutral die Schnittmenge an Informationen zu definieren die auf beiden Seiten gebraucht werden. Auch der Workaround mit dem d.ts File für den Cookie Validator gefällt mir nicht.
+
+---
+
+- Outsiders:
   - Taskfile oder ähnliches verwenden statt npm scripts, allein wegen der code generation
   - `NgOptimizedImage` nutzen
-  - Eventuell schlechte Architektur von `app-image-grid-item`: Könnte <img> rein geben, dann kann ich dessen loading hier direkt steuern. Alternativ gucken wie und ob ich durch reiche vs abstrahiere (evtl. unnötige Komplexität). Könnte dann auch den Link als slot definieren aber first things first.
+  - Eventuell schlechte Architektur von `app-image-grid-item`: Könnte <img> rein geben, dann kann ich dessen loading hier direkt steuern. Alternativ gucken wie und ob ich durch reiche vs abstrahiere (evtl. unnötige Komplexität).

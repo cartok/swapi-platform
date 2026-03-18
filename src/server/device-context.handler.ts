@@ -21,7 +21,7 @@ export function addDeviceContextHandler(server: express.Express): void {
     const heightHeader = req.get('sec-ch-viewport-height')
 
     // Parse headers and store them.
-    // TODO: Add, inject and process info from device cookie
+    // TODO: Add, inject and process info from device cookie but outside.
     const headerDeviceFormat = parseDeviceFormatHeaders({
       formFactorsHeader,
       mobileHeader,

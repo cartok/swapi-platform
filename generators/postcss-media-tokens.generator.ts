@@ -1,4 +1,4 @@
-import { BREAKPOINTS } from 'breakpoints'
+import { BREAKPOINTS } from '@/shared/device/context'
 import fs from 'node:fs/promises'
 
 const widthTokenLines = BREAKPOINTS.width.map(

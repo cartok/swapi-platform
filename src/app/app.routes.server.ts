@@ -53,7 +53,6 @@ export const serverRoutes: ServerRoute[] = [
   },
   {
     path: '**',
-    // TODO: Temporär alles andere auf CSR umgestellt.
     renderMode: RenderMode.Server,
   },
 ]

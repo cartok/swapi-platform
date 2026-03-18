@@ -1,4 +1,3 @@
-import { DefaultUrlSerializer, PRIMARY_OUTLET } from '@angular/router'
 import type { Static } from '@sinclair/typebox'
 import { Type } from '@sinclair/typebox'
 import { Value } from '@sinclair/typebox/value'

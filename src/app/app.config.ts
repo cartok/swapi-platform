@@ -27,7 +27,7 @@ export const appConfig: ApplicationConfig = {
         paramsInheritanceStrategy: 'always',
       }),
     ),
-    provideEnvironmentInitializer(() => inject(DeviceService).init()),
+    provideEnvironmentInitializer(() => inject(DeviceService)),
     provideHttpClient(withFetch(), withInterceptors([httpRetryInterceptor])),
   ],
 }
