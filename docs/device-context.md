@@ -103,7 +103,10 @@ Entscheidung: Per prefix routes.
 #### TODOs
 
 - Grundlegend
-  - CSR-Switch für Github Pages: Per branch name oder so
+  - vanilla-extract-css refactoring
+  - CSR-Switch für Github Pages: Per branch name oder so -> vite build (wip)
+    - Non-SSR device context defaults überprüfen
+  - Unit Tests fixen
   - Fallback Mechanimsus abschließen
     - Grundlegend die device init page incl. redirect umsetzen
     - Cookie und header daten vereinen
