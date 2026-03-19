@@ -10,6 +10,8 @@
   "typescript.preferences.preferTypeOnlyAutoImports": false,
   "typescript.suggest.includeCompletionsForImportStatements": true,
   "typescript.updateImportsOnFileMove.enabled": "prompt",
+  "debug.terminal.clearBeforeReusing": true,
+  "debug.terminal.keepOnExit": false,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
   },

@@ -12,6 +12,7 @@
     "build:client": "vite build",
     "build:server": "vite build --ssr server/express/server.prod.ts --outDir ../dist/vite/server --emptyOutDir false",
     "build:prerender": "vite build --ssr server/angular/prerender.ts --outDir ../dist/vite/server --emptyOutDir false && node dist/vite/server/prerender.js",
+    "start": "node dist/vite/server/server.prod.js",
     "dev": "vite",
     "dev:server": "bun run build:prerender && bunx tsx --watch src/server/express/server.dev.ts",
     "test": "ng test --watch=false",

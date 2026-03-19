@@ -48,8 +48,8 @@ Installation und Start:
 
 ```bash
 bun install
-bun run generate
-bun run start
+bun bun run dev:server
+bun bun run dev
 ```
 
 App lokal:
@@ -58,8 +58,10 @@ App lokal:
 
 ## Verfügbare Scripts
 
-- `bun run start` startet den Dev-Server
+- `bun run dev:server` startet den Server für die Entwicklung
+- `bun run dev` startet den Client für die Entwicklung
 - `bun run build` erstellt den Production-Build
+- `bun run start` startet den Production-Build
 - `bun run test` startet Unit-Tests
 - `bun run lint` führt Typecheck, Angular-Lint und Prettier-Check aus
 - `bun run fix` führt Lint-Fixes und Formatierung aus

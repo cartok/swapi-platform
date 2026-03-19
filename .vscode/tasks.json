@@ -1,82 +1,22 @@
 {
-  // For more information, visit: https://go.microsoft.com/fwlink/?LinkId=733558
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "serve:ssr:inspect",
+      "label": "build:prerender",
       "type": "shell",
-      "command": "bunx ng serve --inspect=9229",
-      "isBackground": true,
-      "problemMatcher": {
-        "owner": "typescript",
-        "pattern": "$tsc",
-        "background": {
-          "activeOnStart": true,
-          "beginsPattern": {
-            "regexp": "(.*?)"
-          },
-          "endsPattern": {
-            "regexp": "Watch mode enabled|Application bundle generation complete"
-          }
-        }
-      }
-    },
-    {
-      "label": "build:ssr:watch",
-      "type": "shell",
-      "command": "bunx ng build --watch --configuration development",
-      "isBackground": true,
-      "problemMatcher": {
-        "owner": "typescript",
-        "pattern": "$tsc",
-        "background": {
-          "activeOnStart": true,
-          "beginsPattern": {
-            "regexp": "(.*?)"
-          },
-          "endsPattern": {
-            "regexp": "bundle generation complete"
-          }
-        }
-      }
-    },
-    {
-      "type": "shell",
-      "label": "start",
-      "command": "bun run start",
-      "isBackground": true,
-      "problemMatcher": {
-        "owner": "typescript",
-        "pattern": "$tsc",
-        "background": {
-          "activeOnStart": true,
-          "beginsPattern": {
-            "regexp": "(.*?)"
-          },
-          "endsPattern": {
-            "regexp": "bundle generation complete"
-          }
-        }
-      }
-    },
-    {
-      "type": "shell",
-      "label": "test",
-      "command": "bun run test",
-      "isBackground": true,
-      "problemMatcher": {
-        "owner": "typescript",
-        "pattern": "$tsc",
-        "background": {
-          "activeOnStart": true,
-          "beginsPattern": {
-            "regexp": "(.*?)"
-          },
-          "endsPattern": {
-            "regexp": "bundle generation complete"
-          }
-        }
-      }
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "command": "bun run build:prerender",
+      "presentation": {
+        "reveal": "never",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": true,
+        "close": true
+      },
+      "problemMatcher": []
     }
   ]
 }
