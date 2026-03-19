@@ -41,6 +41,7 @@ Talk to me in german, even if I sometimes talk in english or mix both up.
 - Functions should have explicit return types in their signature
 - Ensure that you've read the linting rules in [eslint.config.js](eslint.config.js)
 - Generally don't `export` things that are not used anywhere outside!
+- Generally inline type definitions like function parameters, if they are not considered to be exported.
 
 ## Angular Best Practices
 

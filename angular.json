@@ -31,7 +31,7 @@
               "allowedHosts": []
             },
             "ssr": {
-              "entry": "src/server/express/server.ts"
+              "entry": "src/server/express/server.prod.ts"
             }
           },
           "configurations": {

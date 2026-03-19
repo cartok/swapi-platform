@@ -7,8 +7,9 @@ import {
   deviceContextToPathSegment,
   isDeviceContextPathSegment,
 } from '@/shared/device/context'
+import { isProdEnvironment } from '@/shared/environment/is-prod'
 
-const isProd = process.env['NODE_ENV'] === 'production'
+const isProd = isProdEnvironment()
 const JUST_REDIRECTED_COOKIE_KEY = 'justRedirected'
 
 export function addDeviceRedirectHandler(server: express.Express): void {

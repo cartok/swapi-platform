@@ -4,8 +4,9 @@ import type { ParamsDictionary } from 'express-serve-static-core'
 
 import type { DeviceCookie } from '@/generated/types/device-cookie.types'
 import { validate } from '@/generated/validators/device-cookie.validator.js'
+import { isProdEnvironment } from '@/shared/environment/is-prod'
 
-const isProd = process.env['NODE_ENV'] === 'production'
+const isProd = isProdEnvironment()
 const DEVICE_COOKIE_KEY = 'device'
 
 export function addDeviceCookieHandler(server: express.Express): void {
