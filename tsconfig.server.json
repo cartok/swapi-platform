@@ -2,17 +2,13 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "./out-tsc/server",
-    "types": ["node"],
+    "types": ["node", "vite/client"],
     "allowJs": true
   },
   "include": [
-    "src/server.ts",
     "src/server/**/*.ts",
-    "src/main.server.ts",
-    "src/app/app.config.server.ts",
-    "src/app/app.routes.server.ts",
     "generated/**/*.ts",
     "generated/**/*.mts",
-    "generated/**/*.mjs"
+    "generated/**/*.js"
   ]
 }

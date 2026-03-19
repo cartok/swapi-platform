@@ -8,14 +8,21 @@ export default defineConfig({
   root: './src',
   publicDir: '../public',
   build: {
-    outDir: '../dist/vite',
+    outDir: '../dist/vite/client',
     emptyOutDir: true,
     sourcemap: true,
   },
   resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
-    },
+    alias: [
+      {
+        find: '@/generated',
+        replacement: fileURLToPath(new URL('./generated', import.meta.url)),
+      },
+      {
+        find: '@',
+        replacement: fileURLToPath(new URL('./src', import.meta.url)),
+      },
+    ],
     mainFields: ['module'],
   },
   server: {

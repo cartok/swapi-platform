@@ -51,9 +51,8 @@ export function addDeviceRedirectHandler(server: express.Express): void {
 }
 
 function createDeviceContextUrl(originalUrl: string, deviceContextPathSegment: string) {
-  const pathWithoutTrailingSlash = removeTrailingSlash(originalUrl)
-
-  const tempUrl = new URL(pathWithoutTrailingSlash, 'http://1337') // host is not necessary
+  const tempUrl = new URL(originalUrl, 'http://1337') // host is not necessary
+  const hadTrailingSlash = tempUrl.pathname.length > 1 && tempUrl.pathname.endsWith('/')
   const segments = tempUrl.pathname.split('/')
   segments.shift()
 
@@ -66,11 +65,9 @@ function createDeviceContextUrl(originalUrl: string, deviceContextPathSegment: s
   }
 
   const path = '/' + [deviceContextPathSegment, ...segments].join('/')
-  const url = path + tempUrl.search
+  const pathWithTrailingSlash =
+    hadTrailingSlash || tempUrl.pathname === '/' ? `${path}/` : path
+  const url = pathWithTrailingSlash + tempUrl.search
 
   return url
-}
-
-function removeTrailingSlash(value: string) {
-  return value.replace(/\/$|\/(\?.*)$/, '$1')
 }

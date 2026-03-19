@@ -25,13 +25,13 @@
               }
             ],
             "styles": ["src/styles.css"],
-            "server": "src/main.server.ts",
+            "server": "src/server/angular/main.server.ts",
             "outputMode": "server",
             "security": {
               "allowedHosts": []
             },
             "ssr": {
-              "entry": "src/server.ts"
+              "entry": "src/server/express/server.ts"
             }
           },
           "configurations": {

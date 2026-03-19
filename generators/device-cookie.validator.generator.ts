@@ -13,8 +13,9 @@ const validate = ajv.compile(schema)
 
 const BASE_NAME = 'device-cookie.validator'
 const validator = standaloneCode(ajv, validate)
+// TODO: build & start um zu gucken ob mjs extension nötig wäre
 const dts = `
-declare module '@/generated/validators/${BASE_NAME}.mjs' {
+declare module '@/generated/validators/${BASE_NAME}.js' {
   export const validate: (<T>(data: unknown) => data is T) & {
     errors: null | {
       instancePath: string,
@@ -28,7 +29,7 @@ declare module '@/generated/validators/${BASE_NAME}.mjs' {
 }
 `
 const outputDir = new URL('../generated/validators/', import.meta.url)
-const outputFile = new URL(`${BASE_NAME}.mjs`, outputDir)
+const outputFile = new URL(`${BASE_NAME}.js`, outputDir)
 const outputFileDts = new URL(`${BASE_NAME}.d.ts`, outputDir)
 
 await fs.mkdir(outputDir, { recursive: true })
