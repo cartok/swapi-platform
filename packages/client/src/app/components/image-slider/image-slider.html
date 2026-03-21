@@ -1,0 +1,51 @@
+<div class="image-slider">
+  <div
+    class="viewport"
+    appSwipe
+    [style]="{ height: `${viewportHeight()}px` }"
+    (swipeStart)="enableDraggingCursor()"
+    (swipeEnd)="disableDraggingCursor()"
+    (swipeCancel)="disableDraggingCursor()"
+    (swipeLeft)="incrementActiveIndex()"
+    (swipeRight)="decrementActiveIndex()"
+  >
+    // eslint-disable-next-line @angular-eslint/template/no-inline-styles
+    <div
+      class="slides"
+      [class.slides-swiping]="isSwiping()"
+      [style]="{ transform: `translateX(${slidesTranslateX()})` }"
+    >
+      @for (image of images(); track $index) {
+        <div class="slide">
+          <img
+            class="image"
+            decoding="async"
+            i18n-decoding
+            [ngSrc]="image.url"
+            [alt]="image.alt"
+            [width]="image.width"
+            [height]="image.height"
+            [priority]="$first"
+          />
+        </div>
+      }
+    </div>
+  </div>
+  <div class="indicators" aria-hidden="true">
+    @for (image of images(); track $index) {
+      <button
+        type="button"
+        class="indicator"
+        [class.indicator-active]="$index === activeIndex()"
+        (click)="setActiveIndex($index)"
+      >
+        <svg width="11" height="11" aria-hidden="true" focusable="false">
+          <use
+            href="assets/svg-sprite-sheet/build/sprite-sheet.e12f08b580e7ccf1473c0a9c4f93af72c96f622d9c82a2554e31c36f1c78c626
+.svg#circle"
+          />
+        </svg>
+      </button>
+    }
+  </div>
+</div>

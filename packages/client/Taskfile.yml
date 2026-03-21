@@ -1,0 +1,35 @@
+version: '3'
+run: once
+set: [pipefail]
+
+tasks:
+  clean:
+    cmds:
+      - rm -rf ./dist ./src/dist
+      - rm -rf ./node_modules
+
+  dev:
+    cmds:
+      - bunx vite --config ./vite.config.ts
+
+  build:dev:
+    cmds:
+      - task: clean
+      - bunx vite build --config ./vite.config.ts --outDir ../dist/dev/browser --emptyOutDir
+
+  build:prod:
+    cmds:
+      - task: clean
+      - bunx vite build --config ./vite.config.ts --outDir ../dist/prod/browser --emptyOutDir
+
+  build:ssr:bundle:
+    cmds:
+      - bunx vite build --config ./vite.config.ts --ssr ./server/main.server.ts --outDir ../dist/server --emptyOutDir
+
+  test:
+    cmds:
+      - bunx vitest run
+
+  test:watch:
+    cmds:
+      - bunx vitest

@@ -1,0 +1,37 @@
+<div class="image-grid-item">
+  <div class="image-wrapper">
+    @let i = index();
+    <img
+      class="image"
+      decoding="async"
+      fill
+      [ngSrc]="imageUrl()"
+      [alt]="imageAlt()"
+      [priority]="
+        device.isMaxWidth(device.WIDTH.W768)
+          ? i <= 1
+          : device.isMaxWidth(device.WIDTH.W1100)
+            ? i <= 2
+            : i <= 4
+      "
+    />
+  </div>
+  <div class="description-container">
+    <div class="g-title-3">
+      <span class="g-truncate-1">
+        {{ label() }}
+      </span>
+    </div>
+    <div class="g-text-2 description">
+      <ng-content />
+    </div>
+    <a
+      #link
+      class="g-label-3 link"
+      [routerLink]="linkUri()"
+      [attr.aria-label]="link.textContent.trim()"
+    >
+      More information...
+    </a>
+  </div>
+</div>

@@ -103,19 +103,33 @@ Entscheidung: Per prefix routes.
 #### TODOs
 
 - Grundlegend
+  - Taskfile:
+    - code generation als deps
+    - code generation caching
+    - symlinks + cli autocompletion
   - vanilla-extract-css refactoring
-  - CSR-Switch für Github Pages: Per branch name oder so -> vite build (wip)
-    - Non-SSR device context defaults überprüfen
-  - Unit Tests fixen
-  - Fallback Mechanimsus abschließen
-    - Grundlegend die device init page incl. redirect umsetzen
-    - Cookie und header daten vereinen
-    - Fallback Logik die über die device init seite entscheidet sollte gut und togglebar sein
-  - Touch/Hover Geschichte abschließen / bereinigen oder erstmal entfernen
-    - Sollte für touch prüfung js touchpoints check hinzugenommen werden?
-      ```js
-      const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0
-      ```
+  - Vite build Optimierungen einbauen, anhand alter angular.json
+
+---
+
+- CSR für Github Pages
+  - Non-SSR device context defaults überprüfen
+- Unit Tests fixen
+
+---
+
+- Fallback Mechanimsus abschließen
+  - Grundlegend die device init page incl. redirect umsetzen
+  - Cookie und header daten vereinen
+  - Fallback Logik die über die device init seite entscheidet sollte gut und togglebar sein
+
+---
+
+- Touch/Hover Geschichte abschließen / bereinigen oder erstmal entfernen
+  - Sollte für touch prüfung js touchpoints check hinzugenommen werden?
+    ```js
+    const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0
+    ```
 
 ---
 

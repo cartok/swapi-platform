@@ -9,7 +9,7 @@ const config = {
   singleQuote: true,
   overrides: [
     {
-      files: '*.html',
+      files: './packages/client/src/**/*.html',
       options: {
         parser: 'angular',
       },

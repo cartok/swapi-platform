@@ -1,0 +1,41 @@
+{
+  "name": "@swapi/shared",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@sinclair/typebox": "^0.34.48"
+  },
+  "devDependencies": {
+    "@go-task/cli": "3.49.1",
+    "ajv": "^8.18.0",
+    "quicktype": "^23.2.6"
+  },
+  "exports": {
+    "./device/context": {
+      "types": "./src/device/context.ts",
+      "default": "./dist/device/context.js"
+    },
+    "./environment/is-prod": {
+      "types": "./src/environment/is-prod.ts",
+      "default": "./dist/environment/is-prod.js"
+    },
+    "./routing/path": {
+      "types": "./src/routing/path.ts",
+      "default": "./dist/routing/path.js"
+    },
+    "./routing/ssg-paths": {
+      "types": "./src/routing/ssg-paths.ts",
+      "default": "./dist/routing/ssg-paths.js"
+    },
+    "./generated/types/*": "./generated/types/*.ts",
+    "./generated/validators/*": {
+      "types": "./generated/validators/*.d.ts",
+      "default": "./generated/validators/*.js"
+    },
+    "./generated/validators/*.js": {
+      "types": "./generated/validators/*.d.ts",
+      "default": "./generated/validators/*.js"
+    },
+    "./generated/*": "./generated/*"
+  }
+}

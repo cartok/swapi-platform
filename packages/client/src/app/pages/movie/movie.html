@@ -1,0 +1,68 @@
+<app-detail-page-layout>
+  @let data = item.data();
+
+  @if (data) {
+    <app-heading
+      resourceDetailHeading
+      location="Film Details"
+      [title]="data.title"
+      [subtitle]="`Episode ${data.episodeId}`"
+    />
+  }
+
+  @if (data) {
+    <section resourceDetailDetails aria-labelledby="details-heading">
+      <app-labeled-box>
+        <h2 #label class="g-title-3" id="details-heading">Details:</h2>
+        <app-row-description-list [items]="descriptionRows()" />
+      </app-labeled-box>
+      <p class="g-text-1 description">{{ data.openingCrawl }}</p>
+    </section>
+  }
+
+  @if (data && data.images.length) {
+    <app-image-slider
+      resourceDetailSlider
+      [images]="data.images"
+      [viewportHeight]="374"
+    />
+  }
+
+  @if (data && data.characterIds.length) {
+    <app-labeled-box
+      resourceDetailLinks
+      appVisibleTrigger
+      (becameVisible)="onCharacterLinksVisible()"
+    >
+      <h2 #label class="g-title-3" id="details-heading">Characters:</h2>
+      @if (characterItems().length) {
+        <app-link-list>
+          @for (character of characterItems(); track $index) {
+            <app-link-list-item [linkUri]="['/character', character.id]">
+              {{ character.name }}
+            </app-link-list-item>
+          }
+        </app-link-list>
+      }
+    </app-labeled-box>
+  }
+
+  @if (data && data.planetIds.length) {
+    <app-labeled-box
+      resourceDetailLinks
+      appVisibleTrigger
+      (becameVisible)="onPlanetLinksVisible()"
+    >
+      <h2 #label class="g-title-3" id="details-heading">Planets:</h2>
+      @if (planetItems().length) {
+        <app-link-list>
+          @for (planet of planetItems(); track $index) {
+            <app-link-list-item [linkUri]="['/planet', planet.id]">
+              {{ planet.name }}
+            </app-link-list-item>
+          }
+        </app-link-list>
+      }
+    </app-labeled-box>
+  }
+</app-detail-page-layout>

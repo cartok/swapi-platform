@@ -1,0 +1,97 @@
+version: '3'
+run: once
+set: [pipefail]
+
+includes:
+  client:
+    taskfile: ./packages/client
+    dir: ./packages/client
+  server:
+    taskfile: ./packages/server
+    dir: ./packages/server
+  shared:
+    taskfile: ./packages/shared
+    dir: ./packages/shared
+
+tasks:
+  clean:
+    deps:
+      - task: client:clean
+      - task: server:clean
+      - task: shared:clean
+    cmds:
+      - rm -rf ./dist
+
+  dev:
+    deps:
+      - task: build:shared
+    cmds:
+      - bun i
+      - task: client:dev
+
+  dev:server:
+    deps:
+      - task: build:shared
+    cmds:
+      # TODO: Das ist noch Müll.
+      - task: client:build:dev
+      - task: client:build:ssr:bundle
+      - task: server:dev:start
+
+  build:
+    deps:
+      - task: build:shared
+    cmds:
+      - task: build:client
+      - task: server:build
+
+  build:shared:
+    deps:
+      - task: shared:generate
+      - task: shared:build
+
+  build:client:
+    deps:
+      - task: client:build:prod
+      - task: client:build:ssr:bundle
+
+  lint:
+    cmds:
+      - task: lint:tsc
+      - task: lint:eslint
+      - task: lint:prettier
+
+  lint:tsc:
+    deps:
+      - task: lint:tsc:client
+      - task: lint:tsc:server
+      - task: lint:tsc:shared
+
+  lint:tsc:client:
+    cmds:
+      - bunx tsc --noEmit -p packages/client/tsconfig.app.json
+
+  lint:tsc:server:
+    cmds:
+      - bunx tsc --noEmit -p packages/server/tsconfig.server.json
+
+  lint:tsc:shared:
+    cmds:
+      - bunx tsc --noEmit -p packages/shared/tsconfig.shared.json
+
+  lint:eslint:
+    cmds:
+      - bunx eslint .
+
+  lint:prettier:
+    cmds:
+      - bunx prettier --check .
+
+  fix:
+    cmds:
+      - bunx eslint . --fix
+      - task: format
+
+  format:
+    cmds:
+      - bunx prettier --write --list-different .

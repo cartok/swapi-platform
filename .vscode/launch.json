@@ -7,7 +7,7 @@
       "type": "node-terminal",
       "request": "launch",
       "cwd": "${workspaceFolder}",
-      "command": "node --import tsx --watch src/server/express/server.dev.ts",
+      "command": "node --import tsx --watch packages/server/src/express/server.dev.ts",
       "preLaunchTask": "build:prerender",
       "skipFiles": ["<node_internals>/**"]
     }

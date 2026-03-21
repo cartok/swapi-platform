@@ -1,0 +1,62 @@
+<app-detail-page-layout>
+  @let data = item.data();
+
+  @if (data) {
+    <app-heading resourceDetailHeading location="Planet Details" [title]="data.name" />
+  }
+
+  @if (data) {
+    <section resourceDetailDetails aria-labelledby="details-heading">
+      <app-labeled-box>
+        <h2 #label class="g-title-3" id="details-heading">Details:</h2>
+        <app-row-description-list [items]="descriptionRows()" />
+      </app-labeled-box>
+    </section>
+  }
+
+  @if (data && data.images.length) {
+    <app-image-slider
+      resourceDetailSlider
+      [images]="data.images"
+      [viewportHeight]="374"
+    />
+  }
+
+  @if (data && data.residentIds.length) {
+    <app-labeled-box
+      resourceDetailLinks
+      appVisibleTrigger
+      (becameVisible)="onResidentLinksVisible()"
+    >
+      <h2 #label class="g-title-3" id="details-heading">Residents:</h2>
+      @if (residentItems().length) {
+        <app-link-list>
+          @for (resident of residentItems(); track $index) {
+            <app-link-list-item [linkUri]="['/character', resident.id]">
+              {{ resident.name }}
+            </app-link-list-item>
+          }
+        </app-link-list>
+      }
+    </app-labeled-box>
+  }
+
+  @if (data && data.filmIds.length) {
+    <app-labeled-box
+      resourceDetailLinks
+      appVisibleTrigger
+      (becameVisible)="onFilmLinksVisible()"
+    >
+      <h2 #label class="g-title-3" id="details-heading">Films:</h2>
+      @if (filmItems().length) {
+        <app-link-list>
+          @for (film of filmItems(); track $index) {
+            <app-link-list-item [linkUri]="['/movie', film.id]">
+              {{ film.title }}
+            </app-link-list-item>
+          }
+        </app-link-list>
+      }
+    </app-labeled-box>
+  }
+</app-detail-page-layout>

@@ -1,0 +1,25 @@
+{
+  "name": "@swapi/server",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./server": "./src/server.ts",
+    "./server.prod": "./src/server.prod.ts",
+    "./prerender": "./src/prerender.ts"
+  },
+  "dependencies": {
+    "@angular/compiler": "21.2.5",
+    "@angular/ssr": "21.2.3",
+    "@swapi/client": "workspace:*",
+    "@swapi/shared": "workspace:*",
+    "cookie-parser": "^1.4.7",
+    "express": "^5.2.1",
+    "structured-headers": "^2.0.2"
+  },
+  "devDependencies": {
+    "@go-task/cli": "3.49.1",
+    "@types/cookie-parser": "^1.4.10",
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.3.5"
+  }
+}

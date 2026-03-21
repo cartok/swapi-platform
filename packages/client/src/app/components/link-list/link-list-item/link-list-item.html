@@ -1,0 +1,9 @@
+<a
+  class="g-label-2 link-list-item"
+  [routerLink]="linkUri()"
+  [attr.aria-labelledby]="content.textContent.trim()"
+>
+  <span #content class="g-truncate-1">
+    <ng-content />
+  </span>
+</a>
