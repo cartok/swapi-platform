@@ -2,7 +2,8 @@
   "search.exclude": {
     "**/node_modules": true,
     "**/.angular": true,
-    "**/dist": true
+    "**/dist": true,
+    "**/*.lock": true
   },
   "files.associations": {},
   "editor.wordBasedSuggestions": "matchingDocuments",
