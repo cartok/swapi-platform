@@ -2,51 +2,25 @@ version: '3'
 run: once
 set: [pipefail]
 
-vars:
-  CLIENT_DEV_BROWSER_DIST: ../client/dist/dev/browser
-  CLIENT_PROD_BROWSER_DIST: ../client/dist/prod/browser
-  SERVER_DEV_PUBLIC_DIST: ./dist/dev/public
-  SERVER_PROD_PUBLIC_DIST: ./dist/prod/public
+includes:
+  client:
+    taskfile: ../client
+    dir: ../client
 
 tasks:
-  clean:
+  dev:
     cmds:
-      - rm -rf ./dist
-      - rm -rf ./node_modules
+      - task: dev:start
 
-  assemble:dev:
+  dev:ssg:
     cmds:
-      - rm -rf {{.SERVER_DEV_PUBLIC_DIST}}
-      - mkdir -p {{.SERVER_DEV_PUBLIC_DIST}}
-      - cp -R {{.CLIENT_DEV_BROWSER_DIST}}/. {{.SERVER_DEV_PUBLIC_DIST}}
-
-  assemble:build:
-    cmds:
-      - rm -rf {{.SERVER_PROD_PUBLIC_DIST}}
-      - mkdir -p {{.SERVER_PROD_PUBLIC_DIST}}
-      - cp -R {{.CLIENT_PROD_BROWSER_DIST}}/. {{.SERVER_PROD_PUBLIC_DIST}}
-
-  dev:prepare:
-    cmds:
-      - rm -rf ./dist/dev
-      - task: assemble:dev
-      - PRERENDER_PUBLIC_DIR={{.SERVER_DEV_PUBLIC_DIST}} node --import tsx ./src/prerender.ts
+      - rm -rf ./dist/dev || true
+      - bunx --no-install tsx ./src/prerender.ts
 
   dev:start:
     cmds:
-      - CLIENT_DIST_DIR={{.SERVER_DEV_PUBLIC_DIST}} node --watch --import tsx ./src/server.dev.ts
-
-  dev:
-    cmds:
-      - task: dev:prepare
-      - task: dev:start
+      - bunx --no-install tsx --watch ./src/server.ts
 
   build:
     cmds:
-      - task: clean
-      - task: assemble:build
-      - PRERENDER_PUBLIC_DIR={{.SERVER_PROD_PUBLIC_DIST}} node --import tsx ./src/prerender.ts
-
-  start:
-    cmds:
-      - CLIENT_DIST_DIR={{.SERVER_PROD_PUBLIC_DIST}} node --import tsx ./src/server.prod.ts
+      - bunx --no-install tsc ./src/server.ts

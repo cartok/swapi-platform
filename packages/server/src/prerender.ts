@@ -16,22 +16,24 @@ const angular = new CommonEngine({
   providers: [{ provide: ɵSERVER_CONTEXT, useValue: 'ssg' }],
 })
 
-const serverDistFolder = dirname(fileURLToPath(import.meta.url))
-const browserDistFolder =
-  process.env['PRERENDER_PUBLIC_DIR'] ?? resolve(serverDistFolder, '..', 'public')
-const indexHtmlPath = resolve(browserDistFolder, 'index.html')
+const scriptDir = dirname(fileURLToPath(import.meta.url))
+const clientDistFolder = resolve(
+  scriptDir,
+  '../../client/dist/production/production/browser',
+)
+const indexHtml = resolve(clientDistFolder, 'index.html')
 const origin = 'http://localhost:4000'
 
 for (const path of SSG_PATHS) {
   const html = await angular.render({
     url: new URL(`/${path}`, origin).toString(),
-    documentFilePath: indexHtmlPath,
-    publicPath: browserDistFolder,
+    documentFilePath: indexHtml,
+    publicPath: clientDistFolder,
   })
-  const outputFilePath = resolve(browserDistFolder, path, 'index.html')
+  const outputFilePath = resolve(clientDistFolder, path, 'index.html')
   console.log(`SSG: Rendered /${path}/index.html`)
   await mkdir(dirname(outputFilePath), { recursive: true })
   await writeFile(outputFilePath, html, 'utf8')
 }
 
-console.log(`Prerendered ${String(SSG_PATHS.length)} routes into ${browserDistFolder}`)
+console.log(`Prerendered ${String(SSG_PATHS.length)} routes into ${clientDistFolder}`)

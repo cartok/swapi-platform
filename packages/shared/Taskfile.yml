@@ -3,17 +3,18 @@ run: once
 set: [pipefail]
 
 tasks:
-  clean:
-    cmds:
-      - rm -rf ./dist ./generated
-      - rm -rf ./node_modules
-
   build:
     cmds:
-      - rm -rf ./dist
-      - bunx tsc -p ./tsconfig.build.json
+      - rm -rf ./dist || true
+      - bunx --no-install tsc -p ./tsconfig.build.json
 
   generate:
+    cmds:
+      - rm -rf ./generated || true
+      - task: i:generate
+
+  i:generate:
+    internal: true
     deps:
       - task: generate:device-cookie:types
       - task: generate:device-cookie:validator
@@ -31,17 +32,18 @@ tasks:
     generates:
       - ./generated/types/device-cookie.types.ts
     cmds:
+      - rm -rf ./generated/types || true
       - mkdir -p ./generated/types
-      - |
-        bunx quicktype \
-          --src ./generators/device-cookie.schema.json \
-          --src-lang schema \
-          --lang typescript \
-          --nice-property-names \
-          --readonly \
-          --top-level DeviceCookie \
-          --out ./generated/types/device-cookie.types.ts \
-          --just-types
+      - >
+        bunx --no-install quicktype
+        --src ./generators/device-cookie.schema.json
+        --src-lang schema
+        --lang typescript
+        --nice-property-names
+        --readonly
+        --top-level DeviceCookie
+        --out ./generated/types/device-cookie.types.ts
+        --just-types
 
   generate:device-cookie:validator:
     preconditions:
@@ -59,6 +61,7 @@ tasks:
       - ./generated/validators/device-cookie.validator.js
       - ./generated/validators/device-cookie.validator.d.ts
     cmds:
+      - rm -rf ./generated/validators || true
       - mkdir -p ./generated/validators
       - node --import tsx ./generators/device-cookie.validator.generator.ts
 
@@ -77,5 +80,6 @@ tasks:
     generates:
       - ./generated/css/media.css
     cmds:
+      - rm -rf ./generated/css || true
       - mkdir -p ./generated/css
       - node --import tsx ./generators/postcss-media-tokens.generator.ts

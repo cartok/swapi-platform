@@ -2,34 +2,50 @@ version: '3'
 run: once
 set: [pipefail]
 
+# TODO: Eigentlich muss shared gebaut werden. Sollte ich das shared Taskfile jeweils importieren
+# oder doch alles in einem Task file zusammen bauen?
 tasks:
-  clean:
-    cmds:
-      - rm -rf ./dist ./src/dist
-      - rm -rf ./node_modules
-
   dev:
     cmds:
-      - bunx vite --config ./vite.config.ts
+      - bunx --no-install vite --config ./vite.config.ts
 
-  build:dev:
+  dev:ssr:
     cmds:
-      - task: clean
-      - bunx vite build --config ./vite.config.ts --outDir ../dist/dev/browser --emptyOutDir
+      - >
+        bunx --no-install vite build
+        --mode development
+        --config ./vite.config.ts
+        --ssr ./main.server.ts
+        --outDir ../dist/local/development/ssr
+        --watch
+        --emptyOutDir
+
+  build:
+    deps:
+      - task: build:prod
+      - task: build:prod:ssr
 
   build:prod:
     cmds:
-      - task: clean
-      - bunx vite build --config ./vite.config.ts --outDir ../dist/prod/browser --emptyOutDir
+      - >
+        bunx --no-install vite build
+        --config ./vite.config.ts
+        --outDir ../dist/production/production/browser
+        --emptyOutDir
 
-  build:ssr:bundle:
+  build:prod:ssr:
     cmds:
-      - bunx vite build --config ./vite.config.ts --ssr ./server/main.server.ts --outDir ../dist/server --emptyOutDir
+      - >
+        bunx --no-install vite build
+        --config ./vite.config.ts
+        --ssr ./main.server.ts
+        --outDir ../dist/production/production/ssr
+        --emptyOutDir
 
   test:
     cmds:
-      - bunx vitest run
+      - bunx --no-install vitest run
 
   test:watch:
     cmds:
-      - bunx vitest
+      - bunx --no-install vitest

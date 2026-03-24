@@ -14,46 +14,37 @@ includes:
     dir: ./packages/shared
 
 tasks:
-  clean:
-    deps:
-      - task: client:clean
-      - task: server:clean
-      - task: shared:clean
-    cmds:
-      - rm -rf ./dist
-
   dev:
     deps:
-      - task: build:shared
+      - task: shared:generate
+      - task: shared:build
     cmds:
-      - bun i
       - task: client:dev
 
   dev:server:
     deps:
-      - task: build:shared
+      - task: shared:generate
+      - task: shared:build
     cmds:
-      # TODO: Das ist noch Müll.
-      - task: client:build:dev
-      - task: client:build:ssr:bundle
+      # TODO: Browser build fehlt noch für index.html für SSG.
+      # TODO: Aktuell beziehe ich main.server.js aus production/production.
+      #       Müsste ich dann nicht per env-config checks bestimmen welche Dateien
+      #       verwendet werden sollen?
+      # TODO: Müsste der SSR watcher nicht in den background?
+      - task: client:dev:ssr
       - task: server:dev:start
 
   build:
     deps:
-      - task: build:shared
+      - task: shared:generate
+      - task: shared:build
     cmds:
       - task: build:client
       - task: server:build
 
-  build:shared:
-    deps:
-      - task: shared:generate
-      - task: shared:build
-
   build:client:
     deps:
-      - task: client:build:prod
-      - task: client:build:ssr:bundle
+      - task: client:build
 
   lint:
     cmds:
@@ -69,29 +60,29 @@ tasks:
 
   lint:tsc:client:
     cmds:
-      - bunx tsc --noEmit -p packages/client/tsconfig.app.json
+      - bunx --no-install tsc --noEmit -p ./packages/client/tsconfig.app.json
 
   lint:tsc:server:
     cmds:
-      - bunx tsc --noEmit -p packages/server/tsconfig.server.json
+      - bunx --no-install tsc --noEmit -p ./packages/server/tsconfig.server.json
 
   lint:tsc:shared:
     cmds:
-      - bunx tsc --noEmit -p packages/shared/tsconfig.shared.json
+      - bunx --no-install tsc --noEmit -p ./packages/shared/tsconfig.shared.json
 
   lint:eslint:
     cmds:
-      - bunx eslint .
+      - bunx --no-install eslint .
 
   lint:prettier:
     cmds:
-      - bunx prettier --check .
+      - bunx --no-install prettier --check .
 
   fix:
     cmds:
-      - bunx eslint . --fix
+      - bunx --no-install eslint . --fix
       - task: format
 
   format:
     cmds:
-      - bunx prettier --write --list-different .
+      - bunx --no-install prettier --write --list-different .
