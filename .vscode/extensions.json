@@ -9,7 +9,8 @@
     "dbaeumer.vscode-eslint",
     "esbenp.prettier-vscode",
     "YoavBls.pretty-ts-errors",
-    "redhat.vscode-yaml"
+    "redhat.vscode-yaml",
+    "task.vscode-task"
   ],
   "unwantedRecommendations": [
     "firsttris.vscode-jest-runner",
@@ -18,6 +19,8 @@
     "vunguyentuan.vscode-postcss",
     "csstools.postcss",
     "cpylua.language-postcss",
-    "ricard.PostCSS"
+    "ricard.PostCSS",
+    "paulvarache.vscode-taskfile",
+    "iulian-radu-at.taskfile-launcher"
   ]
 }
