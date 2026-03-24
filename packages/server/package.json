@@ -2,11 +2,6 @@
   "name": "@swapi/server",
   "private": true,
   "type": "module",
-  "exports": {
-    "./server": "./src/server.ts",
-    "./server.prod": "./src/server.prod.ts",
-    "./prerender": "./src/prerender.ts"
-  },
   "dependencies": {
     "@angular/compiler": "catalog:angular",
     "@angular/ssr": "catalog:angular",
