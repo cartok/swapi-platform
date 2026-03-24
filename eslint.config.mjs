@@ -48,14 +48,13 @@ export default defineConfig(
     ],
   },
   {
+    files: ['./packages/client/vite.config.ts'],
+    extends: [tseslint.configs.disableTypeChecked],
+  },
+  {
     files: ['./packages/client/src/**/*.ts'],
     extends: [angular.configs.tsAll],
     processor: angular.processInlineTemplates,
-    languageOptions: {
-      parserOptions: {
-        projectService: true,
-      },
-    },
     rules: {
       '@angular-eslint/component-class-suffix': ['off'],
       '@angular-eslint/directive-selector': [
