@@ -1,18 +1,9 @@
 {
   "extends": "./tsconfig.json",
+  "compileOnSave": false,
   "compilerOptions": {
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "types": ["vite/client"]
-  },
-  "angularCompilerOptions": {
-    "enableI18nLegacyMessageIdFormat": false,
-    "strictTemplates": true,
-    "strictInjectionParameters": true,
-    "strictInputAccessModifiers": true,
-    "extendedDiagnostics": {
-      "checks": {
-        "nullishCoalescingNotNullable": "warning"
-      }
-    }
   },
   "include": ["./src/**/*.ts"],
   "exclude": ["./src/**/*.spec.ts"]
