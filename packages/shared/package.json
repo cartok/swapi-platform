@@ -3,12 +3,14 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@sinclair/typebox": "^0.34.48"
+    "@sinclair/typebox": "catalog:validation"
   },
   "devDependencies": {
-    "@go-task/cli": "3.49.1",
-    "ajv": "^8.18.0",
-    "quicktype": "^23.2.6"
+    "@go-task/cli": "catalog:tooling",
+    "ajv": "catalog:validation",
+    "quicktype": "catalog:validation",
+    "tsx": "catalog:",
+    "typescript": "catalog:"
   },
   "exports": {
     "./device/context": {

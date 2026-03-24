@@ -8,8 +8,8 @@
     "./prerender": "./src/prerender.ts"
   },
   "dependencies": {
-    "@angular/compiler": "21.2.5",
-    "@angular/ssr": "21.2.3",
+    "@angular/compiler": "catalog:angular",
+    "@angular/ssr": "catalog:angular",
     "@swapi/client": "workspace:*",
     "@swapi/shared": "workspace:*",
     "cookie-parser": "^1.4.7",
@@ -17,9 +17,11 @@
     "structured-headers": "^2.0.2"
   },
   "devDependencies": {
-    "@go-task/cli": "3.49.1",
+    "@go-task/cli": "catalog:tooling",
     "@types/cookie-parser": "^1.4.10",
     "@types/express": "^5.0.6",
-    "@types/node": "^25.3.5"
+    "@types/node": "catalog:",
+    "tsx": "catalog:",
+    "typescript": "catalog:"
   }
 }
