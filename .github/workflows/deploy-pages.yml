@@ -35,8 +35,9 @@ jobs:
       - name: Resolve repository base path
         run: echo "REPO_NAME=${GITHUB_REPOSITORY#*/}" >> "$GITHUB_ENV"
 
+      # TODO: broken & outdated
       - name: Build Angular app
-        run: bunx ng build --configuration production --base-href "/${REPO_NAME}/"
+        run: bunx --no-install ng build --configuration production --base-href "/${REPO_NAME}/"
 
       - name: Verify build output
         run: test -f dist/swapi-angular-frontend/browser/index.html
