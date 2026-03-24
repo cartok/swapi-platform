@@ -25,7 +25,7 @@ export function createExpressServer(options: {
     }
 
     angularAppPromise = (async () => {
-      const { default: bootstrap } = await import('@swapi/client/server/main.server')
+      const { default: bootstrap } = await import('@swapi/client/main.server')
       return new CommonEngine({ bootstrap, allowedHosts: [...allowedHosts] })
     })()
 

@@ -8,7 +8,7 @@ import { ɵSERVER_CONTEXT } from '@angular/platform-server'
 import { CommonEngine } from '@angular/ssr/node'
 import { SSG_PATHS } from '@swapi/shared/routing/ssg-paths'
 
-const { default: bootstrap } = await import('@swapi/client/server/main.server')
+const { default: bootstrap } = await import('@swapi/client/main.server')
 
 const angular = new CommonEngine({
   bootstrap,

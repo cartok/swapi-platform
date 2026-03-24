@@ -30,11 +30,9 @@
     "vitest": "4.0.18"
   },
   "exports": {
-    "./*": "./src/app/*.ts",
-    "./server/main.server": {
-      "types": "./src/server/main.server.ts",
+    "./main.server": {
+      "types": "./src/main.server.ts",
       "default": "./dist/server/main.server.js"
-    },
-    "./server/*": "./src/server/*.ts"
+    }
   }
 }

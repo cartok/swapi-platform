@@ -4,7 +4,7 @@ import { bootstrapApplication } from '@angular/platform-browser'
 import { isProdEnvironment } from '@swapi/shared/environment/is-prod'
 
 import { App } from '@/app/app'
-import { config } from '@/server/app.config.server'
+import { config } from '@/app/app.config.server'
 
 if (isProdEnvironment()) {
   enableProdMode()
