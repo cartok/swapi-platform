@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core'
 import { RouterOutlet } from '@angular/router'
 
-import { Footer } from '@/app/blocks/footer/footer'
-import { Header } from '@/app/blocks/header/header'
-import { Separator } from '@/app/components/separator/separator'
+import { Footer } from '@/blocks/footer/footer'
+import { Header } from '@/blocks/header/header'
+import { Separator } from '@/components/separator/separator'
 
 @Component({
   selector: 'app-root',

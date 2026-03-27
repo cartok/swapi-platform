@@ -1,26 +1,96 @@
-version: '3'
-run: once
-set: [pipefail]
+version: 3
 
 includes:
   client:
     taskfile: ../client
     dir: ../client
+    internal: true
+  shared:
+    taskfile: ../shared
+    dir: ../shared
+    internal: true
 
 tasks:
+  clean:
+    preconditions:
+      - test -s ./tsconfig.server.json
+    cmds:
+      - rm -f ./tsconfig.server.tsbuildinfo || true
+      - rm -rf ./dist || true
+
   dev:
+    deps:
+      - task: shared:build
+      - task: client:build:browser
+      - task: build:ssg
+    sources:
+      - ./src/**/*
+    generates:
+      - ./dist/**/*
+    vars:
+      MODE:
+        ref: .SWAPI_OUTPUT_MODE | default "development"
+    dotenv:
+      - ./env/.env.target.local
+      - ./env/.env.output.{{.MODE}}
     cmds:
-      - task: dev:start
-
-  dev:ssg:
-    cmds:
-      - rm -rf ./dist/dev || true
-      - bunx --no-install tsx ./src/prerender.ts
-
-  dev:start:
-    cmds:
-      - bunx --no-install tsx --watch ./src/server.ts
+      - >
+        bunx --no-install bun
+        --conditions @swapi/source
+        --watch ./src/server.ts
 
   build:
+    deps:
+      - task: shared:build
+      - task: client:build:browser
+      - task: build:ssg
+    sources:
+      - ./src/**/*
+    generates:
+      - ./dist/**/*
+    preconditions:
+      - test -s ./tsconfig.server.json
+    vars:
+      MODE:
+        ref: .SWAPI_OUTPUT_MODE | default "development"
+    dotenv:
+      - ./env/.env.target.local
+      - ./env/.env.output.{{.MODE}}
     cmds:
+      - rm -f ./tsconfig.server.tsbuildinfo || true
+      - rm -f ./dist || true
       - bunx --no-install tsc ./src/server.ts
+
+  build:ssg:
+    deps:
+      - task: shared:build
+        vars:
+          MODE: '{{.MODE}}'
+      - task: client:build:browser
+        vars:
+          MODE: '{{.MODE}}'
+    generates:
+      - ../client/dist/browser/r\;*/index.html
+    vars:
+      MODE:
+        ref: .SWAPI_OUTPUT_MODE | default "production"
+    dotenv:
+      - ./env/.env.target.local
+      - ./env/.env.output.{{.MODE}}
+    cmds:
+      - >
+        bunx --no-install bun
+        --conditions @swapi/source
+        ./src/prerender.ts
+
+  start:
+    deps:
+      - task: build
+    vars:
+      MODE:
+        ref: .SWAPI_OUTPUT_MODE | default "development"
+    dotenv:
+      - ./env/.env.target.local
+      - ./env/.env.output.{{.MODE}}
+    cmds:
+      - bunx --no-install bun ./src/server.ts

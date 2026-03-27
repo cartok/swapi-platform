@@ -1,9 +1,7 @@
 {
-  "extends": "../../tsconfig.base.json",
   "files": [],
   "references": [
-    {
-      "path": "./tsconfig.server.json"
-    }
+    { "path": "./tsconfig.server.json" },
+    { "path": "../shared/tsconfig.shared.json" }
   ]
 }

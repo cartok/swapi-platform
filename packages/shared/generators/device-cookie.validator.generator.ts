@@ -13,7 +13,6 @@ const validate = ajv.compile(schema)
 
 const BASE_NAME = 'device-cookie.validator'
 const validator = standaloneCode(ajv, validate)
-// TODO: build & start um zu gucken ob mjs extension nötig wäre
 const dts = `
 export const validate: (<T>(data: unknown) => data is T) & {
   errors: null | {

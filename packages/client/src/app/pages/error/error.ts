@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core'
 
-import { DefaultPageLayout } from '@/app/layouts/default-page-layout/default-page-layout'
+import { DefaultPageLayout } from '@/layouts/default-page-layout/default-page-layout'
 
 @Component({
   selector: 'app-error',

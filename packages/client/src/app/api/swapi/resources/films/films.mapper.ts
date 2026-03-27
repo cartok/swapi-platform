@@ -1,6 +1,6 @@
-import type { FilmDto } from '@/app/api/swapi/resources/films/films.dto'
-import type { Film } from '@/app/api/swapi/resources/films/films.model'
-import { createMockFilmImages } from '@/app/api/swapi/resources/images.mock'
+import type { FilmDto } from '@/api/swapi/resources/films/films.dto'
+import type { Film } from '@/api/swapi/resources/films/films.model'
+import { createMockFilmImages } from '@/api/swapi/resources/images.mock'
 import {
   extractSwapiId,
   extractSwapiIds,
@@ -8,7 +8,7 @@ import {
   toOptionalDate,
   toOptionalString,
   toRomanNumber,
-} from '@/app/api/swapi/shared/utils/mapping'
+} from '@/api/swapi/shared/utils/mapping'
 
 export function mapFilmDtoToModel(dto: FilmDto): Film {
   const id = extractSwapiId(dto.url)

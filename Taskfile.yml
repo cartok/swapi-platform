@@ -1,4 +1,4 @@
-version: '3'
+version: 3
 run: once
 set: [pipefail]
 
@@ -14,38 +14,6 @@ includes:
     dir: ./packages/shared
 
 tasks:
-  dev:
-    deps:
-      - task: shared:generate
-      - task: shared:build
-    cmds:
-      - task: client:dev
-
-  dev:server:
-    deps:
-      - task: shared:generate
-      - task: shared:build
-    cmds:
-      # TODO: Browser build fehlt noch für index.html für SSG.
-      # TODO: Aktuell beziehe ich main.server.js aus production/production.
-      #       Müsste ich dann nicht per env-config checks bestimmen welche Dateien
-      #       verwendet werden sollen?
-      # TODO: Müsste der SSR watcher nicht in den background?
-      - task: client:dev:ssr
-      - task: server:dev:start
-
-  build:
-    deps:
-      - task: shared:generate
-      - task: shared:build
-    cmds:
-      - task: build:client
-      - task: server:build
-
-  build:client:
-    deps:
-      - task: client:build
-
   lint:
     cmds:
       - task: lint:tsc

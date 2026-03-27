@@ -2,42 +2,34 @@
   "name": "@swapi/shared",
   "private": true,
   "type": "module",
-  "dependencies": {
-    "@sinclair/typebox": "catalog:validation"
-  },
-  "devDependencies": {
-    "@go-task/cli": "catalog:tooling",
-    "ajv": "catalog:validation",
-    "quicktype": "catalog:validation",
-    "tsx": "catalog:",
-    "typescript": "catalog:"
+  "imports": {
+    "##/*": {
+      "types": "./src/*.ts",
+      "@swapi/source": "./src/*.ts",
+      "default": "./dist/*.js"
+    }
   },
   "exports": {
-    "./device/context": {
-      "types": "./src/device/context.ts",
-      "default": "./dist/device/context.js"
-    },
-    "./environment/is-prod": {
-      "types": "./src/environment/is-prod.ts",
-      "default": "./dist/environment/is-prod.js"
-    },
-    "./routing/path": {
-      "types": "./src/routing/path.ts",
-      "default": "./dist/routing/path.js"
-    },
-    "./routing/ssg-paths": {
-      "types": "./src/routing/ssg-paths.ts",
-      "default": "./dist/routing/ssg-paths.js"
-    },
-    "./generated/types/*": "./generated/types/*.ts",
+    "./generated/types/*": "./generated/types/*.d.ts",
     "./generated/validators/*": {
       "types": "./generated/validators/*.d.ts",
       "default": "./generated/validators/*.js"
     },
-    "./generated/validators/*.js": {
-      "types": "./generated/validators/*.d.ts",
-      "default": "./generated/validators/*.js"
-    },
-    "./generated/*": "./generated/*"
+    "./*": {
+      "types": "./src/*.ts",
+      "@swapi/source": "./src/*.ts",
+      "default": "./dist/*.js"
+    }
+  },
+  "dependencies": {
+    "@sinclair/typebox": "catalog:validation",
+    "tslib": "catalog:"
+  },
+  "devDependencies": {
+    "@go-task/cli": "catalog:tooling",
+    "ajv": "catalog:validation",
+    "bun": "catalog:",
+    "quicktype": "catalog:validation",
+    "typescript": "catalog:"
   }
 }

@@ -1,13 +1,12 @@
-import { isProdEnvironment } from '@swapi/shared/environment/is-prod'
 import type { DeviceCookie } from '@swapi/shared/generated/types/device-cookie.types'
 import { validate } from '@swapi/shared/generated/validators/device-cookie.validator'
 import cookieParser from 'cookie-parser'
 import express from 'express'
 import type { ParamsDictionary } from 'express-serve-static-core'
 
-import { getRequestCookie } from './request-cookie'
+import { env } from '##/env'
+import { getRequestCookie } from '##/handler/request-cookie'
 
-const isProd = isProdEnvironment()
 const DEVICE_COOKIE_KEY = 'device'
 
 export function addDeviceCookieHandler(server: express.Express): void {
@@ -65,9 +64,9 @@ const deviceCookieHandler: express.RequestHandler<ParamsDictionary, unknown, unk
   // Set new cookie from request body.
   res.cookie(DEVICE_COOKIE_KEY, requestBody, {
     sameSite: 'lax',
-    secure: isProd,
+    secure: env.SWAPI_TARGET !== 'local',
     path: '/',
-    maxAge: isProd ? 1000 * 60 * 60 * 24 * 7 : 1000 * 60 * 2,
+    maxAge: env.SWAPI_TARGET !== 'local' ? 1000 * 60 * 60 * 24 * 7 : 1000 * 60 * 2,
   })
 
   return res.status(200).json({

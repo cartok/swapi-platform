@@ -1,13 +1,20 @@
 {
-  "extends": "./tsconfig.json",
+  "extends": [
+    "@swapi/tsconfig/base",
+    "@swapi/tsconfig/rules",
+    "@swapi/tsconfig/node",
+    "@swapi/tsconfig/node.lib"
+  ],
   "compilerOptions": {
-    "outDir": "./dist/server/tsc",
-    "types": ["node", "vite/client"],
-    "allowJs": true,
-    "baseUrl": "./",
-    "paths": {
-      "@/*": ["./src/*", "../client/src/*"]
-    }
+    "rootDir": "./src",
+    "outDir": "./dist"
   },
-  "include": ["./src/**/*.ts"]
+  // Workaround: The Angular compiler options are already set by @swapi/tsconfig/angular.
+  // I've set `strictTemplates` here to get around wrong language service warnings.
+  // Don't extend the options here.
+  "angularCompilerOptions": {
+    "strictTemplates": true
+  },
+  "include": ["./src/**/*.ts"],
+  "references": [{ "path": "../shared/tsconfig.shared.json" }]
 }

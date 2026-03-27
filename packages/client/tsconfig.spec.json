@@ -1,9 +1,14 @@
 {
-  "extends": "./tsconfig.json",
+  "extends": ["./tsconfig.base.json"],
   "compilerOptions": {
     "outDir": "./dist/spec",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "types": ["vite/client", "vitest/globals"]
+  },
+  // Workaround: The Angular compiler options are already set by @swapi/tsconfig/angular.
+  // I've set `strictTemplates` here to get around wrong language service warnings.
+  // Don't extend the options here.
+  "angularCompilerOptions": {
+    "strictTemplates": true
   },
   "include": ["src/**/*.d.ts", "src/**/*.spec.ts"]
 }

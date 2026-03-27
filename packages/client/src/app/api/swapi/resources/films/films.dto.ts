@@ -1,4 +1,4 @@
-import type { SwapiResourceDto } from '@/app/api/swapi/shared/types/dto'
+import type { SwapiResourceDto } from '@/api/swapi/shared/types/dto'
 
 /**
  * A Star Wars film

@@ -1,12 +1,11 @@
 import { enableProdMode } from '@angular/core'
 import type { BootstrapContext } from '@angular/platform-browser'
 import { bootstrapApplication } from '@angular/platform-browser'
-import { isProdEnvironment } from '@swapi/shared/environment/is-prod'
 
-import { App } from '@/app/app'
-import { config } from '@/app/app.config.server'
+import { App } from '@/app'
+import { config } from '@/app.config.server'
 
-if (isProdEnvironment()) {
+if (SWAPI_OUTPUT_MODE === 'production') {
   enableProdMode()
 }
 

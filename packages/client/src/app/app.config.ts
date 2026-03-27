@@ -9,15 +9,16 @@ import {
 } from '@angular/core'
 import { provideRouter, withInMemoryScrolling, withRouterConfig } from '@angular/router'
 
-import { httpRetryInterceptor } from '@/app/api/swapi/shared/http/http-retry.interceptor'
-import { routes } from '@/app/app.routes'
-import { DeviceService } from '@/app/services/DeviceService'
+import { httpRetryInterceptor } from '@/api/swapi/shared/http/http-retry.interceptor'
+import { routes } from '@/app.routes'
+import { DeviceService } from '@/services/DeviceService'
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    { provide: LOCALE_ID, useValue: 'en-US' },
     provideZonelessChangeDetection(),
+    { provide: LOCALE_ID, useValue: 'en-US' },
     { provide: LocationStrategy, useClass: NoTrailingSlashPathLocationStrategy },
+    provideEnvironmentInitializer(() => inject(DeviceService)),
     provideRouter(
       routes,
       withInMemoryScrolling({
@@ -27,7 +28,6 @@ export const appConfig: ApplicationConfig = {
         paramsInheritanceStrategy: 'always',
       }),
     ),
-    provideEnvironmentInitializer(() => inject(DeviceService)),
     provideHttpClient(withFetch(), withInterceptors([httpRetryInterceptor])),
   ],
 }

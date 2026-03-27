@@ -1,17 +1,8 @@
 {
   "files": [],
   "references": [
-    {
-      "path": "./packages/client/tsconfig.app.json"
-    },
-    {
-      "path": "./packages/client/tsconfig.spec.json"
-    },
-    {
-      "path": "./packages/server/tsconfig.server.json"
-    },
-    {
-      "path": "./packages/shared/tsconfig.shared.json"
-    }
+    { "path": "./packages/client/tsconfig.json" },
+    { "path": "./packages/server/tsconfig.json" },
+    { "path": "./packages/shared/tsconfig.json" }
   ]
 }

@@ -1,0 +1,9 @@
+{
+  "files": [],
+  "compileOnSave": false,
+  "compilerOptions": {
+    "skipLibCheck": true,
+    "importHelpers": true,
+    "isolatedModules": true
+  }
+}

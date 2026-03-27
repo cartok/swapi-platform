@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core'
 
-import type { Person } from '@/app/api/swapi/resources/people/people.model'
-import { PeopleService } from '@/app/api/swapi/resources/people/people.service'
-import { Heading } from '@/app/components/heading/heading'
-import { ImageGrid } from '@/app/components/image-grid/image-grid'
-import { ImageGridItem } from '@/app/components/image-grid/image-grid-item/image-grid-item'
-import { DefaultPageLayout } from '@/app/layouts/default-page-layout/default-page-layout'
+import type { Person } from '@/api/swapi/resources/people/people.model'
+import { PeopleService } from '@/api/swapi/resources/people/people.service'
+import { Heading } from '@/components/heading/heading'
+import { ImageGrid } from '@/components/image-grid/image-grid'
+import { ImageGridItem } from '@/components/image-grid/image-grid-item/image-grid-item'
+import { DefaultPageLayout } from '@/layouts/default-page-layout/default-page-layout'
 
 @Component({
   selector: 'app-characters',

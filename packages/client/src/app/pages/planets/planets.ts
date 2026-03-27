@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core'
 
-import type { Planet } from '@/app/api/swapi/resources/planets/planets.model'
-import { PlanetsService } from '@/app/api/swapi/resources/planets/planets.service'
-import { Heading } from '@/app/components/heading/heading'
-import { ImageGrid } from '@/app/components/image-grid/image-grid'
-import { ImageGridItem } from '@/app/components/image-grid/image-grid-item/image-grid-item'
-import { DefaultPageLayout } from '@/app/layouts/default-page-layout/default-page-layout'
-import { DeviceService } from '@/app/services/DeviceService'
+import type { Planet } from '@/api/swapi/resources/planets/planets.model'
+import { PlanetsService } from '@/api/swapi/resources/planets/planets.service'
+import { Heading } from '@/components/heading/heading'
+import { ImageGrid } from '@/components/image-grid/image-grid'
+import { ImageGridItem } from '@/components/image-grid/image-grid-item/image-grid-item'
+import { DefaultPageLayout } from '@/layouts/default-page-layout/default-page-layout'
+import { DeviceService } from '@/services/DeviceService'
 
 @Component({
   selector: 'app-planets',

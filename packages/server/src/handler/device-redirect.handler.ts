@@ -3,14 +3,13 @@ import {
   deviceContextToPathSegment,
   isDeviceContextPathSegment,
 } from '@swapi/shared/device/context'
-import { isProdEnvironment } from '@swapi/shared/environment/is-prod'
 import { ERROR_PATH } from '@swapi/shared/routing/path'
 import cookieParser from 'cookie-parser'
 import type express from 'express'
 
-import { getRequestCookie } from './request-cookie'
+import { env } from '##/env'
+import { getRequestCookie } from '##/handler/request-cookie'
 
-const isProd = isProdEnvironment()
 const JUST_REDIRECTED_COOKIE_KEY = 'justRedirected'
 
 export function addDeviceRedirectHandler(server: express.Express): void {
@@ -44,7 +43,7 @@ export function addDeviceRedirectHandler(server: express.Express): void {
     res.cookie(JUST_REDIRECTED_COOKIE_KEY, 'true', {
       sameSite: 'lax',
       httpOnly: true,
-      secure: isProd,
+      secure: env.SWAPI_TARGET !== 'local',
       path: '/',
     })
     res.redirect(302, deviceContextUrl)

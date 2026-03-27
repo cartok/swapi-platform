@@ -1,12 +1,12 @@
 import { inject, Injectable, Injector, type Signal } from '@angular/core'
 
-import type { PersonDto } from '@/app/api/swapi/resources/people/people.dto'
-import { mapPersonDtoToModel } from '@/app/api/swapi/resources/people/people.mapper'
-import type { Person } from '@/app/api/swapi/resources/people/people.model'
-import { type RetryableHttpResourceMethodOptions } from '@/app/api/swapi/shared/http/http-retry.interceptor'
-import { SwapiResourceService } from '@/app/api/swapi/shared/http/swapi-resource.service'
-import type { SwapiResourceCollection } from '@/app/api/swapi/shared/types/model'
-import type { SwapiServiceResult } from '@/app/api/swapi/shared/types/service'
+import type { PersonDto } from '@/api/swapi/resources/people/people.dto'
+import { mapPersonDtoToModel } from '@/api/swapi/resources/people/people.mapper'
+import type { Person } from '@/api/swapi/resources/people/people.model'
+import { type RetryableHttpResourceMethodOptions } from '@/api/swapi/shared/http/http-retry.interceptor'
+import { SwapiResourceService } from '@/api/swapi/shared/http/swapi-resource.service'
+import type { SwapiResourceCollection } from '@/api/swapi/shared/types/model'
+import type { SwapiServiceResult } from '@/api/swapi/shared/types/service'
 
 @Injectable({
   providedIn: 'root',

@@ -18,35 +18,34 @@ import { ERROR_PATH, HOME_PATH } from '@swapi/shared/routing/path'
 const actualRoutes: Routes = [
   {
     path: HOME_PATH,
-    loadComponent: () => import('@/app/pages/home/home').then(({ Home }) => Home),
+    loadComponent: () => import('@/pages/home/home').then(({ Home }) => Home),
     pathMatch: 'full',
   },
   {
     path: 'movies',
-    loadComponent: () => import('@/app/pages/movies/movies').then(({ Movies }) => Movies),
+    loadComponent: () => import('@/pages/movies/movies').then(({ Movies }) => Movies),
   },
   {
     path: 'movie/:id',
-    loadComponent: () => import('@/app/pages/movie/movie').then(({ Movie }) => Movie),
+    loadComponent: () => import('@/pages/movie/movie').then(({ Movie }) => Movie),
   },
   {
     path: 'characters',
     loadComponent: () =>
-      import('@/app/pages/characters/characters').then(({ Characters }) => Characters),
+      import('@/pages/characters/characters').then(({ Characters }) => Characters),
   },
   {
     path: 'character/:id',
     loadComponent: () =>
-      import('@/app/pages/character/character').then((component) => component.Character),
+      import('@/pages/character/character').then((component) => component.Character),
   },
   {
     path: 'planets',
-    loadComponent: () =>
-      import('@/app/pages/planets/planets').then(({ Planets }) => Planets),
+    loadComponent: () => import('@/pages/planets/planets').then(({ Planets }) => Planets),
   },
   {
     path: 'planet/:id',
-    loadComponent: () => import('@/app/pages/planet/planet').then(({ Planet }) => Planet),
+    loadComponent: () => import('@/pages/planet/planet').then(({ Planet }) => Planet),
   },
 ]
 
@@ -139,8 +138,7 @@ export const routes: Routes = [
   ...actualRoutes,
   {
     path: ERROR_PATH,
-    loadComponent: () =>
-      import('@/app/pages/error/error').then(({ ErrorPage }) => ErrorPage),
+    loadComponent: () => import('@/pages/error/error').then(({ ErrorPage }) => ErrorPage),
   },
   {
     path: '**',

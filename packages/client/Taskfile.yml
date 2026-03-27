@@ -1,51 +1,106 @@
-version: '3'
-run: once
-set: [pipefail]
+version: 3
 
-# TODO: Eigentlich muss shared gebaut werden. Sollte ich das shared Taskfile jeweils importieren
-# oder doch alles in einem Task file zusammen bauen?
+includes:
+  shared:
+    taskfile: ../shared
+    dir: ../shared
+    internal: true
+
 tasks:
-  dev:
-    cmds:
-      - bunx --no-install vite --config ./vite.config.ts
+  clean:
+    - rm -rf ./dist || true
 
-  dev:ssr:
+  dev:
+    deps:
+      - task: shared:generate
+    vars:
+      MODE:
+        ref: .SWAPI_OUTPUT_MODE | default "development"
+    dotenv:
+      - ./env/.env.target.local
+      - ./env/.env.output.{{.MODE}}
     cmds:
-      - >
-        bunx --no-install vite build
-        --mode development
-        --config ./vite.config.ts
-        --ssr ./main.server.ts
-        --outDir ../dist/local/development/ssr
-        --watch
-        --emptyOutDir
+      - bunx --no-install vite --configLoader runner
 
   build:
     deps:
-      - task: build:prod
-      - task: build:prod:ssr
+      - task: build:browser
+      - task: build:ssr
 
-  build:prod:
+  build:browser:watch:
+    cmds:
+      - task: build:browser
+        vars:
+          WATCH: true
+
+  build:browser:
+    deps:
+      - task: shared:build
+    vars:
+      MODE:
+        ref: .SWAPI_OUTPUT_MODE | default "production"
+    dotenv:
+      - ./env/.env.target.local
+      - ./env/.env.output.{{.MODE}}
+    sources:
+      - ./src/**/*
+    generates:
+      - ./dist/browser/**/*
     cmds:
       - >
         bunx --no-install vite build
-        --config ./vite.config.ts
-        --outDir ../dist/production/production/browser
-        --emptyOutDir
+        --outDir ./dist/browser
+        {{if .WATCH}}--watch{{end}}
 
-  build:prod:ssr:
+  build:ssr:watch:
+    cmds:
+      - task: build:ssr
+        vars:
+          WATCH: true
+
+  build:ssr:
+    deps:
+      - task: shared:build
+    vars:
+      MODE:
+        ref: .SWAPI_OUTPUT_MODE | default "production"
+    dotenv:
+      - ./env/.env.target.local
+      - ./env/.env.output.{{.MODE}}
+    sources:
+      - ./src/**/*
+    generates:
+      - ./dist/ssr/**/*
     cmds:
       - >
         bunx --no-install vite build
-        --config ./vite.config.ts
-        --ssr ./main.server.ts
-        --outDir ../dist/production/production/ssr
-        --emptyOutDir
+        --ssr ./src/main.server.ts
+        --outDir ./dist/ssr
+        {{if .WATCH}}--watch{{end}}
 
-  test:
+  start:
+    deps:
+      - task: build:browser
+    vars:
+      MODE:
+        ref: .SWAPI_OUTPUT_MODE | default "production"
+    dotenv:
+      - ./env/.env.target.local
+      - ./env/.env.output.{{.MODE}}
     cmds:
-      - bunx --no-install vitest run
+      - bunx --no-install vite preview --outDir ./dist/browser
 
   test:watch:
     cmds:
-      - bunx --no-install vitest
+      - task: shared:build
+        vars:
+          WATCH: true
+
+  test:
+    deps:
+      - task: shared:build
+    dotenv:
+      - ./env/.env.target.local
+      - ./env/.env.output.development
+    cmds:
+      - bunx --no-install vitest --configLoader runner {{if eq .WATCH false}}run{{end}}

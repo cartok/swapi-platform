@@ -1,7 +1,7 @@
 import type { ComponentFixture } from '@angular/core/testing'
 import { TestBed } from '@angular/core/testing'
 
-import { Separator } from '@/app/components/separator/separator'
+import { Separator } from '@/components/separator/separator'
 
 describe('Separator', () => {
   let component: Separator

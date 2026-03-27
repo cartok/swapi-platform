@@ -1,7 +1,7 @@
 import type { Injector, ResourceStatus, Signal } from '@angular/core'
 
-import type { RetryableHttpResourceMethodOptions } from '@/app/api/swapi/shared/http/http-retry.interceptor'
-import type { SwapiResource } from '@/app/api/swapi/shared/types/model'
+import type { RetryableHttpResourceMethodOptions } from '@/api/swapi/shared/http/http-retry.interceptor'
+import type { SwapiResource } from '@/api/swapi/shared/types/model'
 
 export interface SwapiServiceResult<T> {
   status: Signal<ResourceStatus>

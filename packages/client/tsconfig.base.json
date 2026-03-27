@@ -1,0 +1,14 @@
+{
+  "files": [],
+  "extends": [
+    "@swapi/tsconfig/base",
+    "@swapi/tsconfig/rules",
+    "@swapi/tsconfig/bundler",
+    "@swapi/tsconfig/angular"
+  ],
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/app/*"]
+    }
+  }
+}

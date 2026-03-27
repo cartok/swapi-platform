@@ -1,0 +1,21 @@
+{
+  "extends": ["./tsconfig.base.json"],
+  "compilerOptions": {
+    "types": ["node", "vite/client"]
+  },
+  // Workaround: The Angular compiler options are already set by @swapi/tsconfig/angular.
+  // I've set `strictTemplates` here to get around wrong language service warnings.
+  // Don't extend the options here.
+  "angularCompilerOptions": {
+    "strictTemplates": true
+  },
+  "include": [
+    "./vite.config.ts",
+    "./src/**/*.ts",
+    // Workaround: explicitly include sibling workspace package sources so the
+    // Angular/Vite compile pipeline can see them during dev. Package resolution
+    // still happens via workspace package names and `package.json` exports.
+    "../../{packages}/{shared}/src/**/*.ts"
+  ],
+  "exclude": ["**/*.spec.ts", "../../{packages}/{shared}/src/**/*.d.ts"]
+}

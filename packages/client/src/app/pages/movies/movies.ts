@@ -1,13 +1,13 @@
 import { DatePipe } from '@angular/common'
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core'
 
-import type { Film } from '@/app/api/swapi/resources/films/films.model'
-import { FilmsService } from '@/app/api/swapi/resources/films/films.service'
-import { Heading } from '@/app/components/heading/heading'
-import { ImageGrid } from '@/app/components/image-grid/image-grid'
-import { ImageGridItem } from '@/app/components/image-grid/image-grid-item/image-grid-item'
-import { DefaultPageLayout } from '@/app/layouts/default-page-layout/default-page-layout'
-import { DeviceService } from '@/app/services/DeviceService'
+import type { Film } from '@/api/swapi/resources/films/films.model'
+import { FilmsService } from '@/api/swapi/resources/films/films.service'
+import { Heading } from '@/components/heading/heading'
+import { ImageGrid } from '@/components/image-grid/image-grid'
+import { ImageGridItem } from '@/components/image-grid/image-grid-item/image-grid-item'
+import { DefaultPageLayout } from '@/layouts/default-page-layout/default-page-layout'
+import { DeviceService } from '@/services/DeviceService'
 
 @Component({
   selector: 'app-movies',

@@ -2,7 +2,7 @@ import type { ComponentFixture } from '@angular/core/testing'
 import { TestBed } from '@angular/core/testing'
 import { provideRouter } from '@angular/router'
 
-import { Movies } from '@/app/pages/movies/movies'
+import { Movies } from '@/pages/movies/movies'
 
 describe('Movies', () => {
   let component: Movies

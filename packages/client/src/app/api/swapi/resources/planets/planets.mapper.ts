@@ -1,12 +1,12 @@
-import { createMockFilmImages } from '@/app/api/swapi/resources/images.mock'
-import type { PlanetDto } from '@/app/api/swapi/resources/planets/planets.dto'
-import type { Planet } from '@/app/api/swapi/resources/planets/planets.model'
+import { createMockFilmImages } from '@/api/swapi/resources/images.mock'
+import type { PlanetDto } from '@/api/swapi/resources/planets/planets.dto'
+import type { Planet } from '@/api/swapi/resources/planets/planets.model'
 import {
   extractSwapiId,
   extractSwapiIds,
   toMandatoryString,
   toOptionalString,
-} from '@/app/api/swapi/shared/utils/mapping'
+} from '@/api/swapi/shared/utils/mapping'
 
 export function mapPlanetDtoToModel(dto: PlanetDto): Planet {
   const id = extractSwapiId(dto.url)

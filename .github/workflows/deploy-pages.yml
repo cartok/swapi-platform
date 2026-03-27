@@ -40,7 +40,7 @@ jobs:
         run: bunx --no-install ng build --configuration production --base-href "/${REPO_NAME}/"
 
       - name: Verify build output
-        run: test -f dist/swapi-angular-frontend/browser/index.html
+        run: test -sdist/swapi-angular-frontend/browser/index.html
 
       - name: Add SPA fallback for GitHub Pages
         run: cp dist/swapi-angular-frontend/browser/index.html dist/swapi-angular-frontend/browser/404.html

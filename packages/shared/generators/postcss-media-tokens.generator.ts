@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises'
 
-import { BREAKPOINTS } from '@/device/context'
+import { BREAKPOINTS } from '##/device/context'
 
 const widthTokenLines = BREAKPOINTS.width.map(
   (widthValue) => `@custom-media --mw-${widthValue} (max-width: ${widthValue}px);`,

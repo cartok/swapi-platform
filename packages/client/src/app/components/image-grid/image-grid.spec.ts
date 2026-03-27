@@ -1,7 +1,7 @@
 import type { ComponentFixture } from '@angular/core/testing'
 import { TestBed } from '@angular/core/testing'
 
-import { ImageGrid } from '@/app/components/image-grid/image-grid'
+import { ImageGrid } from '@/components/image-grid/image-grid'
 
 describe('ImageGrid', () => {
   let component: ImageGrid

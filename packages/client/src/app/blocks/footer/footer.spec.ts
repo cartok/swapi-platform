@@ -1,7 +1,7 @@
 import type { ComponentFixture } from '@angular/core/testing'
 import { TestBed } from '@angular/core/testing'
 
-import { Footer } from '@/app/blocks/footer/footer'
+import { Footer } from '@/blocks/footer/footer'
 
 describe('Footer', () => {
   let component: Footer

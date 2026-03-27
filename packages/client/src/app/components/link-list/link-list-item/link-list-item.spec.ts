@@ -2,7 +2,7 @@ import type { ComponentFixture } from '@angular/core/testing'
 import { TestBed } from '@angular/core/testing'
 import { provideRouter } from '@angular/router'
 
-import { LinkListItem } from '@/app/components/link-list/link-list-item/link-list-item'
+import { LinkListItem } from '@/components/link-list/link-list-item/link-list-item'
 
 describe('LinkListItem', () => {
   let component: LinkListItem

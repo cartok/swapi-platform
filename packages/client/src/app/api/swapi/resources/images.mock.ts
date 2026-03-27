@@ -1,4 +1,4 @@
-import type { SwapiImageDataMock as SwapiImageMock } from '@/app/api/swapi/shared/types/model'
+import type { SwapiImageDataMock as SwapiImageMock } from '@/api/swapi/shared/types/model'
 
 export function createMockFilmImages(
   resourceName: string,

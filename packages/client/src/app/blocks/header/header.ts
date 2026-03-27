@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core'
 import { RouterLink } from '@angular/router'
 
-import { HeaderLink } from '@/app/blocks/header/header-link/header-link'
+import { HeaderLink } from '@/blocks/header/header-link/header-link'
 
 @Component({
   selector: 'app-header',

@@ -5,7 +5,7 @@ import { TestBed } from '@angular/core/testing'
 import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router'
 import { of } from 'rxjs'
 
-import { Character } from '@/app/pages/character/character'
+import { Character } from '@/pages/character/character'
 
 describe('Character', () => {
   let component: Character

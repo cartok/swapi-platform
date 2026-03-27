@@ -5,7 +5,7 @@ import { TestBed } from '@angular/core/testing'
 import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router'
 import { of } from 'rxjs'
 
-import { Movie } from '@/app/pages/movie/movie'
+import { Movie } from '@/pages/movie/movie'
 
 describe('Movie', () => {
   let component: Movie

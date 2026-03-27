@@ -2,6 +2,9 @@
   "name": "@swapi/server",
   "private": true,
   "type": "module",
+  "imports": {
+    "##/*": "./src/*.ts"
+  },
   "dependencies": {
     "@angular/compiler": "catalog:angular",
     "@angular/ssr": "catalog:angular",
@@ -9,13 +12,15 @@
     "@swapi/shared": "workspace:*",
     "cookie-parser": "^1.4.7",
     "express": "^5.2.1",
-    "structured-headers": "^2.0.2"
+    "structured-headers": "^2.0.2",
+    "tslib": "catalog:"
   },
   "devDependencies": {
     "@go-task/cli": "catalog:tooling",
     "@types/cookie-parser": "^1.4.10",
     "@types/express": "^5.0.6",
     "@types/node": "catalog:",
+    "bun": "catalog:",
     "tsx": "catalog:",
     "typescript": "catalog:"
   }

@@ -1,7 +1,7 @@
 import { DOCUMENT } from '@angular/common'
 import { DestroyRef, Directive, ElementRef, inject, input, output } from '@angular/core'
 
-import { injectIsBrowser } from '@/app/shared/utils/platform'
+import { injectIsBrowser } from '@/shared/utils/platform'
 
 type SwipeDirection = 'left' | 'right'
 type SwipeCancelReason =

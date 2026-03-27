@@ -1,7 +1,13 @@
 {
-  "extends": "./tsconfig.json",
+  "extends": [
+    "@swapi/tsconfig/base",
+    "@swapi/tsconfig/rules",
+    "@swapi/tsconfig/node",
+    "@swapi/tsconfig/node.lib"
+  ],
   "compilerOptions": {
-    "types": ["node", "vite/client"]
+    "rootDir": "./src",
+    "outDir": "./dist"
   },
-  "include": ["src/**/*.ts", "generators/**/*.ts", "generators/**/*.mts"]
+  "include": ["src/**/*.ts"]
 }

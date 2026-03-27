@@ -2,7 +2,7 @@ import { NgOptimizedImage } from '@angular/common'
 import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core'
 import { RouterLink } from '@angular/router'
 
-import { DeviceService } from '@/app/services/DeviceService'
+import { DeviceService } from '@/services/DeviceService'
 
 @Component({
   selector: 'app-image-grid-item',

@@ -13,7 +13,7 @@ import {
 } from '@swapi/shared/device/context'
 import { distinctUntilChanged, filter, map } from 'rxjs'
 
-import { injectIsBrowser } from '@/app/shared/utils/platform'
+import { injectIsBrowser } from '@/shared/utils/platform'
 
 interface DeviceQuery {
   format?: DeviceContext['format']

@@ -5,7 +5,7 @@ import { TestBed } from '@angular/core/testing'
 import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router'
 import { of } from 'rxjs'
 
-import { Planet } from '@/app/pages/planet/planet'
+import { Planet } from '@/pages/planet/planet'
 
 describe('Planet', () => {
   let component: Planet

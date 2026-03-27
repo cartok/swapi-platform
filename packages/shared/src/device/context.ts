@@ -18,7 +18,7 @@ export const DeviceContextSchema = Type.Object(
     format: Type.Union(DEVICE_FORMATS.map((f) => Type.Literal(f))),
     width: Type.Optional(Type.Union(BREAKPOINTS.width.map((bp) => Type.Literal(bp)))),
     height: Type.Optional(Type.Union(BREAKPOINTS.height.map((bp) => Type.Literal(bp)))),
-  },
+  } as const,
   {
     additionalProperties: false,
   },
@@ -29,7 +29,7 @@ export const LenientDeviceContextSchema = Type.Object(
     format: Type.Optional(Type.String()),
     width: Type.Optional(Type.Integer({ minimum: 1 })),
     height: Type.Optional(Type.Integer({ minimum: 1 })),
-  },
+  } as const,
   {
     additionalProperties: false,
   },
@@ -118,19 +118,21 @@ export function deviceContextToPathSegment(deviceContext: DeviceContext): string
 export function parseDeviceContext(
   deviceContext: Record<string, string>,
   schema: typeof DeviceContextSchema,
-): DeviceContext | null
+): Readonly<DeviceContext> | null
 
 export function parseDeviceContext(
   deviceContext: Record<string, string>,
   schema: typeof LenientDeviceContextSchema,
-): LenientDeviceContext | null
+): Readonly<LenientDeviceContext> | null
 
 export function parseDeviceContext(
   deviceContext: Record<string, string>,
   schema: typeof DeviceContextSchema | typeof LenientDeviceContextSchema,
-): DeviceContext | LenientDeviceContext | null {
+): Readonly<DeviceContext> | Readonly<LenientDeviceContext> | null {
   try {
-    return Value.Parse(schema, deviceContext)
+    const parsed = Value.Parse(['Default', 'Convert', 'Assert'], schema, deviceContext)
+    Value.Assert(schema, parsed)
+    return Object.freeze(parsed)
   } catch {
     return null
   }

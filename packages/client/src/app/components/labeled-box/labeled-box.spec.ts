@@ -1,7 +1,7 @@
 import type { ComponentFixture } from '@angular/core/testing'
 import { TestBed } from '@angular/core/testing'
 
-import { LabeledBox } from '@/app/components/labeled-box/labeled-box'
+import { LabeledBox } from '@/components/labeled-box/labeled-box'
 
 describe('LabeledBox', () => {
   let component: LabeledBox

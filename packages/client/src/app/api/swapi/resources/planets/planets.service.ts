@@ -1,12 +1,12 @@
 import { inject, Injectable, Injector, type Signal } from '@angular/core'
 
-import type { PlanetDto } from '@/app/api/swapi/resources/planets/planets.dto'
-import { mapPlanetDtoToModel } from '@/app/api/swapi/resources/planets/planets.mapper'
-import type { Planet } from '@/app/api/swapi/resources/planets/planets.model'
-import { type RetryableHttpResourceMethodOptions } from '@/app/api/swapi/shared/http/http-retry.interceptor'
-import { SwapiResourceService } from '@/app/api/swapi/shared/http/swapi-resource.service'
-import type { SwapiResourceCollection } from '@/app/api/swapi/shared/types/model'
-import type { SwapiServiceResult } from '@/app/api/swapi/shared/types/service'
+import type { PlanetDto } from '@/api/swapi/resources/planets/planets.dto'
+import { mapPlanetDtoToModel } from '@/api/swapi/resources/planets/planets.mapper'
+import type { Planet } from '@/api/swapi/resources/planets/planets.model'
+import { type RetryableHttpResourceMethodOptions } from '@/api/swapi/shared/http/http-retry.interceptor'
+import { SwapiResourceService } from '@/api/swapi/shared/http/swapi-resource.service'
+import type { SwapiResourceCollection } from '@/api/swapi/shared/types/model'
+import type { SwapiServiceResult } from '@/api/swapi/shared/types/service'
 
 @Injectable({
   providedIn: 'root',

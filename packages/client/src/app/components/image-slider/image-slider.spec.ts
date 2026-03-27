@@ -1,7 +1,7 @@
 import type { ComponentFixture } from '@angular/core/testing'
 import { TestBed } from '@angular/core/testing'
 
-import { ImageSlider } from '@/app/components/image-slider/image-slider'
+import { ImageSlider } from '@/components/image-slider/image-slider'
 
 describe('ImageSlider', () => {
   let component: ImageSlider

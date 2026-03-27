@@ -1,22 +1,29 @@
+# Packages
+node_modules/
+
 # Compiled output
+*.tsbuildinfo
 dist/
 generated/
-*.tsbuildinfo
 
 # Cache
 .task/
 
-# Node
-node_modules/
-
-# Visual Studio Code
+# Editor settings
 .vscode/*
 !.vscode/extensions.json
 !.vscode/launch.json
 !.vscode/settings.json
 !.vscode/tasks.json
 
-# System files
+# Application files
 .DS_Store/
 .Trash-*/
+*.save
 Thumbs.db
+
+# Specific
+TODO.md
+
+# Temporary
+./packages/env/

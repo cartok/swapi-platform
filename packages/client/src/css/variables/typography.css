@@ -1,6 +1,6 @@
 @font-face {
   font-family: 'Roboto';
-  src: url('../../../public/fonts/Roboto-VariableFont_wdth,wght.woff2') format('woff2');
+  src: '/fonts/Roboto-VariableFont_wdth,wght.woff2' format('woff2');
   font-style: normal;
   font-weight: 300 700;
   font-display: block;
@@ -8,7 +8,7 @@
 
 @font-face {
   font-family: 'Circular Std';
-  src: url('../../../public/fonts/circular-std-medium-500.woff2') format('woff2');
+  src: '/fonts/Roboto-VariableFont_wdth,wght.woff2' format('woff2');
   font-style: normal;
   font-weight: normal;
   font-display: swap;

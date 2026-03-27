@@ -1,24 +1,40 @@
 import { fileURLToPath, URL } from 'node:url'
 
 import angular from '@analogjs/vite-plugin-angular'
-import { defineConfig } from 'vite'
+import { defaultClientConditions, defineConfig, transformWithOxc } from 'vite'
 
-export default defineConfig(({ mode }) => {
+import { env } from './src/env'
+
+export default defineConfig(() => {
   return {
     clearScreen: false,
-    root: fileURLToPath(new URL('./src', import.meta.url)),
-    publicDir: fileURLToPath(new URL('./public', import.meta.url)),
+    envDir: false,
+    mode: env.SWAPI_OUTPUT_MODE,
     build: {
-      sourcemap: true,
+      emptyOutDir: true,
+      sourcemap: env.SWAPI_OUTPUT_MODE === 'development',
+    },
+    define: {
+      ...Object.entries(env).reduce(
+        (acc, [key, value]) => ({
+          ...acc,
+          [key]: typeof value === 'string' ? `"${value}"` : value,
+        }),
+        {},
+      ),
     },
     resolve: {
+      conditions:
+        env.SWAPI_OUTPUT_MODE === 'development'
+          ? ['@swapi/source', ...defaultClientConditions]
+          : undefined,
+      mainFields: ['module'],
       alias: [
         {
           find: /^@\//,
-          replacement: `${fileURLToPath(new URL('./src/', import.meta.url))}`,
+          replacement: fileURLToPath(new URL('./src/app/', import.meta.url)),
         },
       ],
-      mainFields: ['module'],
     },
     server: {
       host: 'localhost',
@@ -31,9 +47,38 @@ export default defineConfig(({ mode }) => {
       strictPort: true,
     },
     plugins: [
+      /**
+       * Workaround for `@analogjs/vite-plugin-angular`:
+       *
+       * Limit Angular transforms to this app's own source files only. Workspace `.ts` files from
+       * other packages are excluded because, in this setup, letting the Angular plugin handle them
+       * can result in empty module output during dev.
+       *
+       * A small post-transform plugin then transpiles those non-app `.ts` files explicitly via
+       * `transformWithOxc(...)` so they are still delivered as valid browser-executable JavaScript.
+       *
+       * Intended for plain TypeScript from sibling workspace packages, not extra Angular-decorated
+       * code outside the app package.
+       *
+       * Additionally, as of now, there is no good solution to import `paths` aliased files or
+       * workspace modules inside of a vite config. The best solution for now is to import
+       * relative paths & use the `runner` config loader for development mode.
+       */
       angular({
-        tsconfig: fileURLToPath(new URL('./tsconfig.app.json', import.meta.url)),
+        tsconfig: fileURLToPath(new URL('./tsconfig.vite.json', import.meta.url)),
+        transformFilter: (_code, id) => {
+          return id.includes('/packages/client/src/')
+        },
       }),
+      {
+        name: 'transpile-packages',
+        enforce: 'post',
+        async transform(code: string, id: string) {
+          if (id.includes('/packages/client/src/')) return null
+          if (!id.endsWith('.ts')) return null
+          return transformWithOxc(code, id, { sourcemap: true })
+        },
+      },
     ],
   }
 })

@@ -1,36 +1,39 @@
-version: '3'
-run: once
-set: [pipefail]
+version: 3
 
 tasks:
-  build:
+  clean:
+    preconditions:
+      - test -s ./tsconfig.shared.json
     cmds:
+      - rm -f ./tsconfig.shared.tsbuildinfo || true
       - rm -rf ./dist || true
-      - bunx --no-install tsc -p ./tsconfig.build.json
+      - rm -rf ./generated || true
+
+  build:
+    deps:
+      - task: generate
+    preconditions:
+      - test -s ./tsconfig.shared.json
+    sources:
+      - ./src/**/*
+    generates:
+      - ./dist/**/*
+    cmds:
+      - rm -f ./tsconfig.shared.tsbuildinfo || true
+      - rm -rf ./dist || true
+      - bunx --no-install tsc -p ./tsconfig.shared.json
 
   generate:
-    cmds:
-      - rm -rf ./generated || true
-      - task: i:generate
-
-  i:generate:
-    internal: true
     deps:
       - task: generate:device-cookie:types
       - task: generate:device-cookie:validator
       - task: generate:postcss-media-tokens
 
   generate:device-cookie:types:
-    preconditions:
-      - sh: test -f ./generators/device-cookie.schema.json
-        msg: Missing generators/device-cookie.schema.json
-      - sh: command -v bunx >/dev/null 2>&1
-        msg: bunx is required
-    method: checksum
     sources:
       - ./generators/device-cookie.schema.json
     generates:
-      - ./generated/types/device-cookie.types.ts
+      - ./generated/types/device-cookie.types.d.ts
     cmds:
       - rm -rf ./generated/types || true
       - mkdir -p ./generated/types
@@ -42,44 +45,33 @@ tasks:
         --nice-property-names
         --readonly
         --top-level DeviceCookie
-        --out ./generated/types/device-cookie.types.ts
         --just-types
+        --out ./generated/types/device-cookie.types.d.ts
 
   generate:device-cookie:validator:
-    preconditions:
-      - sh: test -f ./generators/device-cookie.schema.json
-        msg: Missing generators/device-cookie.schema.json
-      - sh: test -f ./generators/device-cookie.validator.generator.ts
-        msg: Missing generators/device-cookie.validator.generator.ts
-      - sh: command -v node >/dev/null 2>&1
-        msg: node is required
-    method: checksum
     sources:
       - ./generators/device-cookie.schema.json
-      - ./generators/device-cookie.validator.generator.ts
+      - ./generators/device-cookie.validator.*
     generates:
-      - ./generated/validators/device-cookie.validator.js
-      - ./generated/validators/device-cookie.validator.d.ts
+      - ./generated/validators/device-cookie.*
     cmds:
       - rm -rf ./generated/validators || true
       - mkdir -p ./generated/validators
-      - node --import tsx ./generators/device-cookie.validator.generator.ts
+      - >
+        bunx --no-install bun
+        --conditions @swapi/source
+        ./generators/device-cookie.validator.generator.ts
 
   generate:postcss-media-tokens:
-    preconditions:
-      - sh: test -f ./generators/postcss-media-tokens.generator.ts
-        msg: Missing generators/postcss-media-tokens.generator.ts
-      - sh: test -f ./src/device/context.ts
-        msg: Missing src/device/context.ts
-      - sh: command -v node >/dev/null 2>&1
-        msg: node is required
-    method: checksum
     sources:
-      - ./generators/postcss-media-tokens.generator.ts
+      - ./generators/postcss-media-tokens.*
       - ./src/device/context.ts
     generates:
       - ./generated/css/media.css
     cmds:
       - rm -rf ./generated/css || true
       - mkdir -p ./generated/css
-      - node --import tsx ./generators/postcss-media-tokens.generator.ts
+      - >
+        bunx --no-install bun
+        --conditions @swapi/source
+        ./generators/postcss-media-tokens.generator.ts
