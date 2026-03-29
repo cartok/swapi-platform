@@ -130,7 +130,7 @@ export function parseDeviceContext(
   schema: typeof DeviceContextSchema | typeof LenientDeviceContextSchema,
 ): Readonly<DeviceContext> | Readonly<LenientDeviceContext> | null {
   try {
-    const parsed = Value.Parse(['Default', 'Convert', 'Assert'], schema, deviceContext)
+    const parsed = Value.Parse(['Default', 'Convert'], schema, deviceContext)
     Value.Assert(schema, parsed)
     return Object.freeze(parsed)
   } catch {

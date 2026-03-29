@@ -74,9 +74,6 @@ server.use((error: unknown, req: express.Request, res: express.Response) => {
 })
 
 const port = env.SWAPI_PORT
-server.listen(port, (error) => {
-  if (error) {
-    throw error
-  }
+server.listen(port, () => {
   console.log(`Server listening on port ${port}`)
 })

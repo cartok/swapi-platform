@@ -23,7 +23,6 @@ export const SSG_PATHS: readonly string[] = Object.freeze([
     }),
   ]),
 ])
-console.log(SSG_PATHS)
 
 function createDeviceContextPathSegments(): readonly string[] {
   const paths = new Set<string>()

@@ -2,7 +2,7 @@ import type { TSchema } from '@sinclair/typebox'
 import { type Static, Type } from '@sinclair/typebox'
 import { AssertError, Value } from '@sinclair/typebox/value'
 
-export const LogLevel = Type.Union([
+const LogLevel = Type.Union([
   Type.Literal('debug'),
   Type.Literal('info'),
   Type.Literal('warn'),
@@ -14,7 +14,7 @@ export const OutputMode = Type.Union([
   Type.Literal('production'),
 ])
 
-export const TargetSchema = Type.Union([
+const TargetSchema = Type.Union([
   Type.Literal('local'),
   Type.Literal('testing'),
   Type.Literal('staging'),
