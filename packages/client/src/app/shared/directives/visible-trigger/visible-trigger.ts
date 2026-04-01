@@ -1,11 +1,5 @@
-import {
-  DestroyRef,
-  Directive,
-  ElementRef,
-  inject,
-  type OnInit,
-  output,
-} from '@angular/core'
+import type { OnInit } from '@angular/core'
+import { DestroyRef, Directive, ElementRef, inject, output } from '@angular/core'
 
 import { injectIsBrowser } from '@/shared/utils/platform'
 

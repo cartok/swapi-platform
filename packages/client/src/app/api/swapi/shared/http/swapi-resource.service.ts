@@ -1,11 +1,6 @@
 import { httpResource } from '@angular/common/http'
-import {
-  computed,
-  type ResourceStatus,
-  runInInjectionContext,
-  type Signal,
-  untracked,
-} from '@angular/core'
+import type { ResourceStatus, Signal } from '@angular/core'
+import { computed, runInInjectionContext, untracked } from '@angular/core'
 
 import {
   MINIMAL_HTTP_RETRY_POLICY,
@@ -19,10 +14,10 @@ import type {
   SwapiResource,
   SwapiResourceCollection,
 } from '@/api/swapi/shared/types/model'
-import {
-  type SwapiResourceServiceConfig,
-  type SwapiResourceServiceMethodOptions,
-  type SwapiServiceResult,
+import type {
+  SwapiResourceServiceConfig,
+  SwapiResourceServiceMethodOptions,
+  SwapiServiceResult,
 } from '@/api/swapi/shared/types/service'
 import { extractSwapiIdOptional } from '@/api/swapi/shared/utils/mapping'
 

@@ -2,12 +2,15 @@ import { PlatformLocation } from '@angular/common'
 import { computed, DestroyRef, DOCUMENT, inject, Injectable, signal } from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { NavigationEnd, PRIMARY_OUTLET, Router } from '@angular/router'
-import type { HeightBreakpoint, WidthBreakpoint } from '@swapi/shared/device/context'
+import type {
+  DeviceContext,
+  HeightBreakpoint,
+  WidthBreakpoint,
+} from '@swapi/shared/device/context'
 import {
   BREAKPOINTS,
   DEFAULT_DEVICE_FORMAT,
   DEVICE_CONTEXT_PATH_PARAM_PREFIX,
-  type DeviceContext,
   DeviceContextSchema,
   parseDeviceContext,
 } from '@swapi/shared/device/context'

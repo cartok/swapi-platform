@@ -1,5 +1,5 @@
-import type { TSchema } from '@sinclair/typebox'
-import { type Static, Type } from '@sinclair/typebox'
+import type { Static, TSchema } from '@sinclair/typebox'
+import { Type } from '@sinclair/typebox'
 import { AssertError, Value } from '@sinclair/typebox/value'
 
 const LogLevel = Type.Union([

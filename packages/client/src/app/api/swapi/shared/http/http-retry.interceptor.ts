@@ -1,12 +1,10 @@
-import {
-  HttpContext,
-  HttpContextToken,
-  HttpErrorResponse,
-  type HttpHandlerFn,
-  type HttpInterceptorFn,
-  type HttpRequest,
-  type HttpResourceRequest,
+import type {
+  HttpHandlerFn,
+  HttpInterceptorFn,
+  HttpRequest,
+  HttpResourceRequest,
 } from '@angular/common/http'
+import { HttpContext, HttpContextToken, HttpErrorResponse } from '@angular/common/http'
 import { retry, timer } from 'rxjs'
 
 interface HttpRetryPolicy {

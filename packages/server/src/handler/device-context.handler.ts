@@ -1,6 +1,6 @@
+import type { DeviceContext } from '@swapi/shared/device/context'
 import {
   DEFAULT_DEVICE_FORMAT,
-  type DeviceContext,
   findClosestHeightBreakpoint,
   findClosestWidthBreakpoint,
 } from '@swapi/shared/device/context'

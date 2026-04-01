@@ -1,5 +1,4 @@
-import type { UrlSegment } from '@angular/router'
-import { type Routes } from '@angular/router'
+import type { Routes, UrlSegment } from '@angular/router'
 import type { DeviceContext } from '@swapi/shared/device/context'
 import {
   DEFAULT_DEVICE_FORMAT,

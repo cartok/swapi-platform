@@ -1,9 +1,10 @@
-import { inject, Injectable, Injector, type Signal } from '@angular/core'
+import type { Signal } from '@angular/core'
+import { inject, Injectable, Injector } from '@angular/core'
 
 import type { PersonDto } from '@/api/swapi/resources/people/people.dto'
 import { mapPersonDtoToModel } from '@/api/swapi/resources/people/people.mapper'
 import type { Person } from '@/api/swapi/resources/people/people.model'
-import { type RetryableHttpResourceMethodOptions } from '@/api/swapi/shared/http/http-retry.interceptor'
+import type { RetryableHttpResourceMethodOptions } from '@/api/swapi/shared/http/http-retry.interceptor'
 import { SwapiResourceService } from '@/api/swapi/shared/http/swapi-resource.service'
 import type { SwapiResourceCollection } from '@/api/swapi/shared/types/model'
 import type { SwapiServiceResult } from '@/api/swapi/shared/types/service'

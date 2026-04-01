@@ -4,6 +4,7 @@ import { defineConfig, globalIgnores } from 'eslint/config'
 import tseslint from 'typescript-eslint'
 import angular from 'angular-eslint'
 import eslintConfigPrettier from 'eslint-config-prettier'
+import eslintPluginImport from 'eslint-plugin-import'
 import simpleImportSort from 'eslint-plugin-simple-import-sort'
 
 export default defineConfig(
@@ -22,16 +23,19 @@ export default defineConfig(
       },
     },
     plugins: {
+      import: eslintPluginImport,
       'simple-import-sort': simpleImportSort,
     },
     rules: {
       'simple-import-sort/imports': 'error',
       'simple-import-sort/exports': 'error',
+      'no-duplicate-imports': 'off',
+      'import/no-duplicates': ['error', { 'prefer-inline': false }],
+      'import/consistent-type-specifier-style': ['error', 'prefer-top-level'],
       '@typescript-eslint/consistent-type-imports': [
         'error',
         {
           prefer: 'type-imports',
-          // TODO: Umstellen. Zumindest im vscode workflow "gibt es da Probleme mit".
           fixStyle: 'separate-type-imports',
         },
       ],
