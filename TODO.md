@@ -1,0 +1,10 @@
+- TODO: Github Pages CSR
+- TODO: CSS in JS Refactoring
+- TODO: @defer statt IntersectionObserver directive
+- TODO: Incremental Hydration
+- TODO: Link List Component fertigstellen
+- TODO: Image Fallback
+- TODO: a11y incl. automated Testing
+- TODO: SVG Sprite Sheet generation
+- TODO: Unit Tests fixen und etwas erweitern
+- TODO: E2E Tests

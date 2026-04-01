@@ -21,7 +21,6 @@
     "@types/express": "^5.0.6",
     "@types/node": "catalog:",
     "bun": "catalog:",
-    "tsx": "catalog:",
     "typescript": "catalog:"
   }
 }
