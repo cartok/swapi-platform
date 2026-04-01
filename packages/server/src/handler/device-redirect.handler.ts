@@ -3,12 +3,12 @@ import {
   deviceContextToPathSegment,
   isDeviceContextPathSegment,
 } from '@swapi/shared/device/context'
-import { ERROR_PATH } from '@swapi/shared/routing/path'
+import { ERROR_PATH } from '@swapi/shared/routing/paths'
 import cookieParser from 'cookie-parser'
 import type express from 'express'
 
 import { env } from '##/env'
-import { getRequestCookie } from '##/handler/request-cookie'
+import { getRequestCookie } from '##/request-cookie'
 
 const JUST_REDIRECTED_COOKIE_KEY = 'justRedirected'
 

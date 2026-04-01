@@ -3,7 +3,7 @@ import '@angular/compiler'
 import { CommonEngine } from '@angular/ssr/node'
 import express from 'express'
 
-import { CLIENT_DIST_FOLDER, INDEX_HTML } from '##/client-dist.paths'
+import { CLIENT_DIST_FOLDER, INDEX_HTML } from '##/client-dist'
 import { env } from '##/env'
 import { addDeviceContextHandler } from '##/handler/device-context.handler'
 import { addDeviceCookieHandler } from '##/handler/device-cookie.handler'

@@ -3,7 +3,7 @@ import {
   DEVICE_FORMATS,
   deviceContextToPathSegment,
 } from '##/device/context'
-import { ERROR_PATH, HOME_PATH } from '##/routing/path'
+import { ERROR_PATH, HOME_PATH } from '##/routing/paths'
 
 export const DEVICE_CONTEXT_PATH_SEGMENTS: readonly string[] =
   createDeviceContextPathSegments()

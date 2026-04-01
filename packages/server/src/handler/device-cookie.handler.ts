@@ -5,7 +5,7 @@ import express from 'express'
 import type { ParamsDictionary } from 'express-serve-static-core'
 
 import { env } from '##/env'
-import { getRequestCookie } from '##/handler/request-cookie'
+import { getRequestCookie } from '##/request-cookie'
 
 const DEVICE_COOKIE_KEY = 'device'
 

@@ -12,7 +12,7 @@ import {
   LenientDeviceContextSchema,
   parseDeviceContext,
 } from '@swapi/shared/device/context'
-import { ERROR_PATH, HOME_PATH } from '@swapi/shared/routing/path'
+import { ERROR_PATH, HOME_PATH } from '@swapi/shared/routing/paths'
 
 const actualRoutes: Routes = [
   {
