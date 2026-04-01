@@ -4,6 +4,7 @@ import { defineConfig, globalIgnores } from 'eslint/config'
 import tseslint from 'typescript-eslint'
 import angular from 'angular-eslint'
 import eslintConfigPrettier from 'eslint-config-prettier'
+import stylistic from '@stylistic/eslint-plugin'
 import eslintPluginImport from 'eslint-plugin-import'
 import simpleImportSort from 'eslint-plugin-simple-import-sort'
 
@@ -23,15 +24,24 @@ export default defineConfig(
       },
     },
     plugins: {
-      import: eslintPluginImport,
+      '@stylistic': stylistic,
       'simple-import-sort': simpleImportSort,
+      import: eslintPluginImport,
     },
     rules: {
-      'simple-import-sort/imports': 'error',
-      'simple-import-sort/exports': 'error',
-      'no-duplicate-imports': 'off',
-      'import/no-duplicates': ['error', { 'prefer-inline': false }],
+      '@stylistic/no-multiple-empty-lines': ['error', { max: 1, maxEOF: 1, maxBOF: 0 }],
       'import/consistent-type-specifier-style': ['error', 'prefer-top-level'],
+      'import/first': 'error',
+      'import/newline-after-import': [
+        'error',
+        { count: 1, exactCount: true, considerComments: true },
+      ],
+      'import/no-duplicates': ['error', { 'prefer-inline': false }],
+      'import/no-self-import': 'error',
+      'import/no-useless-path-segments': ['error', { noUselessIndex: true }],
+      'no-duplicate-imports': 'off',
+      'simple-import-sort/exports': 'error',
+      'simple-import-sort/imports': 'error',
       '@typescript-eslint/consistent-type-imports': [
         'error',
         {
@@ -39,8 +49,8 @@ export default defineConfig(
           fixStyle: 'separate-type-imports',
         },
       ],
-      '@typescript-eslint/no-unused-vars': 'warn',
       '@typescript-eslint/no-empty-function': 'warn',
+      '@typescript-eslint/no-unused-vars': 'warn',
     },
   },
   {

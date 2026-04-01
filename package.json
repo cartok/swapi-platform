@@ -43,6 +43,7 @@
   },
   "devDependencies": {
     "@go-task/cli": "catalog:tooling",
+    "@stylistic/eslint-plugin": "^5.10.0",
     "angular-eslint": "^21.0.1",
     "bun": "catalog:",
     "eslint": "^9.39.4",
