@@ -6,7 +6,6 @@
 
 ---
 
-- TODO: Node 22 auf 24 updaten
 - TODO: Github Pages CSR fixen
 - TODO: Git hooks (clone & push)
 - TODO: Update readme & move to new Repository

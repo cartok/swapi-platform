@@ -22,7 +22,7 @@ Frontend-Implementierung einer ehemaligen erfolgreichen Bewerbungsaufgabe.
 
 Voraussetzungen:
 
-- Node.js `22.22.0` (siehe `.node-version`)
+- Node.js `24.14.1` (siehe `.node-version`)
 - Bun `1.3.9` oder kompatibel
 
 Installation und Start:
