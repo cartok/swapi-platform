@@ -8,8 +8,12 @@ import { ɵSERVER_CONTEXT } from '@angular/platform-server'
 import { CommonEngine } from '@angular/ssr/node'
 import { SSG_PATHS } from '@swapi/shared/routing/ssg-paths'
 
-import { CLIENT_DIST_FOLDER, CLIENT_DIST_FOLDER_URL, INDEX_HTML } from '##/client-dist'
-import { env } from '##/env'
+import {
+  CLIENT_DIST_FOLDER,
+  CLIENT_DIST_FOLDER_URL,
+  INDEX_HTML,
+} from '#internal/client-dist'
+import { env } from '#internal/env'
 
 const { default: bootstrap } = await import('@swapi/client/main.server')
 

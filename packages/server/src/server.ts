@@ -3,12 +3,12 @@ import '@angular/compiler'
 import { CommonEngine } from '@angular/ssr/node'
 import express from 'express'
 
-import { CLIENT_DIST_FOLDER, INDEX_HTML } from '##/client-dist'
-import { env } from '##/env'
-import { addDeviceContextHandler } from '##/handler/device-context.handler'
-import { addDeviceCookieHandler } from '##/handler/device-cookie.handler'
-import { addDeviceRedirectHandler } from '##/handler/device-redirect.handler'
-import { addSecurityHandler } from '##/handler/security.handler'
+import { CLIENT_DIST_FOLDER, INDEX_HTML } from '#internal/client-dist'
+import { env } from '#internal/env'
+import { addDeviceContextHandler } from '#internal/handler/device-context.handler'
+import { addDeviceCookieHandler } from '#internal/handler/device-cookie.handler'
+import { addDeviceRedirectHandler } from '#internal/handler/device-redirect.handler'
+import { addSecurityHandler } from '#internal/handler/security.handler'
 
 let angularAppPromise: Promise<CommonEngine> | undefined
 

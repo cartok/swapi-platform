@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "imports": {
-    "##/*": "./src/*.ts"
+    "#internal/*": "./src/*.ts"
   },
   "dependencies": {
     "@angular/compiler": "catalog:angular",

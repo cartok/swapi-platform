@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "imports": {
-    "##/*": {
+    "#internal/*": {
       "types": "./src/*.ts",
       "@swapi/source": "./src/*.ts",
       "default": "./dist/*.js"

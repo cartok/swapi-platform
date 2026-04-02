@@ -1,6 +1,6 @@
 import type express from 'express'
 
-import { env } from '##/env'
+import { env } from '#internal/env'
 
 if (!process.env['NG_ALLOWED_HOSTS']) {
   throw new Error('NG_ALLOWED_HOSTS is not set.')

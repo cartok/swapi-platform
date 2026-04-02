@@ -4,8 +4,8 @@ import cookieParser from 'cookie-parser'
 import express from 'express'
 import type { ParamsDictionary } from 'express-serve-static-core'
 
-import { env } from '##/env'
-import { getRequestCookie } from '##/request-cookie'
+import { env } from '#internal/env'
+import { getRequestCookie } from '#internal/request-cookie'
 
 const DEVICE_COOKIE_KEY = 'device'
 
