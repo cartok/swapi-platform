@@ -86,7 +86,8 @@
     "\"",
     "'",
     "`",
-    " "
+    " ",
+    "{"
   ],
   "path-autocomplete.triggerOutsideStrings": true,
   // EXTENSION: redhat.vscode-yaml and task.vscode-task
