@@ -2,8 +2,18 @@
 
 - TODO: @defer statt IntersectionObserver directive
 - TODO: Incremental Hydration
+
+---
+
 - TODO: Github Pages CSR fixen
 - TODO: Update readme & move to new Repository
+
+---
+
+- TODO: Verschiedene ports für server in development | production mode
+- TODO: Frontend ports per env setzen
+- TODO: Server start sollte dist verwenden und per default production output mode wählen
+- TODO: Dann noch mal readme updaten
 
 ---
 
@@ -18,40 +28,32 @@
 ---
 
 - TODO: a11y
+- TODO: Automated a11y Testing
 
 ---
 
 - TODO: Fix Unit Tests, add browser API mocks, extend some tests
-- TODO: Automated a11y Testing
 - TODO: E2E Tests
-- TODO: Git hooks (clone & push)
+- TODO: Integration Tests
+- TODO: Git hooks (`push`, evtl.: `clone`, `commit`)
+
+---
+
 - TODO: Cookie based client side feature detection for Firefox & Safari
 
 # Später
 
-- HOSTING & DEPLOYMENT
-- ROBUST AUTOMATED TESTING
-- MONITORING, ALERTING, LOGGIN
-
-## Optional
-
-- TODO: Ggf. Angular App Shell ausprobieren
-- TODO: Create vite plugin for 'vite-plugin-angular-in-monorepo' with automatic resolution
-- TODO: Verbessern der Taskfile `generates` / `sources`
-- TODO: Verbessern der DeviceService API
--
-
-## Weitere Ideen
-
-- NEUE IDEE FÜR DATEN INCL. GRAPHQL IN QUARKUS BACKEND
-- AUTH PER KEYCLOAK
-- KI-FEATURE
+- TODO: Hosting & Deployment
+- TODO: Logging
+- TODO: Monitoring
 
 ---
 
-- OFFLINE CACHING
-- TAB COMMUNICATION
-- TRACKING
+- TODO: Angular App Shell ausprobieren
+- TODO: Create vite plugin for 'vite-plugin-angular-in-monorepo' with automatic resolution
+- TODO: Verbessern der Taskfile `generates` / `sources`
+- TODO: Verbessern der DeviceService API
+- TODO: Alerting
 
 ### Hosting
 
@@ -64,3 +66,9 @@ Grobe Richtung:
    - Alles Mögliche
 2. Eine Serverless Function Variante (Plattform: Vercel oder Netlify)
    - Minimalistischer
+
+### Weitere Ideen
+
+- TODO: Neue Idee für Datengrundlage, ggf. Daten in eigenes Quarkus backend migrieren, säubern, GraphQL, Bilder. Ansonsten etwas anderes ausdenken. Zudem sollte user authentication eine Rolle spielen, so dass ich Keycloak per Quarkus Microservice einbauen kann.
+- TODO: Irgend ein KI-Feature überlegen und einbauen.
+- TODO: Falls das mit der Fallback device detection gut geworden ist für die Kubernetes Version des deployments möglichst alle Kommunikation in einen Quarkus Microservice oder anders performant / per best practices einbauen.

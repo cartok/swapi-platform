@@ -30,7 +30,7 @@ Installation und Start:
 
 ```bash
 bun i
-# Frontend dev server 
+# Frontend dev server
 go-task client:dev
 # Frontend dev server (production mode)
 go-task client:start
