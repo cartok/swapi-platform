@@ -1,6 +1,10 @@
 # Demnächst
 
-- TODO: CSS in JS Refactoring
+- TODO: CSS in JS Refactoring / oder aber Lightning CSS statt PostCSS
+- TODO: Create vite plugin for 'vite-plugin-angular-in-monorepo' with automatic resolution
+
+---
+
 - TODO: @defer statt IntersectionObserver directive
 - TODO: Incremental Hydration
 

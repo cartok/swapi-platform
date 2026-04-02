@@ -71,12 +71,19 @@ export default defineConfig(() => {
         },
       }),
       {
-        name: 'transpile-packages',
+        name: 'vite-plugin-angular-in-monorepo',
         enforce: 'post',
-        async transform(code: string, id: string) {
-          if (id.includes('/packages/client/src/')) return null
-          if (!id.endsWith('.ts')) return null
+        transform: {
+          filter: {
+            moduleType: ['ts'],
+            id: {
+              include: /\/packages\//,
+              exclude: /\/packages\/client\/src\//,
+            },
+          },
+          async handler(code: string, id: string) {
           return transformWithOxc(code, id, { sourcemap: true })
+          },
         },
       },
     ],
