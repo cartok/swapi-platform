@@ -3,7 +3,6 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@swapi/shared": "workspace:*",
     "@angular/common": "catalog:angular",
     "@angular/compiler": "catalog:angular",
     "@angular/core": "catalog:angular",
@@ -12,6 +11,7 @@
     "@angular/platform-server": "catalog:angular",
     "@angular/router": "catalog:angular",
     "@angular/ssr": "catalog:angular",
+    "@swapi/shared": "workspace:*",
     "rxjs": "~7.8.2",
     "tslib": "catalog:"
   },
@@ -31,7 +31,7 @@
   },
   "exports": {
     "./main.server": {
-      "types": "./src/main.server.types.d.ts",
+      "types": "./src/main.server.d.ts",
       "default": "./dist/ssr/main.server.js"
     }
   }

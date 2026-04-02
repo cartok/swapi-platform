@@ -3,7 +3,7 @@
     "@swapi/tsconfig/base",
     "@swapi/tsconfig/rules",
     "@swapi/tsconfig/node",
-    "@swapi/tsconfig/node.lib"
+    "@swapi/tsconfig/lib"
   ],
   "compilerOptions": {
     "rootDir": "./src",
