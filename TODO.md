@@ -13,6 +13,8 @@
 - TODO: Verschiedene ports für server in development | production mode
 - TODO: Frontend ports per env setzen
 - TODO: Server start sollte dist verwenden und per default production output mode wählen
+- TODO: vscode launch config updaten für debugging workflow
+- TODO: evtl. vscode tasks welche taskfile tasks ausführen für standard und komplexe Workflows, vorher noch mal taskfile extension ausprobieren
 - TODO: Dann noch mal readme updaten
 
 ---
