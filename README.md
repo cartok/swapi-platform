@@ -22,19 +22,29 @@ Frontend-Implementierung einer ehemaligen erfolgreichen Bewerbungsaufgabe.
 
 Voraussetzungen:
 
-- Node.js `24.14.1` (siehe `.node-version`)
-- Bun `1.3.9` oder kompatibel
+- Node.js `24.14.1`
+- Bun: per `bunx bun` einheitliche Version nutzbar
+- Taskfile: per `bunx go-task` Version ohne cli completion nutzbar
 
 Installation und Start:
 
 ```bash
 bun i
+# Frontend dev server 
 go-task client:dev
+# Frontend dev server (production mode)
+go-task client:start
+# SSR + SSG server, incl. device detection
+go-task server:dev
+# SSR + SSG server, incl. device detection (production mode)
+go-task server:start
 ```
 
 App lokal:
 
-- `http://localhost:4200`
+- Frontend dev server: `http://localhost:4200`
+- Frontend dev server (production mode): `http://localhost:4300`
+- SSR + SSG server: `http://localhost:50000`
 
 ## Anfägliche Dokumentation
 
