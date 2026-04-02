@@ -6,28 +6,27 @@
 
 > Weil man dadurch den SSR Server besser vom Frontend trennen kann. In production könnte das etwas anderes als der Node Server sein/werden.
 
-### Über vanilla-extract vs PostCSS im Kontext der CSS Media Queries
+### Über vanilla-extract vs PostCSS | Lightning CSS im Kontext der CSS Media Queries
+
+> **Update:** Ich werde nun Lightning CSS statt PostCSS verwenden und auf CSS-in-JS per vanilla-extract verzichten, weil es mehr Komplexität mit sich bringt und eine größere Hürde für andere Entwickler ist, die mit vanilla-extract-css nicht vertraut sind. Ziel ist es ein hoch performantes, sauberes, **einfaches**, sicheres Template Projekt zu erzeugen. Die Analyse hier drunter ist also veraltet.
 
 Vorweg: Warum überhaupt die Generierung?
 
-> Weil die Breakpoints zumindest in der JS Nutzung über den `DeviceService` typesafe sein sollten.
-> Weil die Breakpoints nicht an zwei Stellen (CSS & JS) definiert werden sollten
+- Weil die Breakpoints zumindest in der JS Nutzung über den `DeviceService` typesafe sein sollten.
+- Weil die Breakpoints nicht an zwei Stellen (CSS & JS) definiert werden sollten
 
 #### vanilla-extract
 
 ##### Pro
 
 - CSS & JS wäre beides typesafe
-- Kein extra Tooling nötig, aber bringt ja wiederum Tooling mit (siehe Kontra)
+- Saubere Auto-Completion für Dinge wie die Breakpoints, ohne spezielles Tooling
 
 ##### Kontra
 
 - `ng update|(add)`: Man müsste für die Intergration auf Angular version updates via Angular CLI verzichten, siehe: https://angular.dev/ecosystem/custom-build-pipeline#what-are-the-options
 - Extra `<component>.css.ts` files, sofern man die Struktur nicht brechen will, indem man den CSS-in-JS code über die Component Classes in `<component>.ts` packt. Daraus ergibt sich so ein workflow: Man bearbeitet, nachdem man die styles in `<component>.ts` importiert hat `<component>.css.ts` idr. parallel mit `<component>.css` und dann `<component>.html`. Spricht dafür CSS komplett auszutauschen.
-- Bietet mehr Optionen.
-  - Andere Entwickler könnten damit CSS und CSS-in-JS definieren
-  - Andere Entwickler könnten Media Queries in CSS und CSS-in-JS definieren
-- Ich bin mir ohne weiteres nicht sicher, ob es da nicht zu Spezifitäts-Problemen kommen kann wenn man die CSS-in-JS generierten CSS Klassen zusammen mit Angular standard CSS Klassen verwendet. Könnte man aber vermutlich lösen. Spricht dafür CSS komplett auszutauschen.
+- Mehr Komplexität
 
 #### PostCSS
 
@@ -41,7 +40,8 @@ Vorweg: Warum überhaupt die Generierung?
 
 - Zumindets in VSCode gibt es kein gescheites PostCSS Plugin. Man muss bei den media queries auf auto-completion verzichten und unknown @-rule per project settings.json erlauben.
 - Zumindest per default (ggf. gibts Lösungen, Scripten könnte man es ohne viel Aufwand extern von Linting-Tools. Vermutlich könnte man auch stylelint verwenden oder ähnliches, ist aber wiederum mehr tooling, würde aber wiederum auch mehr optionen bieten wie z. B. automatische sortierung von CSS Properties) gibt es in CSS kein Linting bzgl. vorhandener properties (variablen). D. h. dass zum Beispiel nach dem Entfernen eines Breakpoints kein Linter warnt, wenn man noch den alten verwendet.
-- Die media query tokens kann man nicht mit anderen Queries kombinieren. Das heist man müsste tokens für alle möglichen media queries als karthesisches Produkt generieren, was insane ist. Aktuell habe ich nur width & height generiert. Da wäre es sogar allgemein besser auf das custom-media plugin zu verzichten, wodurch PostCSS ganz raus kann, auch wenn man dann nicht mehr single source of truth bzgl. der breakpoints hat. Hier muss definitv was geändert werden. Entweder ein anderer Präprozessor oder CSS-in-JS.
+- ~~Die media query tokens kann man nicht mit anderen Queries kombinieren. Das heist man müsste tokens für alle möglichen media queries als karthesisches Produkt generieren, was insane ist. Aktuell habe ich nur width & height generiert. Da wäre es sogar allgemein besser auf das custom-media plugin zu verzichten, wodurch PostCSS ganz raus kann, auch wenn man dann nicht mehr single source of truth bzgl. der breakpoints hat. Hier muss definitv was geändert werden. Entweder ein anderer Präprozessor oder CSS-in-JS.~~
+  Ich hatte vermutlich falsch getestet. Die `@custom-media` tokens lassen sich verbinden, vermutlich nur nicht untereinander. Per standard `@media` direktive ist es kein Problem z. B.: `@media (--foo) and (--bar) {}`.
 
 ### Ermitteln des Device Contexts
 
