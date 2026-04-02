@@ -2,12 +2,7 @@
 
 - TODO: @defer statt IntersectionObserver directive
 - TODO: Incremental Hydration
-- TODO: Ggf. Angular App Shell ausprobieren
-
----
-
 - TODO: Github Pages CSR fixen
-- TODO: Git hooks (clone & push)
 - TODO: Update readme & move to new Repository
 
 ---
@@ -19,31 +14,34 @@
 - TODO: Image Fallback
 - TODO: Page-Global CSS Cursor + use during image slider drag
 - TODO: Link List Component fertigstellen
-- TODO: a11y
 
 ---
 
-- TODO: Verbessern der DeviceService API
+- TODO: a11y
 
 ---
 
 - TODO: Fix Unit Tests, add browser API mocks, extend some tests
 - TODO: Automated a11y Testing
 - TODO: E2E Tests
+- TODO: Git hooks (clone & push)
 - TODO: Cookie based client side feature detection for Firefox & Safari
-
-## Optional
-
-- TODO: Create vite plugin for 'vite-plugin-angular-in-monorepo' with automatic resolution
 
 # Später
 
 - HOSTING & DEPLOYMENT
 - ROBUST AUTOMATED TESTING
 - MONITORING, ALERTING, LOGGIN
+
+## Optional
+
+- TODO: Ggf. Angular App Shell ausprobieren
+- TODO: Create vite plugin for 'vite-plugin-angular-in-monorepo' with automatic resolution
+- TODO: Verbessern der Taskfile `generates` / `sources`
+- TODO: Verbessern der DeviceService API
 -
 
-# Weitere Ideen
+## Weitere Ideen
 
 - NEUE IDEE FÜR DATEN INCL. GRAPHQL IN QUARKUS BACKEND
 - AUTH PER KEYCLOAK
