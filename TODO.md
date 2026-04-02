@@ -32,6 +32,10 @@
 
 ---
 
+- TODO: Angular App Shell ausprobieren
+
+---
+
 - TODO: Fix Unit Tests, add browser API mocks, extend some tests
 - TODO: Automated a11y Testing
 - TODO: E2E Tests
