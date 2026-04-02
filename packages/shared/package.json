@@ -10,7 +10,9 @@
     }
   },
   "exports": {
+    "./generated/*": "./generated/*",
     "./generated/types/*": "./generated/types/*.d.ts",
+    "./generated/css/*": "./generated/css/*",
     "./generated/validators/*": {
       "types": "./generated/validators/*.d.ts",
       "default": "./generated/validators/*.js"

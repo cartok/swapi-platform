@@ -27,7 +27,7 @@ tasks:
     deps:
       - task: generate:device-cookie:types
       - task: generate:device-cookie:validator
-      - task: generate:postcss-media-tokens
+      - task: generate:custom-media-tokens
 
   generate:device-cookie:types:
     sources:
@@ -62,9 +62,9 @@ tasks:
         --conditions @swapi/source
         ./generators/device-cookie.validator.generator.ts
 
-  generate:postcss-media-tokens:
+  generate:custom-media-tokens:
     sources:
-      - ./generators/postcss-media-tokens.*
+      - ./generators/custom-media-tokens.*
       - ./src/device/context.ts
     generates:
       - ./generated/css/media.css
@@ -74,4 +74,4 @@ tasks:
       - >
         bunx --no-install bun
         --conditions @swapi/source
-        ./generators/postcss-media-tokens.generator.ts
+        ./generators/custom-media-tokens.generator.ts

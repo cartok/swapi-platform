@@ -19,12 +19,10 @@
     "@analogjs/vite-plugin-angular": "catalog:angular",
     "@angular/build": "catalog:angular",
     "@angular/compiler-cli": "catalog:angular",
-    "@csstools/postcss-global-data": "4.0.0",
     "@go-task/cli": "catalog:tooling",
     "bun": "catalog:",
     "jsdom": "catalog:testing",
-    "postcss": "^8.5.8",
-    "postcss-custom-media": "^12.0.1",
+    "lightningcss": "catalog:tooling",
     "typescript": "catalog:",
     "vite": "catalog:tooling",
     "vitest": "catalog:testing"

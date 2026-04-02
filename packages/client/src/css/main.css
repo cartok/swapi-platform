@@ -1,0 +1,13 @@
+@layer reset, base, global;
+
+@import '@swapi/shared/generated/css/media';
+
+@import '@/css/reset' layer(reset);
+
+@import '@/css/variables/layout' layer(base);
+@import '@/css/variables/colors' layer(base);
+@import '@/css/variables/typography' layer(base);
+
+@import '@/css/classes/layout' layer(global);
+@import '@/css/classes/typography' layer(global);
+@import '@/css/classes/truncation' layer(global);

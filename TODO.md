@@ -1,12 +1,8 @@
 # Demnächst
 
-- TODO: CSS in JS Refactoring / oder aber Lightning CSS statt PostCSS
-- TODO: Create vite plugin for 'vite-plugin-angular-in-monorepo' with automatic resolution
-
----
-
 - TODO: @defer statt IntersectionObserver directive
 - TODO: Incremental Hydration
+- TODO: Ggf. Angular App Shell ausprobieren
 
 ---
 
@@ -32,14 +28,14 @@
 
 ---
 
-- TODO: Angular App Shell ausprobieren
-
----
-
 - TODO: Fix Unit Tests, add browser API mocks, extend some tests
 - TODO: Automated a11y Testing
 - TODO: E2E Tests
 - TODO: Cookie based client side feature detection for Firefox & Safari
+
+## Optional
+
+- TODO: Create vite plugin for 'vite-plugin-angular-in-monorepo' with automatic resolution
 
 # Später
 
@@ -60,7 +56,7 @@
 - TAB COMMUNICATION
 - TRACKING
 
-## Hosting
+### Hosting
 
 Grobe Richtung:
 

@@ -41,11 +41,13 @@
   },
   "[html]": {
     "editor.formatOnSave": true,
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "path-autocomplete.includeExtension": true
   },
   "[css]": {
     "editor.formatOnSave": true,
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "path-autocomplete.includeExtension": true
   },
   "[yaml]": {
     "editor.formatOnSave": false,
@@ -74,7 +76,38 @@
   // EXTENSION: ionutvmi.path-autocomplete
   "path-autocomplete.enableFolderTrailingSlash": true,
   "path-autocomplete.pathMappings": {
-    "/fonts": "${folder}/packages/client/public/fonts"
+    "/fonts": {
+      "conditions": [
+        {
+          "when": "**/packages/client/**/*.{css,html}",
+          "value": "${folder}/packages/client/public/fonts"
+        }
+      ]
+    },
+    "@swapi": {
+      "conditions": [
+        {
+          "when": "**/packages/client/**/*.{css,html}",
+          "value": "${workspace}/packages"
+        }
+      ]
+    },
+    "@/css": {
+      "conditions": [
+        {
+          "when": "**/packages/client/**/*.{css,html}",
+          "value": "${workspace}/packages/client/src/css"
+        }
+      ]
+    },
+    "@": {
+      "conditions": [
+        {
+          "when": "**/packages/client/**/*.{css,html}",
+          "value": "${workspace}/packages/client/src"
+        }
+      ]
+    }
   },
   "path-autocomplete.ignoredPrefixes": [
     "=\"/",

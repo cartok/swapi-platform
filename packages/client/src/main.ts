@@ -1,4 +1,4 @@
-import './styles.css'
+import '@/css/main.css'
 
 import { enableProdMode } from '@angular/core'
 import { bootstrapApplication } from '@angular/platform-browser'

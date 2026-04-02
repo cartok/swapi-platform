@@ -31,10 +31,22 @@ export default defineConfig(() => {
       mainFields: ['module'],
       alias: [
         {
+          find: /^@\/css\//,
+          replacement: fileURLToPath(new URL('./src/css/', import.meta.url)),
+        },
+        {
           find: /^@\//,
           replacement: fileURLToPath(new URL('./src/app/', import.meta.url)),
         },
       ],
+    },
+    css: {
+      transformer: 'lightningcss',
+      lightningcss: {
+        drafts: {
+          customMedia: true,
+        },
+      },
     },
     server: {
       host: 'localhost',
@@ -82,7 +94,7 @@ export default defineConfig(() => {
             },
           },
           async handler(code: string, id: string) {
-          return transformWithOxc(code, id, { sourcemap: true })
+            return transformWithOxc(code, id, { sourcemap: true })
           },
         },
       },
