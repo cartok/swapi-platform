@@ -1,9 +1,5 @@
 # Demnächst
 
-- TODO: Incremental Hydration
-
----
-
 - TODO: Github Pages CSR fixen
 - TODO: Update readme & move to new Repository
 

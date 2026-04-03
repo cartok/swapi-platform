@@ -21,13 +21,8 @@
   }
 
   @if (data && data.filmIds.length) {
-    <app-labeled-box
-      slotLinks
-      containerTag="nav"
-      heading="Films"
-      headingId="film-links"
-    >
-      @defer (on viewport) {
+    <app-labeled-box slotLinks containerTag="nav" heading="Films" headingId="film-links">
+      @defer (on viewport; hydrate on viewport) {
         @if (filmItems().length) {
           <app-link-list>
             @for (film of filmItems(); track film.id) {

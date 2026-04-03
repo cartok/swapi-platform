@@ -30,7 +30,7 @@
       heading="Characters"
       headingId="character-links"
     >
-      @defer (on viewport) {
+      @defer (on viewport; hydrate on viewport) {
         @if (characterItems().length) {
           <app-link-list>
             @for (character of characterItems(); track character.id) {
@@ -57,7 +57,7 @@
       heading="Planets"
       headingId="planet-links"
     >
-      @defer (on viewport) {
+      @defer (on viewport; hydrate on viewport) {
         @if (planetItems().length) {
           <app-link-list>
             @for (planet of planetItems(); track planet.id) {

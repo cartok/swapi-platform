@@ -7,6 +7,10 @@ import {
   provideEnvironmentInitializer,
   provideZonelessChangeDetection,
 } from '@angular/core'
+import {
+  provideClientHydration,
+  withIncrementalHydration,
+} from '@angular/platform-browser'
 import { provideRouter, withInMemoryScrolling, withRouterConfig } from '@angular/router'
 
 import { httpRetryInterceptor } from '@/api/swapi/shared/http/http-retry.interceptor'
@@ -16,6 +20,7 @@ import { DeviceService } from '@/services/DeviceService'
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZonelessChangeDetection(),
+    provideClientHydration(withIncrementalHydration()),
     { provide: LOCALE_ID, useValue: 'en-US' },
     { provide: LocationStrategy, useClass: NoTrailingSlashPathLocationStrategy },
     provideEnvironmentInitializer(() => inject(DeviceService)),
