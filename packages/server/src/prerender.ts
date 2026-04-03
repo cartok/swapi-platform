@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url'
 
 import { ɵSERVER_CONTEXT } from '@angular/platform-server'
 import { CommonEngine } from '@angular/ssr/node'
+import { HOME_PATH } from '@swapi/shared/routing/paths'
 import { SSG_PATHS } from '@swapi/shared/routing/ssg-paths'
 
 import {
@@ -30,10 +31,9 @@ for (const path of SSG_PATHS) {
     documentFilePath: INDEX_HTML,
     publicPath: CLIENT_DIST_FOLDER,
   })
-  const outputFilePath = fileURLToPath(
-    new URL(`./${path}/index.html`, CLIENT_DIST_FOLDER_URL),
-  )
-  console.log(`SSG: Rendered /${path}/index.html`)
+  const indexPath = path === HOME_PATH ? './index.html' : `./${path}/index.html`
+  const outputFilePath = fileURLToPath(new URL(indexPath, CLIENT_DIST_FOLDER_URL))
+  console.log('SSG: Rendered', indexPath.replace(/^\./, ''))
   await mkdir(dirname(outputFilePath), { recursive: true })
   await writeFile(outputFilePath, html, 'utf8')
 }
