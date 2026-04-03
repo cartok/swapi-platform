@@ -8,7 +8,7 @@
   @if (data) {
     <section slotDetails aria-labelledby="details-heading">
       <app-labeled-box>
-        <h2 #label class="g-title-3" id="details-heading">Details:</h2>
+        <h2 class="g-title-3" id="details-heading">Details:</h2>
         <app-row-description-list [items]="descriptionRows()" />
       </app-labeled-box>
     </section>
@@ -24,7 +24,7 @@
       appVisibleTrigger
       (becameVisible)="onResidentLinksVisible()"
     >
-      <h2 #label class="g-title-3" id="details-heading">Residents:</h2>
+      <h2 class="g-title-3" id="details-heading">Residents:</h2>
       @if (residentItems().length) {
         <app-link-list>
           @for (resident of residentItems(); track $index) {
@@ -39,7 +39,7 @@
 
   @if (data && data.filmIds.length) {
     <app-labeled-box slotLinks appVisibleTrigger (becameVisible)="onFilmLinksVisible()">
-      <h2 #label class="g-title-3" id="details-heading">Films:</h2>
+      <h2 class="g-title-3" id="details-heading">Films:</h2>
       @if (filmItems().length) {
         <app-link-list>
           @for (film of filmItems(); track $index) {
