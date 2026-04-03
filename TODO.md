@@ -10,6 +10,8 @@
 - TODO: Server start sollte dist verwenden und per default production output mode wählen
 - TODO: vscode launch config updaten für debugging workflow
 - TODO: evtl. vscode tasks welche taskfile tasks ausführen für standard und komplexe Workflows, vorher noch mal taskfile extension ausprobieren
+- TODO: Server dev flow verbessern (watch modes)
+- TODO: Beim `server:dev` Task ist ein Fehler aufgefallen, der nur manchmal auftritt, vermutlich aber nichts mit dem Code zu tun hat, sondern eher ein Fehler von Vite's Hot Reload ist: "Error: JIT compiler unavailable"
 - TODO: Dann noch mal readme updaten
 - TODO: tsconfig.typecheck (stashed)
 - TODO: Warnings (browser console) untersuchen: NgOptimizedImage aspect ratio (slider images), unused preloaded resources
@@ -53,6 +55,9 @@
 - TODO: Verbessern der Taskfile `generates` / `sources`
 - TODO: Verbessern der DeviceService API
 - TODO: Alerting
+- TODO: i18n
+- TODO: Web Vitals gegen checken
+- TODO: SEO gegen checken und mal etwas structured data einbauen
 
 ### Hosting
 
