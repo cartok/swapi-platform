@@ -3,7 +3,7 @@
 
   @if (data) {
     <app-heading
-      resourceDetailHeading
+      slotHeading
       location="Film Details"
       [title]="data.title"
       [subtitle]="`Episode ${data.episodeId}`"
@@ -11,7 +11,7 @@
   }
 
   @if (data) {
-    <section resourceDetailDetails aria-labelledby="details-heading">
+    <section slotDetails aria-labelledby="details-heading">
       <app-labeled-box>
         <h2 #label class="g-title-3" id="details-heading">Details:</h2>
         <app-row-description-list [items]="descriptionRows()" />
@@ -21,16 +21,12 @@
   }
 
   @if (data && data.images.length) {
-    <app-image-slider
-      resourceDetailSlider
-      [images]="data.images"
-      [viewportHeight]="374"
-    />
+    <app-image-slider slotSlider [images]="data.images" [viewportHeight]="374" />
   }
 
   @if (data && data.characterIds.length) {
     <app-labeled-box
-      resourceDetailLinks
+      slotLinks
       appVisibleTrigger
       (becameVisible)="onCharacterLinksVisible()"
     >
@@ -48,11 +44,7 @@
   }
 
   @if (data && data.planetIds.length) {
-    <app-labeled-box
-      resourceDetailLinks
-      appVisibleTrigger
-      (becameVisible)="onPlanetLinksVisible()"
-    >
+    <app-labeled-box slotLinks appVisibleTrigger (becameVisible)="onPlanetLinksVisible()">
       <h2 #label class="g-title-3" id="details-heading">Planets:</h2>
       @if (planetItems().length) {
         <app-link-list>
