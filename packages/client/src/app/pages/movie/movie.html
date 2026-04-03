@@ -11,13 +11,10 @@
   }
 
   @if (data) {
-    <section slotDetails aria-labelledby="details-heading">
-      <app-labeled-box>
-        <h2 class="g-title-3" id="details-heading">Details:</h2>
-        <app-row-description-list [items]="descriptionRows()" />
-      </app-labeled-box>
-      <p class="g-text-1 description">{{ data.openingCrawl }}</p>
-    </section>
+    <app-labeled-box containerTag="section" heading="Details" headingId="movie-details">
+      <app-row-description-list [items]="descriptionRows()" />
+    </app-labeled-box>
+    <p class="g-text-1 description">{{ data.openingCrawl }}</p>
   }
 
   @if (data && data.images.length) {
@@ -27,10 +24,12 @@
   @if (data && data.characterIds.length) {
     <app-labeled-box
       slotLinks
+      containerTag="nav"
+      heading="Characters"
+      headingId="character-links"
       appVisibleTrigger
       (becameVisible)="onCharacterLinksVisible()"
     >
-      <h2 class="g-title-3" id="details-heading">Characters:</h2>
       @if (characterItems().length) {
         <app-link-list>
           @for (character of characterItems(); track $index) {
@@ -44,8 +43,14 @@
   }
 
   @if (data && data.planetIds.length) {
-    <app-labeled-box slotLinks appVisibleTrigger (becameVisible)="onPlanetLinksVisible()">
-      <h2 class="g-title-3" id="details-heading">Planets:</h2>
+    <app-labeled-box
+      slotLinks
+      containerTag="nav"
+      heading="Planets"
+      headingId="planet-links"
+      appVisibleTrigger
+      (becameVisible)="onPlanetLinksVisible()"
+    >
       @if (planetItems().length) {
         <app-link-list>
           @for (planet of planetItems(); track $index) {

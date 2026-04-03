@@ -6,12 +6,9 @@
   }
 
   @if (data) {
-    <section slotDetails aria-labelledby="details-heading">
-      <app-labeled-box>
-        <h2 class="g-title-3" id="details-heading">Details:</h2>
-        <app-row-description-list [items]="descriptionRows()" />
-      </app-labeled-box>
-    </section>
+    <app-labeled-box containerTag="section" heading="Details" headingId="planet-details">
+      <app-row-description-list [items]="descriptionRows()" />
+    </app-labeled-box>
   }
 
   @if (data && data.images.length) {
@@ -21,10 +18,12 @@
   @if (data && data.residentIds.length) {
     <app-labeled-box
       slotLinks
+      containerTag="nav"
+      heading="Residents"
+      headingId="resident-links"
       appVisibleTrigger
       (becameVisible)="onResidentLinksVisible()"
     >
-      <h2 class="g-title-3" id="details-heading">Residents:</h2>
       @if (residentItems().length) {
         <app-link-list>
           @for (resident of residentItems(); track $index) {
@@ -38,8 +37,14 @@
   }
 
   @if (data && data.filmIds.length) {
-    <app-labeled-box slotLinks appVisibleTrigger (becameVisible)="onFilmLinksVisible()">
-      <h2 class="g-title-3" id="details-heading">Films:</h2>
+    <app-labeled-box
+      slotLinks
+      containerTag="nav"
+      heading="Films"
+      headingId="film-links"
+      appVisibleTrigger
+      (becameVisible)="onFilmLinksVisible()"
+    >
       @if (filmItems().length) {
         <app-link-list>
           @for (film of filmItems(); track $index) {

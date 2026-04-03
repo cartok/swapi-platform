@@ -1,3 +1,28 @@
-<div class="labeled-box">
+@switch (containerTag()) {
+  @case ('nav') {
+    <nav
+      class="labeled-box"
+      [attr.aria-labelledby]="headingId() ?? null"
+      [attr.aria-label]="headingId() ? null : heading()"
+    >
+      <ng-container [ngTemplateOutlet]="content" />
+    </nav>
+  }
+  @case ('section') {
+    <section class="labeled-box">
+      <ng-container [ngTemplateOutlet]="content" />
+    </section>
+  }
+  @default {
+    <div class="labeled-box">
+      <ng-container [ngTemplateOutlet]="content" />
+    </div>
+  }
+}
+
+<ng-template #content>
+  @if (heading()) {
+    <h2 class="g-title-3" [attr.id]="headingId() ?? null">{{ heading() }}:</h2>
+  }
   <ng-content />
-</div>
+</ng-template>

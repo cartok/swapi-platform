@@ -6,12 +6,13 @@
   }
 
   @if (data) {
-    <section slotDetails aria-labelledby="details-heading">
-      <app-labeled-box>
-        <h2 #label class="g-title-3" id="details-heading">Details:</h2>
-        <app-row-description-list [items]="descriptionRows()" />
-      </app-labeled-box>
-    </section>
+    <app-labeled-box
+      containerTag="section"
+      heading="Details"
+      headingId="character-details"
+    >
+      <app-row-description-list [items]="descriptionRows()" />
+    </app-labeled-box>
   }
 
   @if (data && data.images.length) {
@@ -19,16 +20,24 @@
   }
 
   @if (data && data.filmIds.length) {
-    <app-labeled-box slotLinks appVisibleTrigger (becameVisible)="onFilmLinksVisible()">
-      <h2 class="g-title-3" id="details-heading">Films:</h2>
-      @if (filmItems().length) {
-        <app-link-list>
-          @for (film of filmItems(); track $index) {
-            <app-link-list-item [linkUri]="['/movie', film.id]">
-              {{ film.title }}
-            </app-link-list-item>
-          }
-        </app-link-list>
+    <app-labeled-box
+      slotLinks
+      containerTag="nav"
+      heading="Films"
+      headingId="film-links"
+      appVisibleTrigger
+      (becameVisible)="onFilmLinksVisible()"
+    >
+      @defer {
+        @if (filmItems().length) {
+          <app-link-list>
+            @for (film of filmItems(); track $index) {
+              <app-link-list-item [linkUri]="['/movie', film.id]">
+                {{ film.title }}
+              </app-link-list-item>
+            }
+          </app-link-list>
+        }
       }
     </app-labeled-box>
   }
