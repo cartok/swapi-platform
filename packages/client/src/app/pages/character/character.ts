@@ -4,7 +4,6 @@ import {
   computed,
   effect,
   inject,
-  signal,
 } from '@angular/core'
 import { toSignal } from '@angular/core/rxjs-interop'
 import { ActivatedRoute, Router } from '@angular/router'
@@ -20,7 +19,6 @@ import { LinkList } from '@/components/link-list/link-list'
 import { LinkListItem } from '@/components/link-list/link-list-item/link-list-item'
 import { RowDescriptionList } from '@/components/row-description-list/row-description-list'
 import { DetailPageLayout } from '@/layouts/detail-page-layout/detail-page-layout'
-import { VisibleTriggerDirective } from '@/shared/directives/visible-trigger/visible-trigger'
 import type { InputValue } from '@/shared/types/component.types'
 
 @Component({
@@ -33,7 +31,6 @@ import type { InputValue } from '@/shared/types/component.types'
     LabeledBox,
     LinkListItem,
     DetailPageLayout,
-    VisibleTriggerDirective,
   ],
   templateUrl: './character.html',
   styleUrl: './character.css',
@@ -51,14 +48,7 @@ export class Character {
   readonly item = this.peopleService.getItem(this.id, {
     retryPolicy: CRITICAL_HTTP_RETRY_POLICY,
   })
-  readonly showFilmLinks = signal(false)
-  readonly filmIds = computed<string[]>(() => {
-    if (!this.showFilmLinks()) {
-      return []
-    }
-
-    return this.item.data()?.filmIds ?? []
-  })
+  readonly filmIds = computed<string[]>(() => this.item.data()?.filmIds ?? [])
   readonly films = this.filmsService.getItems(this.filmIds)
   readonly filmItems = computed(() => this.films.data())
 
@@ -100,9 +90,5 @@ export class Character {
         void this.router.navigate(['/error'])
       }
     })
-  }
-
-  onFilmLinksVisible(): void {
-    this.showFilmLinks.set(true)
   }
 }

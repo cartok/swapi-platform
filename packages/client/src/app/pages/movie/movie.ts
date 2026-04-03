@@ -4,7 +4,6 @@ import {
   computed,
   effect,
   inject,
-  signal,
 } from '@angular/core'
 import { toSignal } from '@angular/core/rxjs-interop'
 import { ActivatedRoute, Router } from '@angular/router'
@@ -21,7 +20,6 @@ import { LinkList } from '@/components/link-list/link-list'
 import { LinkListItem } from '@/components/link-list/link-list-item/link-list-item'
 import { RowDescriptionList } from '@/components/row-description-list/row-description-list'
 import { DetailPageLayout } from '@/layouts/detail-page-layout/detail-page-layout'
-import { VisibleTriggerDirective } from '@/shared/directives/visible-trigger/visible-trigger'
 import type { InputValue } from '@/shared/types/component.types'
 
 @Component({
@@ -34,7 +32,6 @@ import type { InputValue } from '@/shared/types/component.types'
     LabeledBox,
     LinkListItem,
     DetailPageLayout,
-    VisibleTriggerDirective,
   ],
   templateUrl: './movie.html',
   styleUrl: './movie.css',
@@ -53,24 +50,10 @@ export class Movie {
   readonly item = this.filmsService.getItem(this.id, {
     retryPolicy: CRITICAL_HTTP_RETRY_POLICY,
   })
-  readonly showCharacterLinks = signal(false)
-  readonly characterIds = computed<string[]>(() => {
-    if (!this.showCharacterLinks()) {
-      return []
-    }
-
-    return this.item.data()?.characterIds ?? []
-  })
+  readonly characterIds = computed<string[]>(() => this.item.data()?.characterIds ?? [])
   readonly characters = this.peopleService.getItems(this.characterIds)
   readonly characterItems = computed(() => this.characters.data())
-  readonly showPlanetLinks = signal(false)
-  readonly planetIds = computed<string[]>(() => {
-    if (!this.showPlanetLinks()) {
-      return []
-    }
-
-    return this.item.data()?.planetIds ?? []
-  })
+  readonly planetIds = computed<string[]>(() => this.item.data()?.planetIds ?? [])
   readonly planets = this.planetsService.getItems(this.planetIds)
   readonly planetItems = computed(() => this.planets.data())
 
@@ -100,13 +83,5 @@ export class Movie {
         void this.router.navigate(['/error'])
       }
     })
-  }
-
-  onCharacterLinksVisible(): void {
-    this.showCharacterLinks.set(true)
-  }
-
-  onPlanetLinksVisible(): void {
-    this.showPlanetLinks.set(true)
   }
 }

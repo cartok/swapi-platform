@@ -1,6 +1,5 @@
 # Demnächst
 
-- TODO: @defer statt IntersectionObserver directive
 - TODO: Incremental Hydration
 
 ---

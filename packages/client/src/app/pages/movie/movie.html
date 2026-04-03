@@ -11,10 +11,12 @@
   }
 
   @if (data) {
-    <app-labeled-box containerTag="section" heading="Details" headingId="movie-details">
-      <app-row-description-list [items]="descriptionRows()" />
-    </app-labeled-box>
-    <p class="g-text-1 description">{{ data.openingCrawl }}</p>
+    <ng-container slotDetails>
+      <app-labeled-box containerTag="section" heading="Details" headingId="movie-details">
+        <app-row-description-list [items]="descriptionRows()" />
+      </app-labeled-box>
+      <p class="g-text-1 description">{{ data.openingCrawl }}</p>
+    </ng-container>
   }
 
   @if (data && data.images.length) {
@@ -27,15 +29,21 @@
       containerTag="nav"
       heading="Characters"
       headingId="character-links"
-      appVisibleTrigger
-      (becameVisible)="onCharacterLinksVisible()"
     >
-      @if (characterItems().length) {
-        <app-link-list>
-          @for (character of characterItems(); track $index) {
-            <app-link-list-item [linkUri]="['/character', character.id]">
-              {{ character.name }}
-            </app-link-list-item>
+      @defer (on viewport) {
+        @if (characterItems().length) {
+          <app-link-list>
+            @for (character of characterItems(); track character.id) {
+              <app-link-list-item [linkUri]="['/character', character.id]">
+                {{ character.name }}
+              </app-link-list-item>
+            }
+          </app-link-list>
+        }
+      } @placeholder {
+        <app-link-list inert>
+          @for (characterId of data.characterIds; track characterId) {
+            <app-link-list-item />
           }
         </app-link-list>
       }
@@ -48,15 +56,21 @@
       containerTag="nav"
       heading="Planets"
       headingId="planet-links"
-      appVisibleTrigger
-      (becameVisible)="onPlanetLinksVisible()"
     >
-      @if (planetItems().length) {
-        <app-link-list>
-          @for (planet of planetItems(); track $index) {
-            <app-link-list-item [linkUri]="['/planet', planet.id]">
-              {{ planet.name }}
-            </app-link-list-item>
+      @defer (on viewport) {
+        @if (planetItems().length) {
+          <app-link-list>
+            @for (planet of planetItems(); track planet.id) {
+              <app-link-list-item [linkUri]="['/planet', planet.id]">
+                {{ planet.name }}
+              </app-link-list-item>
+            }
+          </app-link-list>
+        }
+      } @placeholder {
+        <app-link-list inert>
+          @for (planetId of data.planetIds; track planetId) {
+            <app-link-list-item />
           }
         </app-link-list>
       }

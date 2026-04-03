@@ -4,7 +4,6 @@ import {
   computed,
   effect,
   inject,
-  signal,
 } from '@angular/core'
 import { toSignal } from '@angular/core/rxjs-interop'
 import { ActivatedRoute, Router } from '@angular/router'
@@ -21,7 +20,6 @@ import { LinkList } from '@/components/link-list/link-list'
 import { LinkListItem } from '@/components/link-list/link-list-item/link-list-item'
 import { RowDescriptionList } from '@/components/row-description-list/row-description-list'
 import { DetailPageLayout } from '@/layouts/detail-page-layout/detail-page-layout'
-import { VisibleTriggerDirective } from '@/shared/directives/visible-trigger/visible-trigger'
 import type { InputValue } from '@/shared/types/component.types'
 
 @Component({
@@ -34,7 +32,6 @@ import type { InputValue } from '@/shared/types/component.types'
     LabeledBox,
     LinkListItem,
     DetailPageLayout,
-    VisibleTriggerDirective,
   ],
   templateUrl: './planet.html',
   styleUrl: './planet.css',
@@ -53,24 +50,10 @@ export class Planet {
   readonly item = this.planetsService.getItem(this.id, {
     retryPolicy: CRITICAL_HTTP_RETRY_POLICY,
   })
-  readonly showResidentLinks = signal(false)
-  readonly residentIds = computed<string[]>(() => {
-    if (!this.showResidentLinks()) {
-      return []
-    }
-
-    return this.item.data()?.residentIds ?? []
-  })
+  readonly residentIds = computed<string[]>(() => this.item.data()?.residentIds ?? [])
   readonly residents = this.peopleService.getItems(this.residentIds)
   readonly residentItems = computed(() => this.residents.data())
-  readonly showFilmLinks = signal(false)
-  readonly filmIds = computed<string[]>(() => {
-    if (!this.showFilmLinks()) {
-      return []
-    }
-
-    return this.item.data()?.filmIds ?? []
-  })
+  readonly filmIds = computed<string[]>(() => this.item.data()?.filmIds ?? [])
   readonly films = this.filmsService.getItems(this.filmIds)
   readonly filmItems = computed(() => this.films.data())
 
@@ -115,13 +98,5 @@ export class Planet {
         void this.router.navigate(['/error'])
       }
     })
-  }
-
-  onResidentLinksVisible(): void {
-    this.showResidentLinks.set(true)
-  }
-
-  onFilmLinksVisible(): void {
-    this.showFilmLinks.set(true)
   }
 }

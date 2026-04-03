@@ -1,12 +1,16 @@
 <app-detail-page-layout>
   @let data = item.data();
-
   @if (data) {
     <app-heading slotHeading location="Planet Details" [title]="data.name" />
   }
 
   @if (data) {
-    <app-labeled-box containerTag="section" heading="Details" headingId="planet-details">
+    <app-labeled-box
+      slotDetails
+      containerTag="section"
+      heading="Details"
+      headingId="planet-details"
+    >
       <app-row-description-list [items]="descriptionRows()" />
     </app-labeled-box>
   }
@@ -21,15 +25,21 @@
       containerTag="nav"
       heading="Residents"
       headingId="resident-links"
-      appVisibleTrigger
-      (becameVisible)="onResidentLinksVisible()"
     >
-      @if (residentItems().length) {
-        <app-link-list>
-          @for (resident of residentItems(); track $index) {
-            <app-link-list-item [linkUri]="['/character', resident.id]">
-              {{ resident.name }}
-            </app-link-list-item>
+      @defer (on viewport) {
+        @if (residentItems().length) {
+          <app-link-list>
+            @for (resident of residentItems(); track resident.id) {
+              <app-link-list-item [linkUri]="['/character', resident.id]">
+                {{ resident.name }}
+              </app-link-list-item>
+            }
+          </app-link-list>
+        }
+      } @placeholder {
+        <app-link-list inert>
+          @for (residentId of data.residentIds; track residentId) {
+            <app-link-list-item />
           }
         </app-link-list>
       }
@@ -37,20 +47,21 @@
   }
 
   @if (data && data.filmIds.length) {
-    <app-labeled-box
-      slotLinks
-      containerTag="nav"
-      heading="Films"
-      headingId="film-links"
-      appVisibleTrigger
-      (becameVisible)="onFilmLinksVisible()"
-    >
-      @if (filmItems().length) {
-        <app-link-list>
-          @for (film of filmItems(); track $index) {
-            <app-link-list-item [linkUri]="['/movie', film.id]">
-              {{ film.title }}
-            </app-link-list-item>
+    <app-labeled-box slotLinks containerTag="nav" heading="Films" headingId="film-links">
+      @defer (on viewport) {
+        @if (filmItems().length) {
+          <app-link-list>
+            @for (film of filmItems(); track film.id) {
+              <app-link-list-item [linkUri]="['/movie', film.id]">
+                {{ film.title }}
+              </app-link-list-item>
+            }
+          </app-link-list>
+        }
+      } @placeholder {
+        <app-link-list inert>
+          @for (filmId of data.filmIds; track filmId) {
+            <app-link-list-item />
           }
         </app-link-list>
       }
