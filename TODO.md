@@ -16,6 +16,8 @@
 - TODO: vscode launch config updaten für debugging workflow
 - TODO: evtl. vscode tasks welche taskfile tasks ausführen für standard und komplexe Workflows, vorher noch mal taskfile extension ausprobieren
 - TODO: Dann noch mal readme updaten
+- TODO: tsconfig.typecheck (stashed)
+- TODO: Warnings (browser console) untersuchen: NgOptimizedImage aspect ratio (slider images), unused preloaded resources
 
 ---
 
