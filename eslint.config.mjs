@@ -93,7 +93,12 @@ export default defineConfig(
     files: ['./packages/client/src/**/*.html'],
     extends: [angular.configs.templateAll],
     rules: {
-      '@angular-eslint/template/i18n': 'off',
+      '@angular-eslint/template/i18n': [
+        'off',
+        {
+          ignoreAttributes: ['img[decoding]'],
+        },
+      ],
       '@angular-eslint/template/no-inline-styles': 'off',
       '@angular-eslint/template/no-call-expression': 'off',
       '@angular-eslint/template/cyclomatic-complexity': [

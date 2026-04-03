@@ -9,7 +9,6 @@
     (swipeLeft)="incrementActiveIndex()"
     (swipeRight)="decrementActiveIndex()"
   >
-    // eslint-disable-next-line @angular-eslint/template/no-inline-styles
     <div
       class="slides"
       [class.slides-swiping]="isSwiping()"
@@ -20,7 +19,6 @@
           <img
             class="image"
             decoding="async"
-            i18n-decoding
             [ngSrc]="image.url"
             [alt]="image.alt"
             [width]="image.width"
