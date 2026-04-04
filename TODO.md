@@ -2,15 +2,7 @@
 
 - TODO: tasks: tsconfig, node builds: tsconfig.build.json anwenden (bspw: tsconfig.server.build.json)
 - TODO: tasks: tsconfig.typecheck (stashed)
-
----
-
 - TODO: Github Pages CSR fixen
-
----
-
-- TODO: tasks: vscode launch config updaten für debugging workflow
-- TODO: tasks: evtl. vscode tasks welche taskfile tasks ausführen für standard und komplexe Workflows, vorher noch mal taskfile extension ausprobieren
 
 ---
 
@@ -61,6 +53,8 @@
 - TODO: SEO gegen checken und mal etwas structured data einbauen
 - TODO: tasks: getrennte dist pfade (für output mode & ggf. zusätzlich target)
 - TODO: tasks: server dev|prod flow weiter verbessern (watch)
+- TODO: tasks: vscode launch config updaten für debugging workflow
+- TODO: tasks: evtl. vscode tasks welche taskfile tasks ausführen für standard und komplexe Workflows, vorher noch mal taskfile extension ausprobieren
 
 ### Hosting
 
