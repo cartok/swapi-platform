@@ -5,14 +5,15 @@ import { defaultClientConditions, defineConfig, transformWithOxc } from 'vite'
 
 import { env } from './src/env'
 
-export default defineConfig(() => {
+export default defineConfig(({ isSsrBuild }) => {
   return {
     clearScreen: false,
     envDir: false,
     mode: env.SWAPI_OUTPUT_MODE,
     build: {
       emptyOutDir: true,
-      sourcemap: env.SWAPI_OUTPUT_MODE === 'development',
+      minify: env.SWAPI_OUTPUT_MODE === 'production',
+      sourcemap: env.SWAPI_OUTPUT_MODE === 'production',
     },
     define: {
       ...Object.entries(env).reduce(
@@ -22,6 +23,7 @@ export default defineConfig(() => {
         }),
         {},
       ),
+      ngServerMode: isSsrBuild,
     },
     resolve: {
       conditions:

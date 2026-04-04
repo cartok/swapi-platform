@@ -1,6 +1,7 @@
 version: 3
 run: once
 set: [pipefail]
+output: prefixed
 
 includes:
   client:
@@ -14,6 +15,11 @@ includes:
     dir: ./packages/shared
 
 tasks:
+  clean:
+    cmds:
+      - task: client:clean
+      - task: shared:clean
+      - task: server:clean
   lint:
     cmds:
       - task: lint:tsc
@@ -28,15 +34,15 @@ tasks:
 
   lint:tsc:client:
     cmds:
-      - bunx --no-install tsc --noEmit -p ./packages/client/tsconfig.app.json
+      - bunx --no-install tsc --noEmit --project ./packages/client/tsconfig.app.json
 
   lint:tsc:server:
     cmds:
-      - bunx --no-install tsc --noEmit -p ./packages/server/tsconfig.server.json
+      - bunx --no-install tsc --noEmit --project ./packages/server/tsconfig.server.json
 
   lint:tsc:shared:
     cmds:
-      - bunx --no-install tsc --noEmit -p ./packages/shared/tsconfig.shared.json
+      - bunx --no-install tsc --noEmit --project ./packages/shared/tsconfig.shared.json
 
   lint:eslint:
     cmds:

@@ -19,9 +19,7 @@ tasks:
     generates:
       - ./dist/**/*
     cmds:
-      - rm -f ./tsconfig.shared.tsbuildinfo || true
-      - rm -rf ./dist || true
-      - bunx --no-install tsc -p ./tsconfig.shared.json
+      - bunx --no-install tsc --project ./tsconfig.shared.json
 
   generate:
     deps:
@@ -35,7 +33,6 @@ tasks:
     generates:
       - ./generated/types/device-cookie.types.d.ts
     cmds:
-      - rm -rf ./generated/types || true
       - mkdir -p ./generated/types
       - >
         bunx --no-install quicktype
@@ -55,8 +52,6 @@ tasks:
     generates:
       - ./generated/validators/device-cookie.*
     cmds:
-      - rm -rf ./generated/validators || true
-      - mkdir -p ./generated/validators
       - >
         bunx --no-install bun
         --conditions @swapi/source
@@ -69,8 +64,6 @@ tasks:
     generates:
       - ./generated/css/media.css
     cmds:
-      - rm -rf ./generated/css || true
-      - mkdir -p ./generated/css
       - >
         bunx --no-install bun
         --conditions @swapi/source

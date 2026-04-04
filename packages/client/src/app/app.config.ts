@@ -2,6 +2,7 @@ import { LocationStrategy, NoTrailingSlashPathLocationStrategy } from '@angular/
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http'
 import type { ApplicationConfig } from '@angular/core'
 import {
+  enableProdMode,
   inject,
   LOCALE_ID,
   provideEnvironmentInitializer,
@@ -16,6 +17,10 @@ import { provideRouter, withInMemoryScrolling, withRouterConfig } from '@angular
 import { httpRetryInterceptor } from '@/api/swapi/shared/http/http-retry.interceptor'
 import { routes } from '@/app.routes'
 import { DeviceService } from '@/services/DeviceService'
+
+if (SWAPI_OUTPUT_MODE === 'production') {
+  enableProdMode()
+}
 
 export const appConfig: ApplicationConfig = {
   providers: [

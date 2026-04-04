@@ -3,6 +3,7 @@ import '@angular/compiler'
 import { CommonEngine } from '@angular/ssr/node'
 import express from 'express'
 
+import { enableAngularServerMode } from '#internal/angular-server-mode'
 import { CLIENT_DIST_FOLDER, INDEX_HTML } from '#internal/client-dist'
 import { env } from '#internal/env'
 import { addDeviceContextHandler } from '#internal/handler/device-context.handler'
@@ -10,10 +11,15 @@ import { addDeviceCookieHandler } from '#internal/handler/device-cookie.handler'
 import { addDeviceRedirectHandler } from '#internal/handler/device-redirect.handler'
 import { addSecurityHandler } from '#internal/handler/security.handler'
 
-let angularAppPromise: Promise<CommonEngine> | undefined
+enableAngularServerMode()
 
 const server = express()
-const getAngularRenderEngine = (): Promise<CommonEngine> => {
+
+let angularAppPromise: Promise<CommonEngine> | undefined
+
+void getAngularRenderEngine()
+
+function getAngularRenderEngine(): Promise<CommonEngine> {
   if (angularAppPromise) {
     return angularAppPromise
   }
@@ -27,7 +33,6 @@ const getAngularRenderEngine = (): Promise<CommonEngine> => {
 
   return angularAppPromise
 }
-void getAngularRenderEngine()
 
 addSecurityHandler(server)
 addDeviceCookieHandler(server)

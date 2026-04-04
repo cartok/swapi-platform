@@ -9,12 +9,15 @@ import { CommonEngine } from '@angular/ssr/node'
 import { HOME_PATH } from '@swapi/shared/routing/paths'
 import { SSG_PATHS } from '@swapi/shared/routing/ssg-paths'
 
+import { enableAngularServerMode } from '#internal/angular-server-mode'
 import {
   CLIENT_DIST_FOLDER,
   CLIENT_DIST_FOLDER_URL,
   INDEX_HTML,
 } from '#internal/client-dist'
 import { env } from '#internal/env'
+
+enableAngularServerMode()
 
 const { default: bootstrap } = await import('@swapi/client/main.server')
 

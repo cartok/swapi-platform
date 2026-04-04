@@ -11,11 +11,15 @@ tasks:
     - rm -rf ./dist || true
 
   dev:
-    deps:
-      - task: shared:generate
     vars:
       MODE:
-        ref: .SWAPI_OUTPUT_MODE | default "development"
+        ref: .SWAPI_OUTPUT_MODE | default .MODE | default "development"
+    requires:
+      vars:
+        - name: MODE
+          enum: [development, production]
+    deps:
+      - task: shared:generate
     dotenv:
       - ./env/.env.target.local
       - ./env/.env.output.{{.MODE}}
@@ -23,52 +27,61 @@ tasks:
       - bunx --no-install vite --configLoader runner
 
   build:
-    deps:
-      - task: build:browser
-      - task: build:ssr
-
-  build:browser:watch:
-    cmds:
-      - task: build:browser
-        vars:
-          WATCH: true
-
-  build:browser:
-    deps:
-      - task: shared:build
     vars:
       MODE:
-        ref: .SWAPI_OUTPUT_MODE | default "production"
+        ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"
+    requires:
+      vars:
+        - name: MODE
+          enum: [development, production]
+    deps:
+      - task: build:browser
+        vars:
+          MODE: '{{.MODE}}'
+      - task: build:ssr
+        vars:
+          MODE: '{{.MODE}}'
+
+  build:browser:
+    requires:
+      vars:
+        - name: MODE
+          enum: [development, production]
+    vars:
+      MODE:
+        ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"
+    deps:
+      - task: shared:build
     dotenv:
       - ./env/.env.target.local
       - ./env/.env.output.{{.MODE}}
     sources:
-      - ./src/**/*
+      - ./{src,public,env}/**/*
+      - ./env/.env.output.{{.MODE}}
     generates:
       - ./dist/browser/**/*
     cmds:
       - >
         bunx --no-install vite build
         --outDir ./dist/browser
-        {{if .WATCH}}--watch{{end}}
-
-  build:ssr:watch:
-    cmds:
-      - task: build:ssr
-        vars:
-          WATCH: true
+      - touch ./dist/browser/.build-mode-{{.MODE}}
 
   build:ssr:
-    deps:
-      - task: shared:build
+    requires:
+      vars:
+        - name: MODE
+          enum: [development, production]
     vars:
       MODE:
-        ref: .SWAPI_OUTPUT_MODE | default "production"
+        ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"
+    deps:
+      - task: shared:build
     dotenv:
       - ./env/.env.target.local
       - ./env/.env.output.{{.MODE}}
     sources:
-      - ./src/**/*
+      - ./{src,public,env}/**/*
+      - ./env/.env.output.{{.MODE}}
     generates:
       - ./dist/ssr/**/*
     cmds:
@@ -76,25 +89,25 @@ tasks:
         bunx --no-install vite build
         --ssr ./src/main.server.ts
         --outDir ./dist/ssr
-        {{if .WATCH}}--watch{{end}}
+      - touch ./dist/ssr/.build-mode-{{.MODE}}
 
   start:
-    deps:
-      - task: build:browser
+    requires:
+      vars:
+        - name: MODE
+          enum: [development, production]
     vars:
       MODE:
-        ref: .SWAPI_OUTPUT_MODE | default "production"
+        ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"
+    deps:
+      - task: build:browser
+        vars:
+          MODE: '{{.MODE}}'
     dotenv:
       - ./env/.env.target.local
       - ./env/.env.output.{{.MODE}}
     cmds:
       - bunx --no-install vite preview --outDir ./dist/browser
-
-  test:watch:
-    cmds:
-      - task: shared:build
-        vars:
-          WATCH: true
 
   test:
     deps:
@@ -103,4 +116,14 @@ tasks:
       - ./env/.env.target.local
       - ./env/.env.output.development
     cmds:
-      - bunx --no-install vitest --configLoader runner {{if eq .WATCH false}}run{{end}}
+      - bunx --no-install vitest --configLoader runner run
+
+  test:watch:
+    deps:
+      - task: shared:build
+    dotenv:
+      - ./env/.env.target.local
+      - ./env/.env.output.development
+    interactive: true
+    cmds:
+      - bunx --no-install vitest --configLoader runner

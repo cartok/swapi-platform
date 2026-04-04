@@ -19,20 +19,27 @@ tasks:
       - rm -rf ./dist || true
 
   dev:
-    deps:
-      - task: shared:build
-      - task: client:build:browser
-      - task: build:ssg
-    sources:
-      - ./src/**/*
-    generates:
-      - ./dist/**/*
     vars:
       MODE:
-        ref: .SWAPI_OUTPUT_MODE | default "development"
+        ref: .SWAPI_OUTPUT_MODE | default .MODE | default "development"
+    requires:
+      vars:
+        - name: MODE
+          enum: [development, production]
+    deps:
+      - task: client:build
+        vars:
+          MODE: '{{.MODE}}'
+      - task: ssg
+        vars:
+          MODE: '{{.MODE}}'
     dotenv:
       - ./env/.env.target.local
       - ./env/.env.output.{{.MODE}}
+    sources:
+      - ./{src,env}/**/*
+      - ./env/.env.output.{{.MODE}}
+    interactive: true
     cmds:
       - >
         bunx --no-install bun
@@ -40,57 +47,80 @@ tasks:
         --watch ./src/server.ts
 
   build:
+    vars:
+      MODE:
+        ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"
+    requires:
+      vars:
+        - name: MODE
+          enum: [development, production]
     deps:
       - task: shared:build
-      - task: client:build:browser
-      - task: build:ssg
+    dotenv:
+      - ./env/.env.target.local
+      - ./env/.env.output.{{.MODE}}
     sources:
-      - ./src/**/*
+      - ./{src,env}/**/*
+      - ./env/.env.output.{{.MODE}}
     generates:
       - ./dist/**/*
     preconditions:
       - test -s ./tsconfig.server.json
+    cmds:
+      - bunx --no-install tsc --project ./tsconfig.server.json
+      - touch ./dist/.build-mode-{{.MODE}}
+
+  ssg:
     vars:
       MODE:
-        ref: .SWAPI_OUTPUT_MODE | default "development"
-    dotenv:
-      - ./env/.env.target.local
-      - ./env/.env.output.{{.MODE}}
-    cmds:
-      - rm -f ./tsconfig.server.tsbuildinfo || true
-      - rm -f ./dist || true
-      - bunx --no-install tsc ./src/server.ts
-
-  build:ssg:
-    deps:
-      - task: shared:build
-        vars:
-          MODE: '{{.MODE}}'
-      - task: client:build:browser
-        vars:
-          MODE: '{{.MODE}}'
-    generates:
-      - ../client/dist/browser/r\;*/index.html
-    vars:
-      MODE:
-        ref: .SWAPI_OUTPUT_MODE | default "production"
-    dotenv:
-      - ./env/.env.target.local
-      - ./env/.env.output.{{.MODE}}
-    cmds:
-      - >
-        bunx --no-install bun
-        --conditions @swapi/source
-        ./src/prerender.ts
-
-  start:
+        ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"
+    requires:
+      vars:
+        - name: MODE
+          enum: [development, production]
     deps:
       - task: build
+        vars:
+          MODE: '{{.MODE}}'
+      - task: client:build
+        vars:
+          MODE: '{{.MODE}}'
+    dotenv:
+      - ./env/.env.target.local
+      - ./env/.env.output.{{.MODE}}
+    sources:
+      - ./{src,env}/**/*
+      - ./env/.env.output.{{.MODE}}
+    generates:
+      - ../client/dist/browser/**/*/index.html
+      - ../client/dist/browser/.ssg-mode-{{.MODE}}
+    cmds:
+      - bunx --no-install bun ./dist/prerender.js
+      - touch ../client/dist/browser/.ssg-mode-{{.MODE}}
+
+  start:
     vars:
       MODE:
-        ref: .SWAPI_OUTPUT_MODE | default "development"
+        ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"
+    requires:
+      vars:
+        - name: MODE
+          enum: [development, production]
+    deps:
+      - task: build
+        vars:
+          MODE: '{{.MODE}}'
+      - task: client:build
+        vars:
+          MODE: '{{.MODE}}'
+      - task: ssg
+        vars:
+          MODE: '{{.MODE}}'
     dotenv:
       - ./env/.env.target.local
       - ./env/.env.output.{{.MODE}}
     cmds:
-      - bunx --no-install bun ./src/server.ts
+      - cmd: bunx --no-install bun ./dist/server.js
+        if: '{{eq .MODE "production"}}'
+      - cmd: bunx --no-install bun ./src/server.ts
+        if: '{{eq .MODE "development"}}'

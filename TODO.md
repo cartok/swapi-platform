@@ -5,15 +5,21 @@
 
 ---
 
-- TODO: Verschiedene ports für server in development | production mode
-- TODO: Frontend ports per env setzen
-- TODO: Server start sollte dist verwenden und per default production output mode wählen
-- TODO: vscode launch config updaten für debugging workflow
-- TODO: evtl. vscode tasks welche taskfile tasks ausführen für standard und komplexe Workflows, vorher noch mal taskfile extension ausprobieren
-- TODO: Server dev flow verbessern (watch modes)
-- TODO: Beim `server:dev` Task ist ein Fehler aufgefallen, der nur manchmal auftritt, vermutlich aber nichts mit dem Code zu tun hat, sondern eher ein Fehler von Vite's Hot Reload ist: "Error: JIT compiler unavailable"
-- TODO: Dann noch mal readme updaten
-- TODO: tsconfig.typecheck (stashed)
+- TODO: tasks: Verschiedene ports für server in development | production mode
+- TODO: tasks: Frontend ports per env setzen
+- TODO: tasks: tsconfig, node builds: tsconfig.build.json anwenden (bspw: tsconfig.server.build.json)
+- TODO: tasks: tsconfig.typecheck (stashed)
+- TODO: tasks: getrennte dist pfade
+
+---
+
+- TODO: tasks: server dev|prod flow weiter verbessern
+- TODO: tasks: vscode launch config updaten für debugging workflow
+- TODO: tasks: evtl. vscode tasks welche taskfile tasks ausführen für standard und komplexe Workflows, vorher noch mal taskfile extension ausprobieren
+
+---
+
+- TODO: readme updaten
 - TODO: Warnings (browser console) untersuchen: NgOptimizedImage aspect ratio (slider images), unused preloaded resources
 
 ---

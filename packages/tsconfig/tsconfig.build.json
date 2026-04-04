@@ -1,7 +1,10 @@
 {
   "files": [],
   "compilerOptions": {
+    "declaration": true,
+    "declarationMap": true,
+    "removeComments": true,
     "skipLibCheck": false,
-    "declarationMap": false
+    "sourceMap": true
   }
 }
