@@ -1,26 +1,19 @@
 # Demnächst
 
-- TODO: Github Pages CSR fixen
-- TODO: Update readme & move to new Repository
-
----
-
 - TODO: tasks: Verschiedene ports für server in development | production mode
 - TODO: tasks: Frontend ports per env setzen
 - TODO: tasks: tsconfig, node builds: tsconfig.build.json anwenden (bspw: tsconfig.server.build.json)
 - TODO: tasks: tsconfig.typecheck (stashed)
-- TODO: tasks: getrennte dist pfade
 
 ---
 
-- TODO: tasks: server dev|prod flow weiter verbessern
+- TODO: Github Pages CSR fixen
+
+---
+
 - TODO: tasks: vscode launch config updaten für debugging workflow
 - TODO: tasks: evtl. vscode tasks welche taskfile tasks ausführen für standard und komplexe Workflows, vorher noch mal taskfile extension ausprobieren
-
----
-
-- TODO: readme updaten
-- TODO: Warnings (browser console) untersuchen: NgOptimizedImage aspect ratio (slider images), unused preloaded resources
+- TODO: Update readme & move to new Repository
 
 ---
 
@@ -39,6 +32,10 @@
 
 ---
 
+- TODO: Warnings (browser console) untersuchen: NgOptimizedImage aspect ratio (slider images), unused preloaded resources
+
+---
+
 - TODO: Fix Unit Tests, add browser API mocks, extend some tests
 - TODO: E2E Tests
 - TODO: Integration Tests
@@ -50,6 +47,7 @@
 
 # Später
 
+- TODO: express ersetzen
 - TODO: Hosting & Deployment
 - TODO: Logging
 - TODO: Monitoring
@@ -64,6 +62,8 @@
 - TODO: i18n
 - TODO: Web Vitals gegen checken
 - TODO: SEO gegen checken und mal etwas structured data einbauen
+- TODO: tasks: getrennte dist pfade (für output mode & ggf. zusätzlich target)
+- TODO: tasks: server dev|prod flow weiter verbessern (watch)
 
 ### Hosting
 
