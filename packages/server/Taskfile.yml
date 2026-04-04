@@ -92,11 +92,11 @@ tasks:
       - ./{src,env}/**/*
       - ./env/.env.output.{{.MODE}}
     generates:
-      - ../client/dist/browser/**/*/index.html
-      - ../client/dist/browser/.ssg-mode-{{.MODE}}
+      - ../client/dist/ssg/**/*/index.html
+      - ../client/dist/ssg/.ssg-mode-{{.MODE}}
     cmds:
       - bunx --no-install bun ./dist/prerender.js
-      - touch ../client/dist/browser/.ssg-mode-{{.MODE}}
+      - touch ../client/dist/ssg/.ssg-mode-{{.MODE}}
 
   start:
     vars:

@@ -1,6 +1,6 @@
 import '@angular/compiler'
 
-import { mkdir, writeFile } from 'node:fs/promises'
+import { mkdir, rm, writeFile } from 'node:fs/promises'
 import { dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -11,8 +11,8 @@ import { SSG_PATHS } from '@swapi/shared/routing/ssg-paths'
 
 import { enableAngularServerMode } from '#internal/angular-server-mode'
 import {
-  CLIENT_DIST_FOLDER,
-  CLIENT_DIST_FOLDER_URL,
+  CLIENT_SSG_FOLDER,
+  CLIENT_SSG_FOLDER_URL,
   INDEX_HTML,
 } from '#internal/client-dist'
 import { env } from '#internal/env'
@@ -28,17 +28,18 @@ const angular = new CommonEngine({
 
 const origin = `http://${env.SWAPI_HOST}:${env.SWAPI_PORT}`
 
+await rm(CLIENT_SSG_FOLDER, { force: true, recursive: true })
+
 for (const path of SSG_PATHS) {
   const html = await angular.render({
     url: new URL(`/${path}`, origin).toString(),
     documentFilePath: INDEX_HTML,
-    publicPath: CLIENT_DIST_FOLDER,
   })
   const indexPath = path === HOME_PATH ? './index.html' : `./${path}/index.html`
-  const outputFilePath = fileURLToPath(new URL(indexPath, CLIENT_DIST_FOLDER_URL))
+  const outputFilePath = fileURLToPath(new URL(indexPath, CLIENT_SSG_FOLDER_URL))
   console.log('SSG: Rendered', indexPath.replace(/^\./, ''))
   await mkdir(dirname(outputFilePath), { recursive: true })
   await writeFile(outputFilePath, html, 'utf8')
 }
 
-console.log(`Prerendered ${String(SSG_PATHS.length)} routes into ${CLIENT_DIST_FOLDER}`)
+console.log(`Prerendered ${String(SSG_PATHS.length)} routes into ${CLIENT_SSG_FOLDER}`)
