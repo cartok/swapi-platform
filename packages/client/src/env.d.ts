@@ -1,8 +1,4 @@
-import type { Static } from '@sinclair/typebox'
-
-import type { AppBrowserEnvSchema } from './env.schema'
-
-type AppBrowserEnv = Static<typeof AppBrowserEnvSchema>
+import type { AppBrowserEnv } from './env.schema'
 
 declare global {
   const SWAPI_OUTPUT_MODE: AppBrowserEnv['SWAPI_OUTPUT_MODE']

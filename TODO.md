@@ -1,7 +1,6 @@
 # Demnächst
 
 - TODO: tasks: Verschiedene ports für server in development | production mode
-- TODO: tasks: Frontend ports per env setzen
 - TODO: tasks: tsconfig, node builds: tsconfig.build.json anwenden (bspw: tsconfig.server.build.json)
 - TODO: tasks: tsconfig.typecheck (stashed)
 

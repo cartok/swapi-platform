@@ -1,33 +1,45 @@
 import { fileURLToPath, URL } from 'node:url'
 
 import angular from '@analogjs/vite-plugin-angular'
-import { defaultClientConditions, defineConfig, transformWithOxc } from 'vite'
+import type { UserConfig } from 'vite'
+import {
+  defaultClientConditions,
+  defineConfig,
+  mergeConfig,
+  transformWithOxc,
+} from 'vite'
 
-import { env } from './src/env'
+import { browserEnv, buildEnv } from './src/env'
+import type { AppBrowserEnv } from './src/env.schema'
 
 export default defineConfig(({ isSsrBuild }) => {
-  return {
+  const definedBrowserEnv = Object.fromEntries(
+    (
+      Object.entries(browserEnv) as [
+        keyof AppBrowserEnv,
+        AppBrowserEnv[keyof AppBrowserEnv],
+      ][]
+    ).map(([key, value]) => {
+      return [key, typeof value === 'string' ? JSON.stringify(value) : value]
+    }),
+  ) satisfies Record<string, string | boolean | number>
+
+  const config: UserConfig = {
     clearScreen: false,
     envDir: false,
-    mode: env.SWAPI_OUTPUT_MODE,
+    mode: browserEnv.SWAPI_OUTPUT_MODE,
     build: {
       emptyOutDir: true,
-      minify: env.SWAPI_OUTPUT_MODE === 'production',
-      sourcemap: env.SWAPI_OUTPUT_MODE === 'production',
+      minify: browserEnv.SWAPI_OUTPUT_MODE === 'production',
+      sourcemap: browserEnv.SWAPI_OUTPUT_MODE === 'production',
     },
     define: {
-      ...Object.entries(env).reduce(
-        (acc, [key, value]) => ({
-          ...acc,
-          [key]: typeof value === 'string' ? `"${value}"` : value,
-        }),
-        {},
-      ),
+      ...definedBrowserEnv,
       ngServerMode: isSsrBuild,
     },
     resolve: {
       conditions:
-        env.SWAPI_OUTPUT_MODE === 'development'
+        browserEnv.SWAPI_OUTPUT_MODE === 'development'
           ? ['@swapi/source', ...defaultClientConditions]
           : undefined,
       mainFields: ['module'],
@@ -49,16 +61,6 @@ export default defineConfig(({ isSsrBuild }) => {
           customMedia: true,
         },
       },
-    },
-    server: {
-      host: 'localhost',
-      port: 4200,
-      strictPort: true,
-    },
-    preview: {
-      host: 'localhost',
-      port: 4300,
-      strictPort: true,
     },
     plugins: [
       /**
@@ -102,4 +104,23 @@ export default defineConfig(({ isSsrBuild }) => {
       },
     ],
   }
+
+  if (browserEnv.SWAPI_TARGET === 'local') {
+    const developmentServerConfig: UserConfig = {
+      server: {
+        host: 'localhost',
+        port: buildEnv.SWAPI_DEV_SERVER_PORT,
+        strictPort: true,
+      },
+      preview: {
+        host: 'localhost',
+        port: buildEnv.SWAPI_PREVIEW_SERVER_PORT,
+        strictPort: true,
+      },
+    }
+
+    return mergeConfig(config, developmentServerConfig)
+  }
+
+  return config
 })

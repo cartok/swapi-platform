@@ -1,7 +1,7 @@
 import { parseEnv } from '../../shared/src/environment/env'
-import { AppBrowserEnvSchema } from './env.schema'
+import { AppBrowserEnvSchema, AppBuildEnvSchema } from './env.schema'
 
-export const env = parseEnv(
+export const browserEnv = parseEnv(
   {
     SWAPI_DEV_TOOLS: process.env['SWAPI_DEV_TOOLS'],
     SWAPI_LOG_LEVEL: process.env['SWAPI_LOG_LEVEL'],
@@ -9,4 +9,12 @@ export const env = parseEnv(
     SWAPI_TARGET: process.env['SWAPI_TARGET'],
   },
   AppBrowserEnvSchema,
+)
+
+export const buildEnv = parseEnv(
+  {
+    SWAPI_DEV_SERVER_PORT: process.env['SWAPI_DEV_SERVER_PORT'],
+    SWAPI_PREVIEW_SERVER_PORT: process.env['SWAPI_PREVIEW_SERVER_PORT'],
+  },
+  AppBuildEnvSchema,
 )
