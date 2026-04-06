@@ -9,7 +9,13 @@ import eslintPluginImport from 'eslint-plugin-import'
 import simpleImportSort from 'eslint-plugin-simple-import-sort'
 
 export default defineConfig(
-  globalIgnores(['**/dist/**', '**/docs/**', '**/generated/**', '**/node_modules/**']),
+  globalIgnores([
+    '**/.cache/**',
+    '**/dist/**',
+    '**/docs/**',
+    '**/generated/**',
+    '**/node_modules/**',
+  ]),
   {
     files: ['**/*.{ts,mts,cts}'],
     extends: [
