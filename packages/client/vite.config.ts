@@ -25,6 +25,7 @@ export default defineConfig(({ isSsrBuild }) => {
   ) satisfies Record<string, string | boolean | number>
 
   const config: UserConfig = {
+    base: buildEnv.SWAPI_PUBLIC_BASE_PATH,
     clearScreen: false,
     envDir: false,
     mode: browserEnv.SWAPI_OUTPUT_MODE,

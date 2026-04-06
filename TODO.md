@@ -1,17 +1,16 @@
 # Demnächst
 
-- TODO: Github Pages CSR fixen
 - TODO: tasks: getrennte dist pfade (für output mode & ggf. zusätzlich target)
+
+---
+
+- TODO: Hosting & Deployment
 
 ---
 
 - TODO: a11y improvements
 - TODO: Warnings (browser console) untersuchen: NgOptimizedImage aspect ratio (slider images), unused preloaded resources
 - TODO: Fix Unit Tests, add browser API mocks, extend some tests
-
----
-
-- TODO: Hosting & Deployment
 - TODO: Cookie based client side feature detection for Firefox & Safari
 
 ---

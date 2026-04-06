@@ -15,4 +15,5 @@ export type AppBrowserEnv = Static<typeof AppBrowserEnvSchema>
 export const AppBuildEnvSchema = Type.Object({
   SWAPI_DEV_SERVER_PORT: Type.Optional(Type.Readonly(Type.Integer())),
   SWAPI_PREVIEW_SERVER_PORT: Type.Optional(Type.Readonly(Type.Integer())),
+  SWAPI_PUBLIC_BASE_PATH: Type.String({ minLength: 1, default: '/' }),
 })

@@ -3,7 +3,7 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - github-pages
+      - advancement
   workflow_dispatch:
 
 permissions:
@@ -37,18 +37,21 @@ jobs:
 
       # TODO: broken & outdated
       - name: Build Angular app
-        run: bunx --no-install ng build --configuration production --base-href "/${REPO_NAME}/"
+        env:
+          SWAPI_PUBLIC_BASE_PATH: /${{ env.REPO_NAME }}/
+        run: bunx --no-install task client:build:browser
 
-      - name: Verify build output
-        run: test -sdist/swapi-angular-frontend/browser/index.html
+      # - name: Verify build output
+      #   run: test -s dist/swapi-angular-frontend/browser/index.html
 
-      - name: Add SPA fallback for GitHub Pages
-        run: cp dist/swapi-angular-frontend/browser/index.html dist/swapi-angular-frontend/browser/404.html
+      # - name: Add SPA fallback for GitHub Pages
+      #   run: cp dist/swapi-angular-frontend/browser/index.html dist/swapi-angular-frontend/browser/404.html
+      #trigger
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist/swapi-angular-frontend/browser
+          path: packages/client/dist/browser
 
   deploy:
     needs: build

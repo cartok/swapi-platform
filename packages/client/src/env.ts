@@ -15,6 +15,7 @@ export const buildEnv = parseEnv(
   {
     SWAPI_DEV_SERVER_PORT: process.env['SWAPI_DEV_SERVER_PORT'],
     SWAPI_PREVIEW_SERVER_PORT: process.env['SWAPI_PREVIEW_SERVER_PORT'],
+    SWAPI_PUBLIC_BASE_PATH: process.env['SWAPI_PUBLIC_BASE_PATH'],
   },
   AppBuildEnvSchema,
 )
