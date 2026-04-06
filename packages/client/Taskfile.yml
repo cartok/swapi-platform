@@ -43,13 +43,13 @@ tasks:
           MODE: '{{.MODE}}'
 
   build:browser:
+    vars:
+      MODE:
+        ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"
     requires:
       vars:
         - name: MODE
           enum: [development, production]
-    vars:
-      MODE:
-        ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"
     deps:
       - task: shared:build
     dotenv:
@@ -67,13 +67,13 @@ tasks:
       - touch ./dist/browser/.build-mode-{{.MODE}}
 
   build:ssr:
+    vars:
+      MODE:
+        ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"
     requires:
       vars:
         - name: MODE
           enum: [development, production]
-    vars:
-      MODE:
-        ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"
     deps:
       - task: shared:build
     dotenv:
@@ -92,13 +92,13 @@ tasks:
       - touch ./dist/ssr/.build-mode-{{.MODE}}
 
   start:
+    vars:
+      MODE:
+        ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"
     requires:
       vars:
         - name: MODE
           enum: [development, production]
-    vars:
-      MODE:
-        ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"
     deps:
       - task: build:browser
         vars:

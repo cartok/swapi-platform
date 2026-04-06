@@ -63,7 +63,7 @@ server.use(async (req, res, next) => {
     console.log('SSG: Serve', ssgFilePath)
     return res.sendFile(ssgFilePath, (error) => {
       if (error) {
-        next(error)
+        return next(error)
       }
     })
   } catch (error) {
@@ -83,12 +83,11 @@ server.use(async (req, res, next) => {
       url,
       documentFilePath: INDEX_HTML,
     })
-
     console.log(`SSR: Rendered ${url}`)
 
-    res.status(200).send(html)
+    return res.status(200).send(html)
   } catch (error) {
-    next(error)
+    return next(error)
   }
 })
 
@@ -104,7 +103,7 @@ server.use((error: unknown, req: express.Request, res: express.Response) => {
     return
   }
 
-  res.redirect(302, '/error')
+  return res.redirect(302, '/error')
 })
 
 const port = env.SWAPI_PORT

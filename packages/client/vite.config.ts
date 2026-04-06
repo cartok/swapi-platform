@@ -20,7 +20,7 @@ export default defineConfig(({ isSsrBuild }) => {
         AppBrowserEnv[keyof AppBrowserEnv],
       ][]
     ).map(([key, value]) => {
-      return [key, typeof value === 'string' ? JSON.stringify(value) : value]
+      return [key, typeof value === 'string' ? `"${value}"` : value]
     }),
   ) satisfies Record<string, string | boolean | number>
 

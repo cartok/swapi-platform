@@ -1,5 +1,3 @@
-@import '@swapi/shared/generated/css/media';
-
 .home {
   background-color: var(--color-primary);
   padding: var(--layout-gutter);

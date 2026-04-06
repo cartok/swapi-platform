@@ -122,5 +122,5 @@ tasks:
     cmds:
       - cmd: bunx --no-install bun ./dist/server.js
         if: '{{eq .MODE "production"}}'
-      - cmd: bunx --no-install bun ./src/server.ts
+      - cmd: bunx --no-install bun --conditions @swapi/source ./src/server.ts
         if: '{{eq .MODE "development"}}'
