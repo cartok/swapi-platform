@@ -6,8 +6,8 @@
     "@swapi/tsconfig/lib"
   ],
   "compilerOptions": {
-    "rootDir": "./src",
-    "outDir": "./dist"
+    "rootDir": "../src",
+    "outDir": "../dist"
   },
-  "include": ["./src/**/*.ts"]
+  "include": ["../src/**/*.ts"]
 }

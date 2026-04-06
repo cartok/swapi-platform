@@ -133,14 +133,14 @@ tasks:
     vars:
       MODE:
         ref: .SWAPI_OUTPUT_MODE | default .MODE | default "development"
-      TSCONFIG: './tsconfig.vite{{if eq .MODE "production"}}.production{{end}}.json'
+      TSCONFIG: './tsconfig/tsconfig.vite{{if eq .MODE "production"}}.production{{end}}.json'
     requires:
       vars:
         - name: MODE
           enum: [development, production]
     sources:
-      - ./tsconfig.app.json
-      - ./tsconfig.base.json
+      - ./tsconfig/tsconfig.app.json
+      - ./tsconfig/tsconfig.base.json
       - '{{.TSCONFIG}}'
       - ./src/**/*
       - ./vite.config.ts

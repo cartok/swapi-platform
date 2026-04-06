@@ -81,7 +81,9 @@ export default defineConfig(({ isSsrBuild }) => {
        * relative paths & use the `runner` config loader for development mode.
        */
       angular({
-        tsconfig: fileURLToPath(new URL('./tsconfig.vite.json', import.meta.url)),
+        tsconfig: fileURLToPath(
+          new URL('./tsconfig/tsconfig.vite.json', import.meta.url),
+        ),
         transformFilter: (_code, id) => {
           return id.includes('/packages/client/src/')
         },

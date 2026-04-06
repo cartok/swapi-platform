@@ -1,6 +1,5 @@
 # Demnächst
 
-- TODO: tasks: tsconfig.typecheck (stashed)
 - TODO: Github Pages CSR fixen
 
 ---

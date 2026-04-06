@@ -10,16 +10,16 @@
     "strictTemplates": true
   },
   "include": [
-    "./src/**/*.ts",
+    "../src/**/*.ts",
     // Workaround: explicitly include sibling workspace package sources so the
     // Angular/Vite compile pipeline can see them during dev. Package resolution
     // still happens via workspace package names and `package.json` exports.
-    "../../packages/shared/src/**/*.ts"
+    "../../../packages/shared/src/**/*.ts"
   ],
   "exclude": [
-    "**/*.spec.ts",
-    "../../packages/shared/src/**/*.d.ts",
-    "./src/env.ts",
-    "./src/env.schema.ts"
+    "../src/**/*.spec.ts",
+    "../../../packages/shared/src/**/*.d.ts",
+    "../src/env.ts",
+    "../src/env.schema.ts"
   ]
 }

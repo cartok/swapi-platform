@@ -12,13 +12,13 @@ tasks:
     deps:
       - task: generate
     preconditions:
-      - test -s ./tsconfig.shared.production.json
+      - test -s ./tsconfig/tsconfig.shared.production.json
     sources:
       - ./src/**/*
     generates:
       - ./dist/**/*
     cmds:
-      - bunx --no-install tsc --project ./tsconfig.shared.production.json
+      - bunx --no-install tsc --project ./tsconfig/tsconfig.shared.production.json
 
   generate:
     deps:
@@ -77,7 +77,7 @@ tasks:
     vars:
       MODE:
         ref: .SWAPI_OUTPUT_MODE | default .MODE | default "development"
-      TSCONFIG: './tsconfig.generators{{if eq .MODE "production"}}.production{{end}}.json'
+      TSCONFIG: './tsconfig/tsconfig.generators{{if eq .MODE "production"}}.production{{end}}.json'
     requires:
       vars:
         - name: MODE
@@ -92,7 +92,7 @@ tasks:
     vars:
       MODE:
         ref: .SWAPI_OUTPUT_MODE | default .MODE | default "development"
-      TSCONFIG: './tsconfig.shared{{if eq .MODE "production"}}.production{{end}}.json'
+      TSCONFIG: './tsconfig/tsconfig.shared{{if eq .MODE "production"}}.production{{end}}.json'
     requires:
       vars:
         - name: MODE

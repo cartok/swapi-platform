@@ -10,6 +10,9 @@ includes:
     dir: ../shared
     internal: true
 
+vars:
+  TSCONFIG: './tsconfig/tsconfig.server{{if eq .MODE "production"}}.production{{end}}.json'
+
 tasks:
   clean:
     cmds:
@@ -64,13 +67,9 @@ tasks:
     generates:
       - ./dist/**/*
     preconditions:
-      - test -s ./tsconfig.server.json
-      - test -s ./tsconfig.server.production.json
+      - test -s '{{.TSCONFIG}}'
     cmds:
-      - cmd: bunx --no-install tsc --project ./tsconfig.server.json
-        if: '{{eq .MODE "development"}}'
-      - cmd: bunx --no-install tsc --project ./tsconfig.server.production.json
-        if: '{{eq .MODE "production"}}'
+      - bunx --no-install tsc --project '{{.TSCONFIG}}'
       - touch ./dist/.build-mode-{{.MODE}}
 
   ssg:
@@ -132,7 +131,6 @@ tasks:
     vars:
       MODE:
         ref: .SWAPI_OUTPUT_MODE | default .MODE | default "development"
-      TSCONFIG: './tsconfig.server{{if eq .MODE "production"}}.production{{end}}.json'
     requires:
       vars:
         - name: MODE

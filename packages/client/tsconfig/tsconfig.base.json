@@ -8,8 +8,8 @@
   ],
   "compilerOptions": {
     "paths": {
-      "@/*": ["./src/app/*"],
-      "@/css/*": ["./src/css/*"]
+      "@/*": ["../src/app/*"],
+      "@/css/*": ["../src/css/*"]
     }
   }
 }

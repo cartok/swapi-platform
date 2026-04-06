@@ -1,7 +1,7 @@
 {
   "files": [],
   "references": [
-    { "path": "./tsconfig.generators.json" },
-    { "path": "./tsconfig.shared.json" }
+    { "path": "./tsconfig/tsconfig.generators.json" },
+    { "path": "./tsconfig/tsconfig.shared.json" }
   ]
 }

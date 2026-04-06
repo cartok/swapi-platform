@@ -4,5 +4,5 @@
     "@swapi/tsconfig/rules",
     "@swapi/tsconfig/node.script"
   ],
-  "include": ["./generators/**/*.ts", "./generators/**/*.json", "./src/**/*.ts"]
+  "include": ["../generators/**/*.ts", "../generators/**/*.json", "../src/**/*.ts"]
 }
