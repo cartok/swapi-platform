@@ -10,9 +10,6 @@ includes:
     dir: ../shared
     internal: true
 
-vars:
-  TSCONFIG: './tsconfig/tsconfig.server{{if eq .MODE "production"}}.production{{end}}.json'
-
 tasks:
   clean:
     cmds:
@@ -52,6 +49,7 @@ tasks:
     vars:
       MODE:
         ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"
+      TSCONFIG: './tsconfig/tsconfig.server{{if eq .MODE "production"}}.production{{end}}.json'
     requires:
       vars:
         - name: MODE
@@ -131,6 +129,7 @@ tasks:
     vars:
       MODE:
         ref: .SWAPI_OUTPUT_MODE | default .MODE | default "development"
+      TSCONFIG: './tsconfig/tsconfig.server{{if eq .MODE "production"}}.production{{end}}.json'
     requires:
       vars:
         - name: MODE
