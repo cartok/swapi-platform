@@ -1,0 +1,9 @@
+{
+  "files": [],
+  "compilerOptions": {
+    "composite": true,
+    "emitDeclarationOnly": true,
+    "incremental": true,
+    "skipLibCheck": false
+  }
+}
