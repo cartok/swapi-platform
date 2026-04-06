@@ -14,6 +14,7 @@ tasks:
   clean:
     cmds:
       - rm -f ./*.tsbuildinfo || true
+      - rm -rf ./.cache || true
       - rm -rf ./dist || true
 
   dev:
@@ -126,3 +127,18 @@ tasks:
         if: '{{eq .MODE "production"}}'
       - cmd: bunx --no-install bun --conditions @swapi/source ./src/server.ts
         if: '{{eq .MODE "development"}}'
+
+  lint:
+    vars:
+      MODE:
+        ref: .SWAPI_OUTPUT_MODE | default .MODE | default "development"
+      TSCONFIG: './tsconfig.server{{if eq .MODE "production"}}.production{{end}}.json'
+    requires:
+      vars:
+        - name: MODE
+          enum: [development, production]
+    sources:
+      - '{{.TSCONFIG}}'
+      - ./src/**/*
+    cmds:
+      - bunx --no-install tsc --noEmit --project '{{.TSCONFIG}}'

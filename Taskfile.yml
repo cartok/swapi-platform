@@ -20,6 +20,8 @@ tasks:
       - task: client:clean
       - task: shared:clean
       - task: server:clean
+      - rm -rf ./.cache || true
+
   lint:
     cmds:
       - task: lint:tsc
@@ -28,21 +30,9 @@ tasks:
 
   lint:tsc:
     deps:
-      - task: lint:tsc:client
-      - task: lint:tsc:server
-      - task: lint:tsc:shared
-
-  lint:tsc:client:
-    cmds:
-      - bunx --no-install tsc --noEmit --project ./packages/client/tsconfig.app.json
-
-  lint:tsc:server:
-    cmds:
-      - bunx --no-install tsc --noEmit --project ./packages/server/tsconfig.server.json
-
-  lint:tsc:shared:
-    cmds:
-      - bunx --no-install tsc --noEmit --project ./packages/shared/tsconfig.shared.json
+      - task: client:lint
+      - task: server:lint
+      - task: shared:lint
 
   lint:eslint:
     cmds:
