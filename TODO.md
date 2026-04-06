@@ -11,31 +11,27 @@
 - TODO: a11y improvements
 - TODO: Warnings (browser console) untersuchen: NgOptimizedImage aspect ratio (slider images), unused preloaded resources
 - TODO: Fix Unit Tests, add browser API mocks, extend some tests
-- TODO: Cookie based client side feature detection for Firefox & Safari
 
 ---
-
-- TODO: Logging
-- TODO: Monitoring
-
-# Später
 
 - TODO: E2E Tests
 - TODO: Automated a11y Testing
 - TODO: Integration Tests
 - TODO: Git hooks (`push`, evtl.: `clone`, `commit`)
 
----
+# Später
 
 - TODO: express ersetzen
 - TODO: Angular App Shell ausprobieren
 - TODO: Create vite plugin for 'vite-plugin-angular-in-monorepo' with automatic resolution
-- TODO: Verbessern der Taskfile `generates` / `sources`
 - TODO: Verbessern der DeviceService API
-- TODO: Alerting
 - TODO: i18n
 - TODO: Web Vitals gegen checken
 - TODO: SEO gegen checken und mal etwas structured data einbauen
+- TODO: Cookie based client side feature detection for Firefox & Safari
+
+---
+
 - TODO: tasks: server dev|prod flow weiter verbessern (watch)
 - TODO: tasks: vscode launch config updaten für debugging workflow
 - TODO: tasks: evtl. vscode tasks welche taskfile tasks ausführen für standard und komplexe Workflows, vorher noch mal taskfile extension ausprobieren
@@ -46,6 +42,14 @@
 - TODO: Image Fallback
 - TODO: Page-Global CSS Cursor + use during image slider drag
 - TODO: Link List Component fertigstellen
+
+---
+
+- TODO: Logging
+- TODO: Monitoring
+- TODO: Alerting
+
+---
 
 ### Hosting
 
