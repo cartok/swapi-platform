@@ -2,10 +2,8 @@ version: 3
 
 tasks:
   clean:
-    preconditions:
-      - test -s ./tsconfig.shared.json
     cmds:
-      - rm -f ./tsconfig.shared.tsbuildinfo || true
+      - rm -f ./*.tsbuildinfo || true
       - rm -rf ./dist || true
       - rm -rf ./generated || true
 
@@ -13,13 +11,13 @@ tasks:
     deps:
       - task: generate
     preconditions:
-      - test -s ./tsconfig.shared.json
+      - test -s ./tsconfig.shared.production.json
     sources:
       - ./src/**/*
     generates:
       - ./dist/**/*
     cmds:
-      - bunx --no-install tsc --project ./tsconfig.shared.json
+      - bunx --no-install tsc --project ./tsconfig.shared.production.json
 
   generate:
     deps:

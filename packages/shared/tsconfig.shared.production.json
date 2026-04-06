@@ -1,3 +1,7 @@
 {
-  "extends": ["./tsconfig.shared.json", "@swapi/tsconfig/production"]
+  "extends": [
+    "./tsconfig.shared.json",
+    "@swapi/tsconfig/production",
+    "@swapi/tsconfig/production.node"
+  ]
 }

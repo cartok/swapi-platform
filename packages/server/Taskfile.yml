@@ -12,10 +12,8 @@ includes:
 
 tasks:
   clean:
-    preconditions:
-      - test -s ./tsconfig.server.json
     cmds:
-      - rm -f ./tsconfig.server.tsbuildinfo || true
+      - rm -f ./*.tsbuildinfo || true
       - rm -rf ./dist || true
 
   dev:
@@ -66,8 +64,12 @@ tasks:
       - ./dist/**/*
     preconditions:
       - test -s ./tsconfig.server.json
+      - test -s ./tsconfig.server.production.json
     cmds:
-      - bunx --no-install tsc --project ./tsconfig.server.json
+      - cmd: bunx --no-install tsc --project ./tsconfig.server.json
+        if: '{{eq .MODE "development"}}'
+      - cmd: bunx --no-install tsc --project ./tsconfig.server.production.json
+        if: '{{eq .MODE "production"}}'
       - touch ./dist/.build-mode-{{.MODE}}
 
   ssg:

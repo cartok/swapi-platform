@@ -1,6 +1,5 @@
 # Demnächst
 
-- TODO: tasks: tsconfig, node builds: tsconfig.build.json anwenden (bspw: tsconfig.server.build.json)
 - TODO: tasks: tsconfig.typecheck (stashed)
 - TODO: Github Pages CSR fixen
 
