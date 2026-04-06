@@ -1,0 +1,7 @@
+{
+  "extends": [
+    "./tsconfig.generators.json",
+    "@swapi/tsconfig/production",
+    "@swapi/tsconfig/production.node"
+  ]
+}
