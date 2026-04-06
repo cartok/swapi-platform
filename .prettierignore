@@ -1,3 +1,1 @@
-dist/
-generated/
-bun.lock
+./packages/client/public/assets/svg-sprite-sheet/build/
