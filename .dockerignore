@@ -1,0 +1,30 @@
+# Packages
+node_modules/
+
+# Compiled output
+*.tsbuildinfo
+dist/
+generated/
+
+# Cache
+.cache/
+.task/
+
+# By filetype
+*.md
+
+# Root content
+.editorconfig
+.github/
+.gitignore
+.prettierignore
+.vscode/
+Dockerfile
+docs/
+eslint.config.*
+prettier.config.*
+
+# Env files
+.env
+!.env.output.production
+!.env.target.local
