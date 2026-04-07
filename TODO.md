@@ -1,10 +1,13 @@
 # Demnächst
 
 - TODO: tasks: getrennte dist pfade (für output mode & ggf. zusätzlich target)
+- TODO: mit rolldown die finale dist bundlen
 
 ---
 
-- TODO: Hosting & Deployment
+- TODO: Hosting bei Fly.io oder Cloudflare Containers vorbereiten
+- TODO: Docker build erweitern (env vars, build modes & targets)
+- TODO: Deployment per Github Actions konfigurieren
 
 ---
 
