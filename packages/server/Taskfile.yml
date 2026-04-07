@@ -21,19 +21,25 @@ tasks:
     vars:
       MODE:
         ref: .SWAPI_OUTPUT_MODE | default .MODE | default "development"
+      TARGET:
+        ref: .SWAPI_TARGET | default .TARGET | default "local"
     requires:
       vars:
         - name: MODE
           enum: [development, production]
+        - name: TARGET
+          enum: [local, test, production]
     deps:
       - task: client:build
         vars:
           MODE: '{{.MODE}}'
+          TARGET: '{{.TARGET}}'
       - task: ssg
         vars:
           MODE: '{{.MODE}}'
+          TARGET: '{{.TARGET}}'
     dotenv:
-      - ./env/.env.target.local
+      - ./env/.env.target.{{.TARGET}}
       - ./env/.env.output.{{.MODE}}
     sources:
       - ./{src,env}/**/*
@@ -49,15 +55,19 @@ tasks:
     vars:
       MODE:
         ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"
+      TARGET:
+        ref: .SWAPI_TARGET | default .TARGET | default "local"
       TSCONFIG: './tsconfig/tsconfig.server{{if eq .MODE "production"}}.production{{end}}.json'
     requires:
       vars:
         - name: MODE
           enum: [development, production]
+        - name: TARGET
+          enum: [local, test, production]
     deps:
       - task: shared:build
     dotenv:
-      - ./env/.env.target.local
+      - ./env/.env.target.{{.TARGET}}
       - ./env/.env.output.{{.MODE}}
     sources:
       - ./{src,env}/**/*
@@ -74,19 +84,25 @@ tasks:
     vars:
       MODE:
         ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"
+      TARGET:
+        ref: .SWAPI_TARGET | default .TARGET | default "local"
     requires:
       vars:
         - name: MODE
           enum: [development, production]
+        - name: TARGET
+          enum: [local, test, production]
     deps:
       - task: build
         vars:
           MODE: '{{.MODE}}'
+          TARGET: '{{.TARGET}}'
       - task: client:build
         vars:
           MODE: '{{.MODE}}'
+          TARGET: '{{.TARGET}}'
     dotenv:
-      - ./env/.env.target.local
+      - ./env/.env.target.{{.TARGET}}
       - ./env/.env.output.{{.MODE}}
     sources:
       - ./{src,env}/**/*
@@ -102,22 +118,29 @@ tasks:
     vars:
       MODE:
         ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"
+      TARGET:
+        ref: .SWAPI_TARGET | default .TARGET | default "local"
     requires:
       vars:
         - name: MODE
           enum: [development, production]
+        - name: TARGET
+          enum: [local, test, production]
     deps:
       - task: build
         vars:
           MODE: '{{.MODE}}'
+          TARGET: '{{.TARGET}}'
       - task: client:build
         vars:
           MODE: '{{.MODE}}'
+          TARGET: '{{.TARGET}}'
       - task: ssg
         vars:
           MODE: '{{.MODE}}'
+          TARGET: '{{.TARGET}}'
     dotenv:
-      - ./env/.env.target.local
+      - ./env/.env.target.{{.TARGET}}
       - ./env/.env.output.{{.MODE}}
     cmds:
       - cmd: bunx --no-install bun ./dist/server.js
@@ -129,6 +152,8 @@ tasks:
     vars:
       MODE:
         ref: .SWAPI_OUTPUT_MODE | default .MODE | default "development"
+      TARGET:
+        ref: .SWAPI_TARGET | default .TARGET | default "local"
       TSCONFIG: './tsconfig/tsconfig.server{{if eq .MODE "production"}}.production{{end}}.json'
     requires:
       vars:

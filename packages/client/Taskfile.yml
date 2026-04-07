@@ -15,14 +15,18 @@ tasks:
     vars:
       MODE:
         ref: .SWAPI_OUTPUT_MODE | default .MODE | default "development"
+      TARGET:
+        ref: .SWAPI_TARGET | default .TARGET | default "local"
     requires:
       vars:
         - name: MODE
           enum: [development, production]
+        - name: TARGET
+          enum: [local, test, production]
     deps:
       - task: shared:generate
     dotenv:
-      - ./env/.env.target.local
+      - ./env/.env.target.{{.TARGET}}
       - ./env/.env.output.{{.MODE}}
     cmds:
       - bunx --no-install vite --configLoader runner
@@ -31,30 +35,40 @@ tasks:
     vars:
       MODE:
         ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"
+      TARGET:
+        ref: .SWAPI_TARGET | default .TARGET | default "local"
     requires:
       vars:
         - name: MODE
           enum: [development, production]
+        - name: TARGET
+          enum: [local, test, production]
     deps:
       - task: build:browser
         vars:
           MODE: '{{.MODE}}'
+          TARGET: '{{.TARGET}}'
       - task: build:ssr
         vars:
           MODE: '{{.MODE}}'
+          TARGET: '{{.TARGET}}'
 
   build:browser:
     vars:
       MODE:
         ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"
+      TARGET:
+        ref: .SWAPI_TARGET | default .TARGET | default "local"
     requires:
       vars:
         - name: MODE
           enum: [development, production]
+        - name: TARGET
+          enum: [local, test, production]
     deps:
       - task: shared:build
     dotenv:
-      - ./env/.env.target.local
+      - ./env/.env.target.{{.TARGET}}
       - ./env/.env.output.{{.MODE}}
     sources:
       - ./{src,public,env}/**/*
@@ -71,14 +85,18 @@ tasks:
     vars:
       MODE:
         ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"
+      TARGET:
+        ref: .SWAPI_TARGET | default .TARGET | default "local"
     requires:
       vars:
         - name: MODE
           enum: [development, production]
+        - name: TARGET
+          enum: [local, test, production]
     deps:
       - task: shared:build
     dotenv:
-      - ./env/.env.target.local
+      - ./env/.env.target.{{.TARGET}}
       - ./env/.env.output.{{.MODE}}
     sources:
       - ./{src,public,env}/**/*
@@ -96,16 +114,21 @@ tasks:
     vars:
       MODE:
         ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"
+      TARGET:
+        ref: .SWAPI_TARGET | default .TARGET | default "local"
     requires:
       vars:
         - name: MODE
           enum: [development, production]
+        - name: TARGET
+          enum: [local, test, production]
     deps:
       - task: build:browser
         vars:
           MODE: '{{.MODE}}'
+          TARGET: '{{.TARGET}}'
     dotenv:
-      - ./env/.env.target.local
+      - ./env/.env.target.{{.TARGET}}
       - ./env/.env.output.{{.MODE}}
     cmds:
       - bunx --no-install vite preview --outDir ./dist/browser
@@ -114,7 +137,7 @@ tasks:
     deps:
       - task: shared:build
     dotenv:
-      - ./env/.env.target.local
+      - ./env/.env.target.{{.TARGET}}
       - ./env/.env.output.development
     cmds:
       - bunx --no-install vitest --configLoader runner run
@@ -123,7 +146,7 @@ tasks:
     deps:
       - task: shared:build
     dotenv:
-      - ./env/.env.target.local
+      - ./env/.env.target.{{.TARGET}}
       - ./env/.env.output.development
     interactive: true
     cmds:
@@ -133,6 +156,8 @@ tasks:
     vars:
       MODE:
         ref: .SWAPI_OUTPUT_MODE | default .MODE | default "development"
+      TARGET:
+        ref: .SWAPI_TARGET | default .TARGET | default "local"
       TSCONFIG: './tsconfig/tsconfig.vite{{if eq .MODE "production"}}.production{{end}}.json'
     requires:
       vars:

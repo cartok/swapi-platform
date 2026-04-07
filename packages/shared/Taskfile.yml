@@ -77,6 +77,8 @@ tasks:
     vars:
       MODE:
         ref: .SWAPI_OUTPUT_MODE | default .MODE | default "development"
+      TARGET:
+        ref: .SWAPI_TARGET | default .TARGET | default "local"
       TSCONFIG: './tsconfig/tsconfig.generators{{if eq .MODE "production"}}.production{{end}}.json'
     requires:
       vars:
@@ -92,6 +94,8 @@ tasks:
     vars:
       MODE:
         ref: .SWAPI_OUTPUT_MODE | default .MODE | default "development"
+      TARGET:
+        ref: .SWAPI_TARGET | default .TARGET | default "local"
       TSCONFIG: './tsconfig/tsconfig.shared{{if eq .MODE "production"}}.production{{end}}.json'
     requires:
       vars:
