@@ -23,30 +23,86 @@ tasks:
       - rm -rf ./.cache || true
 
   lint:
+    vars:
+      MODE:
+        ref: .SWAPI_OUTPUT_MODE | default .MODE | default "development"
+    requires:
+      vars:
+        - name: MODE
+          enum: [development, production]
     cmds:
       - task: lint:tsc
+        vars:
+          MODE: '{{.MODE}}'
       - task: lint:eslint
       - task: lint:prettier
 
   lint:tsc:
+    vars:
+      MODE:
+        ref: .SWAPI_OUTPUT_MODE | default .MODE | default "development"
+    requires:
+      vars:
+        - name: MODE
+          enum: [development, production]
     deps:
       - task: client:lint
+        vars:
+          MODE: '{{.MODE}}'
       - task: server:lint
+        vars:
+          MODE: '{{.MODE}}'
       - task: shared:lint
+        vars:
+          MODE: '{{.MODE}}'
 
   lint:eslint:
+    sources:
+      - ./eslint.config.mjs
+      - ./package.json
+      - ./packages/**/*.{ts,json}
     cmds:
       - bunx --no-install eslint .
 
   lint:prettier:
+    sources:
+      - ./.prettierignore
+      - ./package.json
+      - ./prettier.config.mjs
+      - ./packages/**/*.{ts,json}
     cmds:
       - bunx --no-install prettier --check .
 
   fix:
+    sources:
+      - ./eslint.config.mjs
+      - ./package.json
+      - ./packages/**/*.{ts,json}
     cmds:
       - bunx --no-install eslint . --fix
       - task: format
 
   format:
+    sources:
+      - ./.prettierignore
+      - ./package.json
+      - ./prettier.config.mjs
+      - ./packages/**/*.{ts,json}
     cmds:
-      - bunx --no-install prettier --write --list-different .
+      - bunx --no-install prettier --write --list-different ./
+
+  docker:build:
+    cmds:
+      - docker buildx build --load --tag swapi-angular:local ./
+
+  docker:run:
+    cmds:
+      - |
+        zsh -c '
+          cleanup() {
+            docker rm --force swapi-angular || true
+          }
+          trap cleanup EXIT INT TERM
+          cleanup
+          docker run --rm --publish 51000:51000 --name swapi-angular swapi-angular:local
+        '

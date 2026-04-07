@@ -17,42 +17,48 @@ COPY ./packages/client/Taskfile.yml ./packages/client/
 COPY ./packages/client/vite.config.ts ./packages/client/
 COPY ./packages/client/env/.env.output.production ./packages/client/env/
 COPY ./packages/client/env/.env.target.local ./packages/client/env/
-COPY ./packages/client/public/ ./packages/client/public/
-COPY ./packages/client/src/ ./packages/client/src/
 COPY ./packages/client/tsconfig/*.json ./packages/client/tsconfig/
+COPY ./packages/client/public/ ./packages/client/public
+COPY ./packages/client/src/ ./packages/client/src
 
 # copy server project
 COPY ./packages/server/package.json ./packages/server/
 COPY ./packages/server/Taskfile.yml ./packages/server/
 COPY ./packages/server/env/.env.output.production ./packages/server/env/
 COPY ./packages/server/env/.env.target.local ./packages/server/env/
-COPY ./packages/server/src/ ./packages/server/src/
 COPY ./packages/server/tsconfig/*.json ./packages/server/tsconfig/
+COPY ./packages/server/src/ ./packages/server/src
 
 # copy shared project
 COPY ./packages/shared/package.json ./packages/shared/
 COPY ./packages/shared/Taskfile.yml ./packages/shared/
-COPY ./packages/shared/generators/ ./packages/shared/generators/
-COPY ./packages/shared/src/ ./packages/shared/src/
 COPY ./packages/shared/tsconfig/*.json ./packages/shared/tsconfig/
+COPY ./packages/shared/generators/ ./packages/shared/generators
+COPY ./packages/shared/src/ ./packages/shared/src
 
 # copy tsconfig project
-COPY ./packages/tsconfig/ ./packages/tsconfig/
+COPY ./packages/tsconfig/ ./packages/tsconfig
 
 # build
 RUN bun install --frozen-lockfile
-RUN bunx --no-install task server:ssg
+RUN bunx --no-install task server:build:with-ssg
 
 FROM oven/bun:${BUN_VERSION}-distroless AS runtime
 WORKDIR /app
 
-COPY --from=build /app/packages/client/dist ./dist/client
-COPY --from=build /app/packages/server/dist ./dist/server
-COPY --from=build /app/packages/shared/dist ./dist/shared
+COPY --from=build /app/package.json ./
+COPY --from=build /app/node_modules/ ./node_modules
+COPY --from=build /app/packages/client/package.json ./packages/client/
+COPY --from=build /app/packages/client/dist/ ./packages/client/dist
+COPY --from=build /app/packages/server/package.json ./packages/server/
+COPY --from=build /app/packages/server/dist/ ./packages/server/dist
+COPY --from=build /app/packages/shared/package.json ./packages/shared/
+COPY --from=build /app/packages/shared/dist/ ./packages/shared/dist
+COPY --from=build /app/packages/shared/generated/ ./packages/shared/generated
 
 ENV NG_ALLOWED_HOSTS=localhost,127.0.0.1,::1
 ENV SWAPI_HOST=localhost
-ENV SWAPI_TARGET=test
+ENV SWAPI_TARGET=local
 
 ENV NODE_ENV=production
 ENV SWAPI_OUTPUT_MODE=production
@@ -60,4 +66,4 @@ ENV SWAPI_LOG_LEVEL=info
 ENV SWAPI_PORT=51000
 
 EXPOSE 51000
-CMD ["bun", "./dist/server/server.js"]
+CMD ["./packages/server/dist/server.js"]

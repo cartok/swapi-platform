@@ -9,7 +9,29 @@ includes:
 tasks:
   clean:
     - rm -rf ./.cache || true
+    - rm -rf ./.task || true
     - rm -rf ./dist || true
+
+  lint:
+    vars:
+      MODE:
+        ref: .SWAPI_OUTPUT_MODE | default .MODE | default "development"
+      TARGET:
+        ref: .SWAPI_TARGET | default .TARGET | default "local"
+      TSCONFIG: './tsconfig/tsconfig.vite{{if eq .MODE "production"}}.production{{end}}.json'
+    requires:
+      vars:
+        - name: MODE
+          enum: [development, production]
+    sources:
+      - ./package.json
+      - ./vite.config.ts
+      - ./tsconfig/tsconfig.app.json
+      - ./tsconfig/tsconfig.base.json
+      - '{{.TSCONFIG}}'
+      - ./src/**/*
+    cmds:
+      - bunx --no-install tsc --noEmit --project '{{.TSCONFIG}}'
 
   dev:
     vars:
@@ -59,6 +81,7 @@ tasks:
         ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"
       TARGET:
         ref: .SWAPI_TARGET | default .TARGET | default "local"
+      TSCONFIG: './tsconfig/tsconfig.vite{{if eq .MODE "production"}}.production{{end}}.json'
     requires:
       vars:
         - name: MODE
@@ -71,8 +94,14 @@ tasks:
       - ./env/.env.target.{{.TARGET}}
       - ./env/.env.output.{{.MODE}}
     sources:
-      - ./{src,public,env}/**/*
+      - ./package.json
+      - ./vite.config.ts
       - ./env/.env.output.{{.MODE}}
+      - ./env/.env.target.{{.TARGET}}
+      - ./tsconfig/tsconfig.app.json
+      - ./tsconfig/tsconfig.base.json
+      - '{{.TSCONFIG}}'
+      - ./{src,public}/**/*
     generates:
       - ./dist/browser/**/*
     cmds:
@@ -87,6 +116,7 @@ tasks:
         ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"
       TARGET:
         ref: .SWAPI_TARGET | default .TARGET | default "local"
+      TSCONFIG: './tsconfig/tsconfig.vite{{if eq .MODE "production"}}.production{{end}}.json'
     requires:
       vars:
         - name: MODE
@@ -99,8 +129,14 @@ tasks:
       - ./env/.env.target.{{.TARGET}}
       - ./env/.env.output.{{.MODE}}
     sources:
-      - ./{src,public,env}/**/*
+      - ./package.json
+      - ./vite.config.ts
       - ./env/.env.output.{{.MODE}}
+      - ./env/.env.target.{{.TARGET}}
+      - ./tsconfig/tsconfig.app.json
+      - ./tsconfig/tsconfig.base.json
+      - '{{.TSCONFIG}}'
+      - ./{src,public}/**/*
     generates:
       - ./dist/ssr/**/*
     cmds:
@@ -151,23 +187,3 @@ tasks:
     interactive: true
     cmds:
       - bunx --no-install vitest --configLoader runner
-
-  lint:
-    vars:
-      MODE:
-        ref: .SWAPI_OUTPUT_MODE | default .MODE | default "development"
-      TARGET:
-        ref: .SWAPI_TARGET | default .TARGET | default "local"
-      TSCONFIG: './tsconfig/tsconfig.vite{{if eq .MODE "production"}}.production{{end}}.json'
-    requires:
-      vars:
-        - name: MODE
-          enum: [development, production]
-    sources:
-      - ./tsconfig/tsconfig.app.json
-      - ./tsconfig/tsconfig.base.json
-      - '{{.TSCONFIG}}'
-      - ./src/**/*
-      - ./vite.config.ts
-    cmds:
-      - bunx --no-install tsc --noEmit --project '{{.TSCONFIG}}'

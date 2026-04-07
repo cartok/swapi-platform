@@ -3,22 +3,79 @@ version: 3
 tasks:
   clean:
     cmds:
-      - rm -f ./*.tsbuildinfo || true
-      - rm -rf ./cache || true
+      - rm -f ./tsconfig/*.tsbuildinfo || true
+      - rm -rf ./.cache || true
+      - rm -rf ./.task || true
       - rm -rf ./dist || true
       - rm -rf ./generated || true
 
+  lint:
+    vars:
+      MODE:
+        ref: .SWAPI_OUTPUT_MODE | default .MODE | default "development"
+    requires:
+      vars:
+        - name: MODE
+          enum: [development, production]
+    deps:
+      - task: lint:generators
+        vars:
+          MODE: '{{.MODE}}'
+      - task: lint:shared
+        vars:
+          MODE: '{{.MODE}}'
+
+  lint:generators:
+    vars:
+      MODE:
+        ref: .SWAPI_OUTPUT_MODE | default .MODE | default "development"
+      TSCONFIG: './tsconfig/tsconfig.generators{{if eq .MODE "production"}}.production{{end}}.json'
+    requires:
+      vars:
+        - name: MODE
+          enum: [development, production]
+    sources:
+      - '{{.TSCONFIG}}'
+      - ./{generators,src}/**/*
+    cmds:
+      - bunx --no-install tsc --noEmit --project '{{.TSCONFIG}}'
+
+  lint:shared:
+    vars:
+      MODE:
+        ref: .SWAPI_OUTPUT_MODE | default .MODE | default "development"
+      TSCONFIG: './tsconfig/tsconfig.shared{{if eq .MODE "production"}}.production{{end}}.json'
+    requires:
+      vars:
+        - name: MODE
+          enum: [development, production]
+    sources:
+      - ./package.json
+      - '{{.TSCONFIG}}'
+      - ./src/**/*
+    cmds:
+      - bunx --no-install tsc --noEmit --project '{{.TSCONFIG}}'
+
   build:
+    vars:
+      MODE:
+        ref: .SWAPI_OUTPUT_MODE | default .MODE | default "development"
+      TSCONFIG: './tsconfig/tsconfig.shared{{if eq .MODE "production"}}.production{{end}}.json'
+    requires:
+      vars:
+        - name: MODE
+          enum: [development, production]
     deps:
       - task: generate
-    preconditions:
-      - test -s ./tsconfig/tsconfig.shared.production.json
     sources:
+      - ./package.json
+      - '{{.TSCONFIG}}'
       - ./src/**/*
     generates:
       - ./dist/**/*
     cmds:
-      - bunx --no-install tsc --project ./tsconfig/tsconfig.shared.production.json
+      - bunx --no-install tsc --project '{{.TSCONFIG}}'
+      - touch ./dist/.build-mode-{{.MODE}}
 
   generate:
     deps:
@@ -32,7 +89,7 @@ tasks:
     generates:
       - ./generated/types/device-cookie.types.d.ts
     cmds:
-      - mkdir -p ./generated/types
+      - mkdir -p ./generated/types || true
       - >
         bunx --no-install quicktype
         --src ./generators/device-cookie.schema.json
@@ -67,42 +124,3 @@ tasks:
         bunx --no-install bun
         --conditions @swapi/source
         ./generators/custom-media-tokens.generator.ts
-
-  lint:
-    deps:
-      - task: lint:generators
-      - task: lint:shared
-
-  lint:generators:
-    vars:
-      MODE:
-        ref: .SWAPI_OUTPUT_MODE | default .MODE | default "development"
-      TARGET:
-        ref: .SWAPI_TARGET | default .TARGET | default "local"
-      TSCONFIG: './tsconfig/tsconfig.generators{{if eq .MODE "production"}}.production{{end}}.json'
-    requires:
-      vars:
-        - name: MODE
-          enum: [development, production]
-    sources:
-      - '{{.TSCONFIG}}'
-      - ./{generators,src}/**/*
-    cmds:
-      - bunx --no-install tsc --noEmit --project '{{.TSCONFIG}}'
-
-  lint:shared:
-    vars:
-      MODE:
-        ref: .SWAPI_OUTPUT_MODE | default .MODE | default "development"
-      TARGET:
-        ref: .SWAPI_TARGET | default .TARGET | default "local"
-      TSCONFIG: './tsconfig/tsconfig.shared{{if eq .MODE "production"}}.production{{end}}.json'
-    requires:
-      vars:
-        - name: MODE
-          enum: [development, production]
-    sources:
-      - '{{.TSCONFIG}}'
-      - ./src/**/*
-    cmds:
-      - bunx --no-install tsc --noEmit --project '{{.TSCONFIG}}'

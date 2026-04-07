@@ -3,7 +3,11 @@
   "private": true,
   "type": "module",
   "imports": {
-    "#internal/*": "./src/*.ts"
+    "#internal/*": {
+      "types": "./src/*.ts",
+      "@swapi/source": "./src/*.ts",
+      "default": "./dist/*.js"
+    }
   },
   "dependencies": {
     "@angular/compiler": "catalog:angular",
