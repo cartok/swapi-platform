@@ -1,11 +1,5 @@
 version: 3
 
-includes:
-  shared:
-    taskfile: ../shared
-    dir: ../shared
-    internal: true
-
 tasks:
   clean:
     - rm -rf ./.cache || true
@@ -46,7 +40,7 @@ tasks:
         - name: TARGET
           enum: [local, test, production]
     deps:
-      - task: shared:generate
+      - task: :shared:generate
     dotenv:
       - ./env/.env.target.{{.TARGET}}
       - ./env/.env.output.{{.MODE}}
@@ -89,7 +83,7 @@ tasks:
         - name: TARGET
           enum: [local, test, production]
     deps:
-      - task: shared:build
+      - task: :shared:build
         vars:
           MODE: '{{.MODE}}'
     dotenv:
@@ -126,7 +120,7 @@ tasks:
         - name: TARGET
           enum: [local, test, production]
     deps:
-      - task: shared:build
+      - task: :shared:build
         vars:
           MODE: '{{.MODE}}'
     dotenv:
@@ -175,7 +169,7 @@ tasks:
 
   test:
     deps:
-      - task: shared:build
+      - task: :shared:build
     dotenv:
       - ./env/.env.target.{{.TARGET}}
       - ./env/.env.output.development
@@ -184,7 +178,7 @@ tasks:
 
   test:watch:
     deps:
-      - task: shared:build
+      - task: :shared:build
     dotenv:
       - ./env/.env.target.{{.TARGET}}
       - ./env/.env.output.development
