@@ -1,9 +1,9 @@
 {
   "extends": [
-    "@swapi/tsconfig/base",
-    "@swapi/tsconfig/rules",
-    "@swapi/tsconfig/node",
-    "@swapi/tsconfig/lib"
+    "@swapi/tsconfig/tsconfig.base",
+    "@swapi/tsconfig/tsconfig.rules",
+    "@swapi/tsconfig/tsconfig.node",
+    "@swapi/tsconfig/tsconfig.lib"
   ],
   "compilerOptions": {
     "rootDir": "../src",

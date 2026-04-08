@@ -1,15 +1,15 @@
 {
   "extends": [
-    "@swapi/tsconfig/base",
-    "@swapi/tsconfig/rules",
-    "@swapi/tsconfig/node",
-    "@swapi/tsconfig/lib"
+    "@swapi/tsconfig/tsconfig.base",
+    "@swapi/tsconfig/tsconfig.rules",
+    "@swapi/tsconfig/tsconfig.node",
+    "@swapi/tsconfig/tsconfig.lib"
   ],
   "compilerOptions": {
     "rootDir": "../src",
     "outDir": "../dist/build"
   },
-  // Workaround: The Angular compiler options are already set by @swapi/tsconfig/angular.
+  // Workaround: The Angular compiler options are already set by @swapi/tsconfig/tsconfig.angular.
   // I've set `strictTemplates` here to get around wrong language service warnings.
   // Don't extend the options here.
   "angularCompilerOptions": {

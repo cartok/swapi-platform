@@ -1,8 +1,8 @@
 {
   "extends": [
-    "@swapi/tsconfig/base",
-    "@swapi/tsconfig/rules",
-    "@swapi/tsconfig/node.script"
+    "@swapi/tsconfig/tsconfig.base",
+    "@swapi/tsconfig/tsconfig.rules",
+    "@swapi/tsconfig/tsconfig.node.script"
   ],
   "include": ["../generators/**/*.ts", "../generators/**/*.json", "../src/**/*.ts"]
 }

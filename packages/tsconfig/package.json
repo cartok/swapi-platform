@@ -1,6 +1,6 @@
 {
   "name": "@swapi/tsconfig",
   "exports": {
-    "./*": "./src/*.json"
+    "./tsconfig.*": "./src/tsconfig.*.json"
   }
 }

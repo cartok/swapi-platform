@@ -1,10 +1,10 @@
 {
   "extends": [
     "./tsconfig.server.json",
-    "@swapi/tsconfig/production",
-    "@swapi/tsconfig/production.node"
+    "@swapi/tsconfig/tsconfig.production",
+    "@swapi/tsconfig/tsconfig.production.node"
   ],
-  // Workaround: The Angular compiler options are already set by @swapi/tsconfig/angular.
+  // Workaround: The Angular compiler options are already set by @swapi/tsconfig/tsconfig.angular.
   // I've set `strictTemplates` here to get around wrong language service warnings.
   // Don't extend the options here.
   "angularCompilerOptions": {

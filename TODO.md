@@ -1,8 +1,7 @@
 # Demnächst
 
-- TODO: tsconfig files wieder umbenennen damit comments klar gehen.
 - TODO: tasks: getrennte dist pfade (für output mode & ggf. zusätzlich target)
-- TODO: Dockerfile + Dockerfile.bundle, damit auch non bundling später testbar ist
+- TODO: Dockerfile + Dockerfile.bundle, oder ähnliches, damit auch non bundling später testbar ist
 
 ---
 
