@@ -42,8 +42,8 @@ tasks:
     deps:
       - task: :shared:generate
     dotenv:
-      - ./env/.env.target.{{.TARGET}}
-      - ./env/.env.output.{{.MODE}}
+      - ./.env/.env.target.{{.TARGET}}
+      - ./.env/.env.output.{{.MODE}}
     cmds:
       - bunx --no-install vite --configLoader runner
 
@@ -87,13 +87,13 @@ tasks:
         vars:
           MODE: '{{.MODE}}'
     dotenv:
-      - ./env/.env.target.{{.TARGET}}
-      - ./env/.env.output.{{.MODE}}
+      - ./.env/.env.target.{{.TARGET}}
+      - ./.env/.env.output.{{.MODE}}
     sources:
       - ./package.json
       - ./vite.config.ts
-      - ./env/.env.output.{{.MODE}}
-      - ./env/.env.target.{{.TARGET}}
+      - ./.env/.env.output.{{.MODE}}
+      - ./.env/.env.target.{{.TARGET}}
       - ./tsconfig/tsconfig.app.json
       - ./tsconfig/tsconfig.base.json
       - '{{.TSCONFIG}}'
@@ -124,13 +124,13 @@ tasks:
         vars:
           MODE: '{{.MODE}}'
     dotenv:
-      - ./env/.env.target.{{.TARGET}}
-      - ./env/.env.output.{{.MODE}}
+      - ./.env/.env.target.{{.TARGET}}
+      - ./.env/.env.output.{{.MODE}}
     sources:
       - ./package.json
       - ./vite.config.ts
-      - ./env/.env.output.{{.MODE}}
-      - ./env/.env.target.{{.TARGET}}
+      - ./.env/.env.output.{{.MODE}}
+      - ./.env/.env.target.{{.TARGET}}
       - ./tsconfig/tsconfig.app.json
       - ./tsconfig/tsconfig.base.json
       - '{{.TSCONFIG}}'
@@ -162,8 +162,8 @@ tasks:
           MODE: '{{.MODE}}'
           TARGET: '{{.TARGET}}'
     dotenv:
-      - ./env/.env.target.{{.TARGET}}
-      - ./env/.env.output.{{.MODE}}
+      - ./.env/.env.target.{{.TARGET}}
+      - ./.env/.env.output.{{.MODE}}
     cmds:
       - bunx --no-install vite preview --outDir ./dist/browser
 
@@ -171,8 +171,8 @@ tasks:
     deps:
       - task: :shared:build
     dotenv:
-      - ./env/.env.target.{{.TARGET}}
-      - ./env/.env.output.development
+      - ./.env/.env.target.{{.TARGET}}
+      - ./.env/.env.output.development
     cmds:
       - bunx --no-install vitest --configLoader runner run
 
@@ -180,8 +180,8 @@ tasks:
     deps:
       - task: :shared:build
     dotenv:
-      - ./env/.env.target.{{.TARGET}}
-      - ./env/.env.output.development
+      - ./.env/.env.target.{{.TARGET}}
+      - ./.env/.env.output.development
     interactive: true
     cmds:
       - bunx --no-install vitest --configLoader runner

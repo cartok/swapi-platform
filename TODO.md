@@ -5,7 +5,6 @@
 
 ---
 
-- TODO: folder renaming: env -> .env
 - TODO: Hosting bei Fly.io oder Cloudflare Containers vorbereiten
 - TODO: Deployment per Github Actions konfigurieren und Docker build erweitern (env vars, build modes & targets)
 

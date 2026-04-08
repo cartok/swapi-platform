@@ -45,8 +45,8 @@ tasks:
           MODE: '{{.MODE}}'
           TARGET: '{{.TARGET}}'
     dotenv:
-      - ./env/.env.target.{{.TARGET}}
-      - ./env/.env.output.{{.MODE}}
+      - ./.env/.env.target.{{.TARGET}}
+      - ./.env/.env.output.{{.MODE}}
     interactive: true
     cmds:
       - >
@@ -73,13 +73,13 @@ tasks:
           MODE: '{{.MODE}}'
           TARGET: '{{.TARGET}}'
     dotenv:
-      - ./env/.env.target.{{.TARGET}}
-      - ./env/.env.output.{{.MODE}}
+      - ./.env/.env.target.{{.TARGET}}
+      - ./.env/.env.output.{{.MODE}}
     sources:
       - '{{.TSCONFIG}}'
       - ./package.json
-      - ./env/.env.output.{{.MODE}}
-      - ./env/.env.target.{{.TARGET}}
+      - ./.env/.env.output.{{.MODE}}
+      - ./.env/.env.target.{{.TARGET}}
       - ./src/prerender.ts
     generates:
       - ../client/dist/ssg/**/*/index.html
@@ -110,8 +110,8 @@ tasks:
           MODE: '{{.MODE}}'
           TARGET: '{{.TARGET}}'
     dotenv:
-      - ./env/.env.target.{{.TARGET}}
-      - ./env/.env.output.{{.MODE}}
+      - ./.env/.env.target.{{.TARGET}}
+      - ./.env/.env.output.{{.MODE}}
 
   build:compile:
     vars:
@@ -131,13 +131,13 @@ tasks:
         vars:
           MODE: '{{.MODE}}'
     dotenv:
-      - ./env/.env.target.{{.TARGET}}
-      - ./env/.env.output.{{.MODE}}
+      - ./.env/.env.target.{{.TARGET}}
+      - ./.env/.env.output.{{.MODE}}
     sources:
       - '{{.TSCONFIG}}'
       - ./package.json
-      - ./env/.env.output.{{.MODE}}
-      - ./env/.env.target.{{.TARGET}}
+      - ./.env/.env.output.{{.MODE}}
+      - ./.env/.env.target.{{.TARGET}}
       - ./src/**/*
     generates:
       - ./dist/build/**/*
@@ -164,8 +164,8 @@ tasks:
           MODE: '{{.MODE}}'
           TARGET: '{{.TARGET}}'
     dotenv:
-      - ./env/.env.target.{{.TARGET}}
-      - ./env/.env.output.{{.MODE}}
+      - ./.env/.env.target.{{.TARGET}}
+      - ./.env/.env.output.{{.MODE}}
     sources:
       - ./tsconfig/tsconfig.server.bundle.json
       - ./rolldown.config.ts
@@ -194,8 +194,8 @@ tasks:
           MODE: '{{.MODE}}'
           TARGET: '{{.TARGET}}'
     dotenv:
-      - ./env/.env.target.{{.TARGET}}
-      - ./env/.env.output.{{.MODE}}
+      - ./.env/.env.target.{{.TARGET}}
+      - ./.env/.env.output.{{.MODE}}
     cmds:
       - cmd: bunx --no-install bun ./dist/build/server.js
         if: '{{eq .MODE "production"}}'
@@ -220,7 +220,7 @@ tasks:
           MODE: '{{.MODE}}'
           TARGET: '{{.TARGET}}'
     dotenv:
-      - ./env/.env.target.{{.TARGET}}
-      - ./env/.env.output.{{.MODE}}
+      - ./.env/.env.target.{{.TARGET}}
+      - ./.env/.env.output.{{.MODE}}
     cmds:
       - bunx --no-install bun ./dist/bundle/server.js

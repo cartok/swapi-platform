@@ -15,8 +15,8 @@ COPY ./packages/client/index.html ./packages/client/
 COPY ./packages/client/package.json ./packages/client/
 COPY ./packages/client/Taskfile.yml ./packages/client/
 COPY ./packages/client/vite.config.ts ./packages/client/
-COPY ./packages/client/env/.env.output.production ./packages/client/env/
-COPY ./packages/client/env/.env.target.local ./packages/client/env/
+COPY ./packages/client/.env/.env.output.production ./packages/client/.env/
+COPY ./packages/client/.env/.env.target.local ./packages/client/.env/
 COPY ./packages/client/tsconfig/*.json ./packages/client/tsconfig/
 COPY ./packages/client/public/ ./packages/client/public
 COPY ./packages/client/src/ ./packages/client/src
@@ -25,8 +25,8 @@ COPY ./packages/client/src/ ./packages/client/src
 COPY ./packages/server/package.json ./packages/server/
 COPY ./packages/server/rolldown.config.ts ./packages/server/
 COPY ./packages/server/Taskfile.yml ./packages/server/
-COPY ./packages/server/env/.env.output.production ./packages/server/env/
-COPY ./packages/server/env/.env.target.local ./packages/server/env/
+COPY ./packages/server/.env/.env.output.production ./packages/server/.env/
+COPY ./packages/server/.env/.env.target.local ./packages/server/.env/
 COPY ./packages/server/tsconfig/*.json ./packages/server/tsconfig/
 COPY ./packages/server/src/ ./packages/server/src
 
