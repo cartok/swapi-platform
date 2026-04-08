@@ -1,10 +1,5 @@
 # Demnächst
 
-- TODO: tasks: getrennte dist pfade (für output mode & ggf. zusätzlich target)
-- TODO: Dockerfile + Dockerfile.bundle, oder ähnliches, damit auch non bundling später testbar ist
-
----
-
 - TODO: Hosting bei Fly.io oder Cloudflare Containers vorbereiten
 - TODO: Deployment per Github Actions konfigurieren und Docker build erweitern (env vars, build modes & targets)
 
@@ -12,6 +7,7 @@
 
 - TODO: Fix Unit Tests, add browser API mocks, extend some tests
 - TODO: Linting und unit tests in build pipeline einbauen
+- TODO: ggf.Dockerfile + Dockerfile.bundle, oder ähnliches, damit auch non bundling später testbar ist
 
 ---
 
@@ -28,6 +24,7 @@
 # Später
 
 - TODO: express ersetzen
+- TODO: task erstellen: `server:dev:source` = Vite-Dev-Server/Middleware oder Proxy statt dist-Serving des client outputs
 - TODO: Server build ist nicht JIT free, gucken dass ich Angular-Linker-Schritt einbaue oder ng statt rolldown zum bauen verwende.
 - TODO: Angular App Shell ausprobieren
 - TODO: Create vite plugin for 'vite-plugin-angular-in-monorepo' with automatic resolution

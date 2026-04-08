@@ -16,8 +16,8 @@ export const OutputMode = Type.Union([
 
 const TargetSchema = Type.Union([
   Type.Literal('local'),
+  Type.Literal('pages'),
   Type.Literal('testing'),
-  Type.Literal('staging'),
   Type.Literal('production'),
 ])
 

@@ -60,6 +60,7 @@ tasks:
     vars:
       MODE:
         ref: .SWAPI_OUTPUT_MODE | default .MODE | default "development"
+      DIST_DIR: './dist/{{.MODE}}'
       TSCONFIG: './tsconfig/tsconfig.shared{{if eq .MODE "production"}}.production{{end}}.json'
     requires:
       vars:
@@ -72,10 +73,9 @@ tasks:
       - '{{.TSCONFIG}}'
       - ./src/**/*
     generates:
-      - ./dist/**/*
+      - '{{.DIST_DIR}}/**/*'
     cmds:
-      - bunx --no-install tsc --project '{{.TSCONFIG}}'
-      - touch ./dist/.build-mode-{{.MODE}}
+      - bunx --no-install tsc --project '{{.TSCONFIG}}' --outDir '{{.DIST_DIR}}'
 
   generate:
     deps:

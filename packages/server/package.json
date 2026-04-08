@@ -6,7 +6,13 @@
     "#internal/*": {
       "types": "./src/*.ts",
       "@swapi/source": "./src/*.ts",
-      "default": "./dist/build/*.js"
+      "@swapi/local/development": "./dist/local/development/build/*.js",
+      "@swapi/local/production": "./dist/local/production/build/*.js",
+      "@swapi/testing/development": "./dist/testing/development/build/*.js",
+      "@swapi/testing/production": "./dist/testing/production/build/*.js",
+      "@swapi/production/development": "./dist/production/development/build/*.js",
+      "@swapi/production/production": "./dist/production/production/build/*.js",
+      "default": "./dist/local/production/build/*.js"
     }
   },
   "dependencies": {

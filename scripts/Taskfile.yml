@@ -1,0 +1,14 @@
+version: 3
+
+tasks:
+  clean:
+    cmds:
+      - rm -f ./tsconfig/*.tsbuildinfo || true
+      - rm -rf ./.task || true
+
+  lint:
+    sources:
+      - ./tsconfig/*.json
+      - ./docker/**/*.ts
+    cmds:
+      - bunx --no-install tsc --project ./tsconfig/tsconfig.scripts.json

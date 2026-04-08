@@ -10,8 +10,6 @@ tasks:
     vars:
       MODE:
         ref: .SWAPI_OUTPUT_MODE | default .MODE | default "development"
-      TARGET:
-        ref: .SWAPI_TARGET | default .TARGET | default "local"
       TSCONFIG: './tsconfig/tsconfig.vite{{if eq .MODE "production"}}.production{{end}}.json'
     requires:
       vars:
@@ -31,18 +29,14 @@ tasks:
     vars:
       MODE:
         ref: .SWAPI_OUTPUT_MODE | default .MODE | default "development"
-      TARGET:
-        ref: .SWAPI_TARGET | default .TARGET | default "local"
     requires:
       vars:
         - name: MODE
           enum: [development, production]
-        - name: TARGET
-          enum: [local, test, production]
     deps:
       - task: :shared:generate
     dotenv:
-      - ./.env/.env.target.{{.TARGET}}
+      - ./.env/.env.target.local
       - ./.env/.env.output.{{.MODE}}
     cmds:
       - bunx --no-install vite --configLoader runner
@@ -58,7 +52,7 @@ tasks:
         - name: MODE
           enum: [development, production]
         - name: TARGET
-          enum: [local, test, production]
+          enum: [local, testing, production]
     deps:
       - task: build:browser
         vars:
@@ -75,13 +69,14 @@ tasks:
         ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"
       TARGET:
         ref: .SWAPI_TARGET | default .TARGET | default "local"
+      DIST_DIR: './dist/{{.TARGET}}/{{.MODE}}/browser'
       TSCONFIG: './tsconfig/tsconfig.vite{{if eq .MODE "production"}}.production{{end}}.json'
     requires:
       vars:
         - name: MODE
           enum: [development, production]
         - name: TARGET
-          enum: [local, test, production]
+          enum: [local, pages, testing, production]
     deps:
       - task: :shared:build
         vars:
@@ -99,12 +94,11 @@ tasks:
       - '{{.TSCONFIG}}'
       - ./{src,public}/**/*
     generates:
-      - ./dist/browser/**/*
+      - '{{.DIST_DIR}}/**/*'
     cmds:
       - >
         bunx --no-install vite build
-        --outDir ./dist/browser
-      - touch ./dist/browser/.build-mode-{{.MODE}}
+        --outDir {{.DIST_DIR}}
 
   build:ssr:
     vars:
@@ -112,13 +106,14 @@ tasks:
         ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"
       TARGET:
         ref: .SWAPI_TARGET | default .TARGET | default "local"
+      DIST_DIR: './dist/{{.TARGET}}/{{.MODE}}/ssr'
       TSCONFIG: './tsconfig/tsconfig.vite{{if eq .MODE "production"}}.production{{end}}.json'
     requires:
       vars:
         - name: MODE
           enum: [development, production]
         - name: TARGET
-          enum: [local, test, production]
+          enum: [local, testing, production]
     deps:
       - task: :shared:build
         vars:
@@ -136,13 +131,12 @@ tasks:
       - '{{.TSCONFIG}}'
       - ./{src,public}/**/*
     generates:
-      - ./dist/ssr/**/*
+      - '{{.DIST_DIR}}/**/*'
     cmds:
       - >
         bunx --no-install vite build
         --ssr ./src/main.server.ts
-        --outDir ./dist/ssr
-      - touch ./dist/ssr/.build-mode-{{.MODE}}
+        --outDir {{.DIST_DIR}}
 
   start:
     vars:
@@ -150,12 +144,13 @@ tasks:
         ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"
       TARGET:
         ref: .SWAPI_TARGET | default .TARGET | default "local"
+      DIST_DIR: './dist/{{.TARGET}}/{{.MODE}}/browser'
     requires:
       vars:
         - name: MODE
           enum: [development, production]
         - name: TARGET
-          enum: [local, test, production]
+          enum: [local, testing, production]
     deps:
       - task: build:browser
         vars:
@@ -165,11 +160,13 @@ tasks:
       - ./.env/.env.target.{{.TARGET}}
       - ./.env/.env.output.{{.MODE}}
     cmds:
-      - bunx --no-install vite preview --outDir ./dist/browser
+      - bunx --no-install vite preview --outDir {{.DIST_DIR}}
 
   test:
     deps:
       - task: :shared:build
+        vars:
+          MODE: development
     dotenv:
       - ./.env/.env.target.{{.TARGET}}
       - ./.env/.env.output.development
@@ -179,6 +176,8 @@ tasks:
   test:watch:
     deps:
       - task: :shared:build
+        vars:
+          MODE: development
     dotenv:
       - ./.env/.env.target.{{.TARGET}}
       - ./.env/.env.output.development
