@@ -95,7 +95,7 @@ tasks:
     cmds:
       - docker buildx build --load --tag swapi-angular:local ./
 
-  docker:run:
+  docker:start:
     cmds:
       - |
         zsh -c '

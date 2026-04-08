@@ -23,6 +23,7 @@ COPY ./packages/client/src/ ./packages/client/src
 
 # copy server project
 COPY ./packages/server/package.json ./packages/server/
+COPY ./packages/server/rolldown.config.ts ./packages/server/
 COPY ./packages/server/Taskfile.yml ./packages/server/
 COPY ./packages/server/env/.env.output.production ./packages/server/env/
 COPY ./packages/server/env/.env.target.local ./packages/server/env/
@@ -41,20 +42,16 @@ COPY ./packages/tsconfig/ ./packages/tsconfig
 
 # build
 RUN bun install --frozen-lockfile
-RUN bunx --no-install task server:build:with-ssg
+RUN bunx --no-install task server:bundle
 
 FROM oven/bun:${BUN_VERSION}-distroless AS runtime
 WORKDIR /app
 
 COPY --from=build /app/package.json ./
 COPY --from=build /app/node_modules/ ./node_modules
-COPY --from=build /app/packages/client/package.json ./packages/client/
-COPY --from=build /app/packages/client/dist/ ./packages/client/dist
-COPY --from=build /app/packages/server/package.json ./packages/server/
-COPY --from=build /app/packages/server/dist/ ./packages/server/dist
-COPY --from=build /app/packages/shared/package.json ./packages/shared/
-COPY --from=build /app/packages/shared/dist/ ./packages/shared/dist
-COPY --from=build /app/packages/shared/generated/ ./packages/shared/generated
+COPY --from=build /app/packages/client/dist/browser/ ./packages/client/dist/browser
+COPY --from=build /app/packages/client/dist/ssg/ ./packages/client/dist/ssg
+COPY --from=build /app/packages/server/dist/bundle/ ./packages/server/dist/bundle
 
 ENV NG_ALLOWED_HOSTS=localhost,127.0.0.1,::1
 ENV SWAPI_HOST=localhost
@@ -64,6 +61,7 @@ ENV NODE_ENV=production
 ENV SWAPI_OUTPUT_MODE=production
 ENV SWAPI_LOG_LEVEL=info
 ENV SWAPI_PORT=51000
+ENV SWAPI_SERVER_PACKAGE_DIR=./packages/server
 
 EXPOSE 51000
-CMD ["./packages/server/dist/server.js"]
+CMD ["./packages/server/dist/bundle/server.js"]

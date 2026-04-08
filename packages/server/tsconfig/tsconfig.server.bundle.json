@@ -1,0 +1,7 @@
+{
+  "extends": ["@swapi/tsconfig/base", "@swapi/tsconfig/rules", "@swapi/tsconfig/node"],
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "files": ["../rolldown.config.ts"]
+}

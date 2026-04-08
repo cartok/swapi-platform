@@ -1,19 +1,24 @@
 # Demnächst
 
+- TODO: tsconfig files wieder umbenennen damit comments klar gehen.
 - TODO: tasks: getrennte dist pfade (für output mode & ggf. zusätzlich target)
-- TODO: mit rolldown die finale dist bundlen
+- TODO: Dockerfile + Dockerfile.bundle, damit auch non bundling später testbar ist
 
 ---
 
+- TODO: folder renaming: env -> .env
 - TODO: Hosting bei Fly.io oder Cloudflare Containers vorbereiten
-- TODO: Docker build erweitern (env vars, build modes & targets)
-- TODO: Deployment per Github Actions konfigurieren
+- TODO: Deployment per Github Actions konfigurieren und Docker build erweitern (env vars, build modes & targets)
+
+---
+
+- TODO: Fix Unit Tests, add browser API mocks, extend some tests
+- TODO: Linting und unit tests in build pipeline einbauen
 
 ---
 
 - TODO: a11y improvements
 - TODO: Warnings (browser console) untersuchen: NgOptimizedImage aspect ratio (slider images), unused preloaded resources
-- TODO: Fix Unit Tests, add browser API mocks, extend some tests
 
 ---
 
@@ -25,6 +30,7 @@
 # Später
 
 - TODO: express ersetzen
+- TODO: Server build ist nicht JIT free, gucken dass ich Angular-Linker-Schritt einbaue oder ng statt rolldown zum bauen verwende.
 - TODO: Angular App Shell ausprobieren
 - TODO: Create vite plugin for 'vite-plugin-angular-in-monorepo' with automatic resolution
 - TODO: Verbessern der DeviceService API

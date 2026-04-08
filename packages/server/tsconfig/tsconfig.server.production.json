@@ -9,6 +9,5 @@
   // Don't extend the options here.
   "angularCompilerOptions": {
     "strictTemplates": true
-  },
-  "references": [{ "path": "../../shared/tsconfig/tsconfig.shared.production.json" }]
+  }
 }

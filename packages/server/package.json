@@ -6,7 +6,7 @@
     "#internal/*": {
       "types": "./src/*.ts",
       "@swapi/source": "./src/*.ts",
-      "default": "./dist/*.js"
+      "default": "./dist/build/*.js"
     }
   },
   "dependencies": {
@@ -25,6 +25,7 @@
     "@types/express": "^5.0.6",
     "@types/node": "catalog:",
     "bun": "catalog:",
+    "rolldown": "catalog:tooling",
     "typescript": "catalog:"
   }
 }

@@ -7,7 +7,7 @@
   ],
   "compilerOptions": {
     "rootDir": "../src",
-    "outDir": "../dist"
+    "outDir": "../dist/build"
   },
   // Workaround: The Angular compiler options are already set by @swapi/tsconfig/angular.
   // I've set `strictTemplates` here to get around wrong language service warnings.
@@ -15,6 +15,5 @@
   "angularCompilerOptions": {
     "strictTemplates": true
   },
-  "include": ["../src/**/*.ts"],
-  "references": [{ "path": "../../shared/tsconfig/tsconfig.shared.json" }]
+  "include": ["../src/**/*.ts"]
 }

@@ -1,8 +1,7 @@
 import '@angular/compiler'
 
 import { mkdir, rm, writeFile } from 'node:fs/promises'
-import { dirname } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { dirname, resolve } from 'node:path'
 
 import { ɵSERVER_CONTEXT } from '@angular/platform-server'
 import { CommonEngine } from '@angular/ssr/node'
@@ -10,11 +9,7 @@ import { HOME_PATH } from '@swapi/shared/routing/paths'
 import { SSG_PATHS } from '@swapi/shared/routing/ssg-paths'
 
 import { enableAngularServerMode } from '#internal/angular-server-mode'
-import {
-  CLIENT_SSG_FOLDER,
-  CLIENT_SSG_FOLDER_URL,
-  INDEX_HTML,
-} from '#internal/client-dist'
+import { CLIENT_SSG_FOLDER, INDEX_HTML } from '#internal/client-dist'
 import { env } from '#internal/env'
 
 enableAngularServerMode()
@@ -36,7 +31,7 @@ for (const path of SSG_PATHS) {
     documentFilePath: INDEX_HTML,
   })
   const indexPath = path === HOME_PATH ? './index.html' : `./${path}/index.html`
-  const outputFilePath = fileURLToPath(new URL(indexPath, CLIENT_SSG_FOLDER_URL))
+  const outputFilePath = resolve(CLIENT_SSG_FOLDER, indexPath)
   console.log('SSG: Rendered', indexPath.replace(/^\./, ''))
   await mkdir(dirname(outputFilePath), { recursive: true })
   await writeFile(outputFilePath, html, 'utf8')
