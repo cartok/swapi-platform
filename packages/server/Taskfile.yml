@@ -82,10 +82,6 @@ tasks:
         vars:
           MODE: '{{.MODE}}'
           TARGET: '{{.TARGET}}'
-      - task: client:build
-        vars:
-          MODE: '{{.MODE}}'
-          TARGET: '{{.TARGET}}'
     dotenv:
       - ./env/.env.target.{{.TARGET}}
       - ./env/.env.output.{{.MODE}}
@@ -94,15 +90,40 @@ tasks:
       - '{{.TSCONFIG}}'
       - ./env/.env.output.{{.MODE}}
       - ./env/.env.target.{{.TARGET}}
-      - ./src/**/*
+      - ./src/prerender.ts
     generates:
       - ../client/dist/ssg/**/*/index.html
-      - ../client/dist/ssg/.ssg-mode-{{.MODE}}
+      - ../client/dist/ssg/.build-mode-{{.MODE}}
     cmds:
       - bunx --no-install bun ./dist/prerender.js
-      - touch ../client/dist/ssg/.ssg-mode-{{.MODE}}
+      - touch ../client/dist/ssg/.build-mode-{{.MODE}}
 
   build:
+    vars:
+      MODE:
+        ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"
+      TARGET:
+        ref: .SWAPI_TARGET | default .TARGET | default "local"
+    requires:
+      vars:
+        - name: MODE
+          enum: [development, production]
+        - name: TARGET
+          enum: [local, test, production]
+    deps:
+      - task: build:compile
+        vars:
+          MODE: '{{.MODE}}'
+          TARGET: '{{.TARGET}}'
+      - task: client:build
+        vars:
+          MODE: '{{.MODE}}'
+          TARGET: '{{.TARGET}}'
+    dotenv:
+      - ./env/.env.target.{{.TARGET}}
+      - ./env/.env.output.{{.MODE}}
+
+  build:compile:
     vars:
       MODE:
         ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"
@@ -130,9 +151,10 @@ tasks:
       - ./src/**/*
     generates:
       - ./dist/**/*
+      - ./dist/.build-mode-{{.MODE}}
     cmds:
       - bunx --no-install tsc --project '{{.TSCONFIG}}'
-      - bunx --no-install bun ./dist/prerender.js
+      - touch ./dist/.build-mode-{{.MODE}}
 
   start:
     vars:

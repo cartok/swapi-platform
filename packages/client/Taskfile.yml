@@ -90,6 +90,8 @@ tasks:
           enum: [local, test, production]
     deps:
       - task: shared:build
+        vars:
+          MODE: '{{.MODE}}'
     dotenv:
       - ./env/.env.target.{{.TARGET}}
       - ./env/.env.output.{{.MODE}}
@@ -125,6 +127,8 @@ tasks:
           enum: [local, test, production]
     deps:
       - task: shared:build
+        vars:
+          MODE: '{{.MODE}}'
     dotenv:
       - ./env/.env.target.{{.TARGET}}
       - ./env/.env.output.{{.MODE}}
