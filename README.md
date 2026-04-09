@@ -6,7 +6,7 @@ This repository started as a successful application challenge implementation of 
 
 Live Demo (GitHub Pages, CSR only):
 
-- [https://cartok.github.io/assecor-assessment-frontend/](https://cartok.github.io/assecor-assessment-frontend/)
+- [https://cartok.github.io/swapi-platform/](https://cartok.github.io/swapi-platform/)
 
 ## What This Project Demonstrates
 

@@ -21,10 +21,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
@@ -37,11 +37,11 @@ jobs:
 
       - name: Build Angular app
         env:
-          SWAPI_PUBLIC_BASE_PATH: /${{ env.REPO_NAME }}/
+          SWAPI_CLIENT_PUBLIC_BASE_PATH: /${{ env.REPO_NAME }}/
         run: bunx --no-install task client:build:browser TARGET=pages
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: packages/client/dist/pages/production/browser
 
@@ -56,4 +56,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
