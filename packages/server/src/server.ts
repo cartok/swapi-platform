@@ -17,6 +17,7 @@ import { addSecurityHandler } from '#internal/handler/security.handler'
 enableAngularServerMode()
 
 const server = express()
+server.set('trust proxy', true)
 
 let angularAppPromise: Promise<CommonEngine> | undefined
 
