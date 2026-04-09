@@ -1,103 +1,103 @@
-# Technische Entscheidungen
+# Technical Decisions
 
-## Kontext
+## Context
 
-Die Umsetzung wurde bewusst iterativ aufgebaut: erst eine belastbare technische Basis, dann schrittweise funktionale und nicht-funktionale Vertiefung.
+The implementation was intentionally iterative: first establish a reliable technical baseline, then deepen functional and non-functional aspects step by step.
 
-Ausgangslage für diese Aufgabe:
+Starting point for this task:
 
-- Seit November 2024 kein klassisches Web-Frontend mit DOM/CSS entwickelt
-- Von Februar 2025 bis August 2025 primar React Native genutzt
-- Kein dauerhaft gepflegter "One-size-fits-all"-Frontend-Stack
+- No classic web frontend work with DOM/CSS since November 2024
+- From February 2025 to August 2025, work focused mainly on React Native
+- No permanently maintained one-size-fits-all frontend stack
 
-Das Ziel war daher, nachvollziehbare Architekturentscheidungen zu treffen, die schnell zu einem sauberen, erweiterbaren Ergebnis führen.
+The goal was therefore to make clear, defensible architecture decisions that quickly lead to a clean and extensible result.
 
-## 1. Angular als Framework
+## 1. Angular as the Framework
 
-Warum:
+Why:
 
-- Sehr gute Trennung von Verantwortlichkeiten
-- Reifer, stabiler Stack mit klaren Konventionen
-- Passt fachlich und technisch zur Aufgabenstellung
-- Durch offene API ohne Auth war kein zusätzliches Backend für Secret-Handling notwendig, wodurch rein CSR kein Problem war.
+- Strong separation of concerns
+- Mature and stable stack with clear conventions
+- Good technical and domain fit for the challenge
+- Since the API is public and requires no auth, no extra backend was needed for secret handling, so pure CSR was initially fine
 
-Alternativen:
+Alternatives:
 
-- Vue (+ Nuxt), bin gespannt auf vapor
+- Vue (+ Nuxt), especially interesting with Vapor
 - Solid (+ SolidStart)
 - React (+ Next/Remix)
 
 Trade-off:
 
-- Nicht der absolute Benchmark-Spitzenreiter bei Rendering-Performance, in diesem Kontext aber mehr als ausreichend
+- Not the absolute top benchmark performer for rendering, but more than sufficient in this context
 
 Status:
 
-- Grundarchitektur läuft stabil
+- Core architecture is stable
 
-Nächster Schritt:
+Next step:
 
-- Siehe unten in README
+- See README for the current roadmap
 
-## 2. Angular CLI statt Nx oder Analog
+## 2. Angular CLI instead of Nx or Analog
 
-Warum:
+Why:
 
-- Möglichst niedrige Einstiegskomplexität
-- Schneller Projektstart mit minimaler Tooling-Reibung
+- Lowest possible onboarding complexity
+- Fast project start with minimal tooling friction
 
-Alternativen:
+Alternatives:
 
 - Nx
 - Analog
 
 Trade-off:
 
-- Einzelne Tooling-Details mussten manuell ergänzt werden
+- Some tooling details had to be added manually
 
 Status:
 
-- Für den Aufgabenkontext passend und DX-seitig stabil
+- Appropriate for this challenge context and stable from a DX perspective
 
-Nächster Schritt:
+Next step:
 
-- Keine kurzfristige Änderung geplant
+- No short-term change planned
 
-## 3. State und Rendering: Signals + Zoneless + CSR
+## 3. State and rendering: Signals + Zoneless + CSR
 
-Warum:
+Why:
 
-- Signals für lokalen Zustand sind direkt, einfach und performant
-- Zoneless reduziert unnötige Change-Detection-Kosten
-- CSR war für den Projektkontext die schnellste und angemessene Basis
+- Signals provide direct, simple, and performant local state handling
+- Zoneless reduces unnecessary change detection overhead
+- CSR was the fastest and most practical starting point for this project phase
 
-Alternativen:
+Alternatives:
 
-- RxJS-fokussierter Ansatz
-- zusätzlich SSR/SSG/Hybrid
+- RxJS-centric state approach
+- Add SSR/SSG/hybrid earlier
 
 Trade-off:
 
-- Ohne SSR sind SEO und initiales Rendering nicht maximal optimiert
-- Route-spezifisches Prefetching bleibt ohne zusätzliche Infrastruktur begrenzt
+- Without SSR, SEO and initial rendering are not maximized
+- Route-specific prefetching remains limited without additional infrastructure
 
 Status:
 
-- Architektur funktioniert gut und bleibt bewusst einfach
+- Architecture works well and intentionally stays simple
 
-Nächster Schritt:
+Next step:
 
-- SSR/Hybrid optional später evaluieren, wenn alle Kernanforderungen abgeschlossen sind
+- Re-evaluate SSR/hybrid options later after all core requirements are complete
 
-## 4. Styling mit nativem CSS statt Tailwind/SCSS
+## 4. Native CSS instead of Tailwind/SCSS
 
-Warum:
+Why:
 
-- Fokus auf Einfachheit und Lesbarkeit
-- Moderne CSS-Features reichen für den aktuellen Umfang weitgehend aus
-- Vermeidet zusätzliche Tooling-Komplexität in früher Projektphase
+- Focus on simplicity and readability
+- Modern CSS features are largely sufficient for the current scope
+- Avoids extra tooling complexity in an early project phase
 
-Alternativen:
+Alternatives:
 
 - Tailwind
 - SCSS
@@ -105,47 +105,47 @@ Alternativen:
 
 Trade-off:
 
-- Bei Media-Query-Organisation und bestimmten Kompatibilitätsdetails wäre ein Preprocessing-Layer hilfreich
-- Die bereitgestellten Mockups waren für die Umsetzung ausreichend, Detailabstände und Feinabstimmung ließen sich im vorhandenen Inspect-Workflow aber teils nur mit manueller Annäherung übernehmen
+- A preprocessing layer would help for media query organization and specific compatibility details
+- Provided mockups were sufficient, but some spacing fine-tuning required manual approximation in the existing inspect workflow
 
 Status:
 
-- Funktioniert für den aktuellen Umfang, aber mit erkennbaren Grenzen
+- Works for the current scope, but with clear limits
 
-Nächster Schritt:
+Next step:
 
-- Siehe unten in README
+- See README for current follow-up steps
 
-## 5. SVG-Asset-Strategie mit manuell gepflegtem Sprite-Sheet
+## 5. SVG asset strategy with a manually maintained sprite sheet
 
-Warum:
+Why:
 
-- SVG-Sprites sind flexibel, cachebar und technisch sauber
-- Für den Projektumfang war ein manuelles Sheet schneller als die Einführung neuer Build-Werkzeuge
+- SVG sprites are flexible, cacheable, and technically clean
+- For this scope, a manual sprite sheet was faster than introducing additional build tooling
 
-Alternativen:
+Alternatives:
 
 - `jannicz/ng-svg-icon-sprite`
 - `ngneat/svg-icon`
 
 Trade-off:
 
-- Weniger Automatisierung und etwas schlechtere Developer Experience
+- Less automation and slightly worse developer experience
 
 Status:
 
-- Für den Scope ausreichend
+- Sufficient for the current scope
 
-Nächster Schritt:
+Next step:
 
-- Bei Projektfortführung: automatisierte Sprite-Generierung einführen
+- If the project continues: introduce automated sprite generation
 
-## 6. Store-Strategie: Signals und einfache Singleton-Services
+## 6. Store strategy: Signals and simple singleton services
 
-Warum:
+Why:
 
-- API-Domain und Scope sind überschaubar
-- Direkte, leicht wartbare Lösung ohne zusätzliche Store-Abstraktion
+- API domain and scope are manageable
+- Direct, easy-to-maintain solution without additional store abstraction
 
 Alternative:
 
@@ -153,48 +153,48 @@ Alternative:
 
 Trade-off:
 
-- Bei stark wachsender Komplexität wäre ein formaler Store ggf. vorteilhaft
+- A formal store could become beneficial if complexity grows significantly
 
 Status:
 
-- Für den Umfang passend
+- Fits the current scope
 
-Nächster Schritt:
+Next step:
 
-- Erst bei klarer Komplexitätszunahme neu bewerten
+- Reevaluate only when complexity clearly increases
 
-## 7. Testing-Ansatz
+## 7. Testing approach
 
-Aktueller Stand:
+Current status:
 
-- Es gibt nur wenig Unit-Test-Abdeckung
+- Unit test coverage is currently limited
 
-Begründung:
+Rationale:
 
-- Für den Umfang dieser Bewerbungsaufgabe lag der Fokus auf Architektur, Funktionalität und sauberer Integrationsbasis
-- Ein hohes Unit-Test-Volumen wäre in dieser Phase unverhältnismässig
+- For the scope of this application challenge, focus was on architecture, functionality, and a clean integration baseline
+- A large unit-test volume would have been disproportionate at this stage
 
-Geplanter Ansatz:
+Planned approach:
 
-- Unit-Tests gezielt für isolierbare, kritische Logik mit klaren In-/Outputs
-- E2E-Tests für kritische User-Flows (Navigation, Kern-Use-Cases)
-- Keine redundanten Assertions über mehrere Testebenen hinweg
-- Ergänzend Integration-, Deployment- und bei Bedarf Contract-Tests in sinnvollem Umfang
+- Targeted unit tests for isolated, critical logic with clear inputs/outputs
+- E2E tests for critical user flows (navigation, core use cases)
+- No redundant assertions across multiple testing layers
+- Complement with integration, deployment, and when needed contract tests, in pragmatic scope
 
-## 8. Accessibility-Strategie und offene Punkte
+## 8. Accessibility strategy and open items
 
-Aktueller Stand:
+Current status:
 
-- Accessibility ist teilweise umgesetzt, aber noch nicht abgeschlossen
-- Es bestehen offene funktionale und nicht-funktionale Punkte in mehreren Komponenten
+- Accessibility is partly implemented, but not yet complete
+- Functional and non-functional gaps remain across multiple components
 
-Priorisierte Weiterentwicklung:
+Prioritized follow-up:
 
-1. Tastatur-Navigation und Fokusführung manuell prüfen und korrigieren
-2. Semantik, ARIA-Attribute und textuelle Metadaten systematisch verfeinern
-3. Manuelle Checks mit Browser-Tools/Plugins ergänzen
-4. Danach automatisierte Accessibility-Prüfungen in E2E-Pipeline aufnehmen
+1. Manually validate and fix keyboard navigation and focus behavior
+2. Systematically refine semantics, ARIA attributes, and textual metadata
+3. Extend with manual checks via browser tools/plugins
+4. Then add automated accessibility checks to the E2E pipeline
 
-Hinweis:
+Note:
 
-- Die SWAPI-spezifischen Integrationsrisiken und Datenprobleme sind separat in [swapi.md](./swapi.md) dokumentiert.
+- SWAPI-specific integration risks and data issues are documented separately in [swapi.md](./swapi.md).

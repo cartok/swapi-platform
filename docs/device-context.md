@@ -1,74 +1,74 @@
 # Device Context
 
-## Themen / Entscheidungen
+## Topics / Decisions
 
-### Warum sollten die Breakpoints in einem allgemeinen Datenformat (JSON/YAML) definiert werden?
+### Why should breakpoints be defined in a generic data format (JSON/YAML)?
 
-> Weil man dadurch den SSR Server besser vom Frontend trennen kann. In production könnte das etwas anderes als der Node Server sein/werden.
+> Because this allows cleaner separation between the SSR server and frontend. In production this could become something other than the current Node server.
 
-### Über vanilla-extract vs PostCSS | Lightning CSS im Kontext der CSS Media Queries
+### On vanilla-extract vs PostCSS | Lightning CSS in the context of CSS media queries
 
-> **Update:** Ich werde nun Lightning CSS statt PostCSS verwenden und auf CSS-in-JS per vanilla-extract verzichten, weil es mehr Komplexität mit sich bringt und eine größere Hürde für andere Entwickler ist, die mit vanilla-extract-css nicht vertraut sind. Ziel ist es ein hoch performantes, sauberes, **einfaches**, sicheres Template Projekt zu erzeugen. Die Analyse hier drunter ist also veraltet.
+> **Update:** I now use Lightning CSS instead of PostCSS and avoid CSS-in-JS via vanilla-extract, because it introduces more complexity and a higher entry barrier for developers not familiar with vanilla-extract-css. The goal is to build a highly performant, clean, **simple**, and secure template project. The analysis below is therefore outdated.
 
-Vorweg: Warum überhaupt die Generierung?
+First, why generate anything at all?
 
-- Weil die Breakpoints zumindest in der JS Nutzung über den `DeviceService` typesafe sein sollten.
-- Weil die Breakpoints nicht an zwei Stellen (CSS & JS) definiert werden sollten
+- Breakpoints should be type-safe when used in JavaScript via `DeviceService`.
+- Breakpoints should not be defined in two places (CSS and JavaScript).
 
 #### vanilla-extract
 
-##### Pro
+##### Pros
 
-- CSS & JS wäre beides typesafe
-- Saubere Auto-Completion für Dinge wie die Breakpoints, ohne spezielles Tooling
+- Both CSS and JavaScript would be type-safe.
+- Clean autocomplete for values like breakpoints, without special tooling.
 
-##### Kontra
+##### Cons
 
-- `ng update|(add)`: Man müsste für die Intergration auf Angular version updates via Angular CLI verzichten, siehe: https://angular.dev/ecosystem/custom-build-pipeline#what-are-the-options
-- Extra `<component>.css.ts` files, sofern man die Struktur nicht brechen will, indem man den CSS-in-JS code über die Component Classes in `<component>.ts` packt. Daraus ergibt sich so ein workflow: Man bearbeitet, nachdem man die styles in `<component>.ts` importiert hat `<component>.css.ts` idr. parallel mit `<component>.css` und dann `<component>.html`. Spricht dafür CSS komplett auszutauschen.
-- Mehr Komplexität
+- `ng update|(add)`: integration would require giving up Angular version updates through Angular CLI in the standard way; see: https://angular.dev/ecosystem/custom-build-pipeline#what-are-the-options
+- Additional `<component>.css.ts` files unless the structure is broken by putting CSS-in-JS directly into `<component>.ts` component classes. This usually leads to editing `<component>.css.ts`, `<component>.css`, and `<component>.html` in parallel, which argues for replacing CSS entirely.
+- More complexity.
 
 #### PostCSS
 
-##### Pro
+##### Pros
 
-- `ng update|(add)`: Ginge grundlegend ohne ejecting (@analogjs/vite-plugin-angular)
-  - Wenn auch ohne automatischen rebuild bei Änderungen an der Breakpoint-Basis-Datei, wäre aber total ausreichend.
-- Styles wären, wie gehabt, möglichst nah beieinander
+- `ng update|(add)`: fundamentally possible without ejecting (`@analogjs/vite-plugin-angular`).
+  - This would still be acceptable even without automatic rebuilds after changes to the breakpoint source file.
+- Styles can remain close to components, as before.
 
-##### Kontra
+##### Cons
 
-- Zumindets in VSCode gibt es kein gescheites PostCSS Plugin. Man muss bei den media queries auf auto-completion verzichten und unknown @-rule per project settings.json erlauben.
-- Zumindest per default (ggf. gibts Lösungen, Scripten könnte man es ohne viel Aufwand extern von Linting-Tools. Vermutlich könnte man auch stylelint verwenden oder ähnliches, ist aber wiederum mehr tooling, würde aber wiederum auch mehr optionen bieten wie z. B. automatische sortierung von CSS Properties) gibt es in CSS kein Linting bzgl. vorhandener properties (variablen). D. h. dass zum Beispiel nach dem Entfernen eines Breakpoints kein Linter warnt, wenn man noch den alten verwendet.
-- ~~Die media query tokens kann man nicht mit anderen Queries kombinieren. Das heist man müsste tokens für alle möglichen media queries als karthesisches Produkt generieren, was insane ist. Aktuell habe ich nur width & height generiert. Da wäre es sogar allgemein besser auf das custom-media plugin zu verzichten, wodurch PostCSS ganz raus kann, auch wenn man dann nicht mehr single source of truth bzgl. der breakpoints hat. Hier muss definitv was geändert werden. Entweder ein anderer Präprozessor oder CSS-in-JS.~~
-  Ich hatte vermutlich falsch getestet. Die `@custom-media` tokens lassen sich verbinden, vermutlich nur nicht untereinander. Per standard `@media` direktive ist es kein Problem z. B.: `@media (--foo) and (--bar) {}`.
+- At least in VSCode, there is no solid PostCSS plugin. You lose autocomplete for media queries and must allow unknown `@` rules in project `settings.json`.
+- By default, CSS has no linting for whether referenced tokens/variables actually exist. For example, after removing a breakpoint, no linter warning is raised if the old one is still used.
+- ~~Media query tokens cannot be combined with other queries. This would require generating tokens for all possible media query combinations as a Cartesian product, which is unrealistic. At that point, dropping `custom-media` and even PostCSS entirely could be better, but then there is no single source of truth for breakpoints. This clearly needed a different preprocessor or CSS-in-JS.~~
+  I likely tested this incorrectly. `@custom-media` tokens can be combined, probably just not with each other in all forms. With standard `@media`, combinations like `@media (--foo) and (--bar) {}` work.
 
-### Ermitteln des Device Contexts
+### Determining the Device Context
 
 #### Low-entropy headers
 
-Werden direkt mitgesended, sofern nicht blockiert.
+Sent directly by the browser unless blocked.
 https://wicg.github.io/client-hints-infrastructure/#low-entropy-hint-table
 
-**Auswahl:**
+**Selection:**
 
 - `Sec-CH-UA-Mobile`: `?1|?0`
-  Bezieht sich auf den Formfaktor des Geräts, nicht auf Browser Eigenschaften, unterscheidet aber nicht zwischen Mobile und Tablet, daher kann ?0 auch Tablet sein.
+  Refers to device form factor rather than browser capabilities, but does not distinguish mobile and tablet. Therefore `?0` can also be a tablet.
 
 #### High-entropy headers
 
-Kann der Server bei Antwort per Accept-CH Header anfragen und werden dann beim nächsten Request mitgesendet, sofern nicht blockiert.
+Can be requested by the server via `Accept-CH` and are then sent on subsequent requests, unless blocked.
 
-**Auswahl:**
+**Selection:**
 
 - `Sec-CH-Form-Factors`: "Desktop", "Automotive", "Mobile", "Tablet", "XR", "EInk", "Watch"
-  Keine Breite Unterstüztung, aber sofern unterstüzt kann man es vor allem für die Evaluierung, ob es Tablet ist hinzunehmen.
+  Support is not broad, but when available it is useful, especially to distinguish tablets.
 - `Sec-CH-Viewport-Width`
 - `Sec-CH-Viewport-Height`
 
 #### Fallbacks
 
-Client-side detection mit minimalem payload und redirect nach POST /device-cookie via 303.
+Client-side detection with minimal payload and redirect after `POST /device-cookie` via `303`.
 
 - `Sec-CH-UA-Mobile`: `(pointer: fine) AND (hover: hover)`
 - `Sec-CH-Viewport-Width`: `window.innerWidth`
@@ -76,11 +76,11 @@ Client-side detection mit minimalem payload und redirect nach POST /device-cooki
 
 #### General Additions
 
-| pointer | hover | Gerätetyp        |
+| pointer | hover | Device type      |
 | ------- | ----- | ---------------- |
 | fine    | hover | Desktop / Laptop |
 | coarse  | none  | Smartphone       |
-| coarse  | hover | selten (Hybrid)  |
+| coarse  | hover | rare (hybrid)    |
 
 **Eventually usable Media Queries:**
 
@@ -96,52 +96,4 @@ Client-side detection mit minimalem payload und redirect nach POST /device-cooki
 
 ### SSG, SSR, CSR Variant Page Routing
 
-Entscheidung: Per prefix routes.
-
----
-
-#### TODOs
-
-- Grundlegend
-  - Taskfile:
-    - code generation als deps
-    - code generation caching
-    - symlinks + cli autocompletion
-  - vanilla-extract-css refactoring
-  - Vite build Optimierungen einbauen, anhand alter angular.json
-
----
-
-- CSR für Github Pages
-  - Non-SSR device context defaults überprüfen
-- Unit Tests fixen
-
----
-
-- Fallback Mechanimsus abschließen
-  - Grundlegend die device init page incl. redirect umsetzen
-  - Cookie und header daten vereinen
-  - Fallback Logik die über die device init seite entscheidet sollte gut und togglebar sein
-
----
-
-- Touch/Hover Geschichte abschließen / bereinigen oder erstmal entfernen
-  - Sollte für touch prüfung js touchpoints check hinzugenommen werden?
-    ```js
-    const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0
-    ```
-
----
-
-- Eventuelle Verbesserungen:
-  - Wenn alle Header initial bereits vorhanden sind, könnte man theoretisch URL Rewrite statt HTTP redirect verweden um den Redirect zu sparen. Ist dann aber nach wie vor das Thema, dass man dann die Dokumente, falls sauber möglich über Header unterscheidbar machen müsste und wenn das implementiert ist, könnte man auch vollständig auf die HTTP Redirection verzichten.
-  - Noch mal gegen prüfen ob man das nicht doch incl. SSG auch ohne URL parameter robust lösen kann, dann könnte man URL rewrite statt redirect verwenden und / sich den redirect sparen und hätte eine saubere URL. Caching muss passen.
-  - Ggf. die Express module etwas umgestalten, gucken wie das idr. gemacht wird.
-  - Der Mix aus den unfertigen Schemas und der Definition der Breakpoints hier, ist nicht gut. Idee war ja grundlegend von der Architektur her mal zu gucken wie es aussehen würde möglichst Server- und Sprach-neutral die Schnittmenge an Informationen zu definieren die auf beiden Seiten gebraucht werden. Auch der Workaround mit dem d.ts File für den Cookie Validator gefällt mir nicht.
-
----
-
-- Outsiders:
-  - Taskfile oder ähnliches verwenden statt npm scripts, allein wegen der code generation
-  - `NgOptimizedImage` nutzen
-  - Eventuell schlechte Architektur von `app-image-grid-item`: Könnte <img> rein geben, dann kann ich dessen loading hier direkt steuern. Alternativ gucken wie und ob ich durch reiche vs abstrahiere (evtl. unnötige Komplexität).
+Decision: use prefix routes.

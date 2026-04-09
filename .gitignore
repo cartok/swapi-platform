@@ -22,3 +22,6 @@ generated/
 .Trash-*/
 *.save
 Thumbs.db
+
+# Symlink to keep project clean
+TODO.md
