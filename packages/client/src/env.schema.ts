@@ -6,14 +6,14 @@ import { CommonEnvSchema } from '../../shared/src/environment/env'
 export const AppBrowserEnvSchema = Type.Intersect([
   CommonEnvSchema,
   Type.Object({
-    SWAPI_DEV_TOOLS: Type.Readonly(Type.Boolean()),
+    SWAPI_CLIENT_DEV_TOOLS: Type.Readonly(Type.Boolean()),
   }),
 ])
 
 export type AppBrowserEnv = Static<typeof AppBrowserEnvSchema>
 
 export const AppBuildEnvSchema = Type.Object({
-  SWAPI_DEV_SERVER_PORT: Type.Optional(Type.Readonly(Type.Integer())),
-  SWAPI_PREVIEW_SERVER_PORT: Type.Optional(Type.Readonly(Type.Integer())),
-  SWAPI_PUBLIC_BASE_PATH: Type.String({ minLength: 1, default: '/' }),
+  SWAPI_CLIENT_DEV_SERVER_PORT: Type.Optional(Type.Readonly(Type.Integer())),
+  SWAPI_CLIENT_PREVIEW_SERVER_PORT: Type.Optional(Type.Readonly(Type.Integer())),
+  SWAPI_CLIENT_PUBLIC_BASE_PATH: Type.String({ minLength: 1, default: '/' }),
 })

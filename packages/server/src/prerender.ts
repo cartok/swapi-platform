@@ -21,7 +21,7 @@ const angular = new CommonEngine({
   providers: [{ provide: ɵSERVER_CONTEXT, useValue: 'ssg' }],
 })
 
-const origin = `http://${env.SWAPI_HOST}:${env.SWAPI_PORT}`
+const origin = `http://${env.SWAPI_SERVER_HOST}:${env.SWAPI_SERVER_PORT}`
 
 await rm(CLIENT_SSG_FOLDER, { force: true, recursive: true })
 

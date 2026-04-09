@@ -1,12 +1,12 @@
 ARG BUN_VERSION=1.3.9
-ARG SWAPI_TARGET=local
 ARG SWAPI_OUTPUT_MODE=production
+ARG SWAPI_TARGET=local
 
 FROM oven/bun:${BUN_VERSION}-slim AS build
-ARG SWAPI_TARGET
 ARG SWAPI_OUTPUT_MODE
-ENV SWAPI_TARGET=${SWAPI_TARGET}
+ARG SWAPI_TARGET
 ENV SWAPI_OUTPUT_MODE=${SWAPI_OUTPUT_MODE}
+ENV SWAPI_TARGET=${SWAPI_TARGET}
 WORKDIR /app
 
 # copy root files
@@ -53,10 +53,10 @@ RUN bun install --frozen-lockfile
 RUN bunx --no-install task server:bundle TARGET=${SWAPI_TARGET} MODE=${SWAPI_OUTPUT_MODE}
 
 FROM oven/bun:${BUN_VERSION}-distroless AS runtime
-ARG SWAPI_TARGET
 ARG SWAPI_OUTPUT_MODE
-ENV SWAPI_TARGET=${SWAPI_TARGET}
+ARG SWAPI_TARGET
 ENV SWAPI_OUTPUT_MODE=${SWAPI_OUTPUT_MODE}
+ENV SWAPI_TARGET=${SWAPI_TARGET}
 WORKDIR /app
 
 COPY --from=build /app/package.json /app
@@ -72,12 +72,11 @@ COPY ./scripts/docker/create-bundle-link.ts ./scripts/docker/
 RUN ["bun", "./scripts/docker/create-bundle-link.ts"]
 
 ENV NG_ALLOWED_HOSTS=localhost,127.0.0.1,::1
-ENV SWAPI_HOST=localhost
-
 ENV NODE_ENV=${SWAPI_OUTPUT_MODE}
 ENV SWAPI_LOG_LEVEL=info
-ENV SWAPI_PORT=51000
+ENV SWAPI_SERVER_HOST=localhost
 ENV SWAPI_SERVER_PACKAGE_DIR=./packages/server
+ENV SWAPI_SERVER_PORT=51000
 
-EXPOSE ${SWAPI_PORT}
+EXPOSE ${SWAPI_SERVER_PORT}
 CMD ["./bundle-link/server.js"]

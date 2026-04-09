@@ -145,6 +145,7 @@ Taskfiles load environment values from checked-in `.env` files:
 
 - `packages/client/.env/.env.target.*`
 - `packages/client/.env/.env.output.*`
+- `packages/server/.env/.env.base`
 - `packages/server/.env/.env.target.*`
 - `packages/server/.env/.env.output.*`
 
@@ -152,8 +153,8 @@ Main runtime variables:
 
 - `SWAPI_TARGET` (`local|testing|production`)
 - `SWAPI_OUTPUT_MODE` (`development|production`)
-- `SWAPI_PORT`
-- `SWAPI_HOST`
+- `SWAPI_SERVER_PORT`
+- `SWAPI_SERVER_HOST`
 - `NG_ALLOWED_HOSTS`
 
 ## Documentation Index

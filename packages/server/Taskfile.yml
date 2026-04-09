@@ -45,16 +45,26 @@ tasks:
           MODE: '{{.MODE}}'
           TARGET: '{{.TARGET}}'
     dotenv:
+      - ./.env/.env.base
       - ./.env/.env.target.{{.TARGET}}
       - ./.env/.env.output.{{.MODE}}
     interactive: true
     cmds:
-      - >
-        bunx --no-install bun
-        --conditions @swapi/source
-        --conditions {{.TARGET_AND_MODE_CONDITION}}
-        --conditions {{.MODE_CONDITION}}
-        --watch ./src/server.ts
+      - cmd: >
+          SWAPI_SERVER_PORT={{if eq .MODE "development"}}50000{{else}}51000{{end}}
+          bunx --no-install bun
+          --conditions @swapi/source
+          --conditions {{.TARGET_AND_MODE_CONDITION}}
+          --conditions {{.MODE_CONDITION}}
+          --watch ./src/server.ts
+        if: '{{eq .TARGET "local"}}'
+      - cmd: >
+          bunx --no-install bun
+          --conditions @swapi/source
+          --conditions {{.TARGET_AND_MODE_CONDITION}}
+          --conditions {{.MODE_CONDITION}}
+          --watch ./src/server.ts
+        if: '{{ne .TARGET "local"}}'
 
   build:with-ssg:
     vars:
@@ -81,11 +91,13 @@ tasks:
           MODE: '{{.MODE}}'
           TARGET: '{{.TARGET}}'
     dotenv:
+      - ./.env/.env.base
       - ./.env/.env.target.{{.TARGET}}
       - ./.env/.env.output.{{.MODE}}
     sources:
       - '{{.TSCONFIG}}'
       - ./package.json
+      - ./.env/.env.base
       - ./.env/.env.output.{{.MODE}}
       - ./.env/.env.target.{{.TARGET}}
       - '{{.BUILD_DIST_DIR}}/prerender.js'
@@ -94,11 +106,19 @@ tasks:
       - '{{.CLIENT_SSG_DIST_DIR}}/index.html'
       - '{{.CLIENT_SSG_DIST_DIR}}/**/*/index.html'
     cmds:
-      - >
-        bunx --no-install bun
-        --conditions {{.TARGET_AND_MODE_CONDITION}}
-        --conditions {{.MODE_CONDITION}}
-        {{.BUILD_DIST_DIR}}/prerender.js
+      - cmd: >
+          SWAPI_SERVER_PORT={{if eq .MODE "development"}}50000{{else}}51000{{end}}
+          bunx --no-install bun
+          --conditions {{.TARGET_AND_MODE_CONDITION}}
+          --conditions {{.MODE_CONDITION}}
+          {{.BUILD_DIST_DIR}}/prerender.js
+        if: '{{eq .TARGET "local"}}'
+      - cmd: >
+          bunx --no-install bun
+          --conditions {{.TARGET_AND_MODE_CONDITION}}
+          --conditions {{.MODE_CONDITION}}
+          {{.BUILD_DIST_DIR}}/prerender.js
+        if: '{{ne .TARGET "local"}}'
 
   build:
     vars:
@@ -122,6 +142,7 @@ tasks:
           MODE: '{{.MODE}}'
           TARGET: '{{.TARGET}}'
     dotenv:
+      - ./.env/.env.base
       - ./.env/.env.target.{{.TARGET}}
       - ./.env/.env.output.{{.MODE}}
 
@@ -144,11 +165,13 @@ tasks:
         vars:
           MODE: '{{.MODE}}'
     dotenv:
+      - ./.env/.env.base
       - ./.env/.env.target.{{.TARGET}}
       - ./.env/.env.output.{{.MODE}}
     sources:
       - '{{.TSCONFIG}}'
       - ./package.json
+      - ./.env/.env.base
       - ./.env/.env.output.{{.MODE}}
       - ./.env/.env.target.{{.TARGET}}
       - ./src/**/*
@@ -183,6 +206,7 @@ tasks:
           MODE: '{{.MODE}}'
           TARGET: '{{.TARGET}}'
     dotenv:
+      - ./.env/.env.base
       - ./.env/.env.target.{{.TARGET}}
       - ./.env/.env.output.{{.MODE}}
     sources:
@@ -192,13 +216,23 @@ tasks:
     generates:
       - '{{.BUNDLE_DIST_DIR}}/**/*'
     cmds:
-      - >
-        bunx --no-install bun
-        --conditions {{.TARGET_AND_MODE_CONDITION}}
-        --conditions {{.MODE_CONDITION}}
-        "$(bunx --no-install bun pm bin)/rolldown"
-        --dir {{.BUNDLE_DIST_DIR}}
-        --config
+      - cmd: >
+          SWAPI_SERVER_PORT={{if eq .MODE "development"}}50000{{else}}51000{{end}}
+          bunx --no-install bun
+          --conditions {{.TARGET_AND_MODE_CONDITION}}
+          --conditions {{.MODE_CONDITION}}
+          "$(bunx --no-install bun pm bin)/rolldown"
+          --dir {{.BUNDLE_DIST_DIR}}
+          --config
+        if: '{{eq .TARGET "local"}}'
+      - cmd: >
+          bunx --no-install bun
+          --conditions {{.TARGET_AND_MODE_CONDITION}}
+          --conditions {{.MODE_CONDITION}}
+          "$(bunx --no-install bun pm bin)/rolldown"
+          --dir {{.BUNDLE_DIST_DIR}}
+          --config
+        if: '{{ne .TARGET "local"}}'
 
   start:
     vars:
@@ -221,22 +255,38 @@ tasks:
           MODE: '{{.MODE}}'
           TARGET: '{{.TARGET}}'
     dotenv:
+      - ./.env/.env.base
       - ./.env/.env.target.{{.TARGET}}
       - ./.env/.env.output.{{.MODE}}
     cmds:
+      - cmd: >
+          SWAPI_SERVER_PORT=51000
+          bunx --no-install bun
+          --conditions {{.TARGET_AND_MODE_CONDITION}}
+          --conditions {{.MODE_CONDITION}}
+          {{.BUILD_DIST_DIR}}/server.js
+        if: '{{and (eq .MODE "production") (eq .TARGET "local")}}'
       - cmd: >
           bunx --no-install bun
           --conditions {{.TARGET_AND_MODE_CONDITION}}
           --conditions {{.MODE_CONDITION}}
           {{.BUILD_DIST_DIR}}/server.js
-        if: '{{eq .MODE "production"}}'
+        if: '{{and (eq .MODE "production") (ne .TARGET "local")}}'
+      - cmd: >
+          SWAPI_SERVER_PORT=50000
+          bunx --no-install bun
+          --conditions @swapi/source
+          --conditions {{.TARGET_AND_MODE_CONDITION}}
+          --conditions {{.MODE_CONDITION}}
+          ./src/server.ts
+        if: '{{and (eq .MODE "development") (eq .TARGET "local")}}'
       - cmd: >
           bunx --no-install bun
           --conditions @swapi/source
           --conditions {{.TARGET_AND_MODE_CONDITION}}
           --conditions {{.MODE_CONDITION}}
           ./src/server.ts
-        if: '{{eq .MODE "development"}}'
+        if: '{{and (eq .MODE "development") (ne .TARGET "local")}}'
 
   start:bundle:
     vars:
@@ -259,11 +309,20 @@ tasks:
           MODE: '{{.MODE}}'
           TARGET: '{{.TARGET}}'
     dotenv:
+      - ./.env/.env.base
       - ./.env/.env.target.{{.TARGET}}
       - ./.env/.env.output.{{.MODE}}
     cmds:
-      - >
-        bunx --no-install bun
-        --conditions {{.TARGET_AND_MODE_CONDITION}}
-        --conditions {{.MODE_CONDITION}}
-        {{.BUNDLE_DIST_DIR}}/server.js
+      - cmd: >
+          SWAPI_SERVER_PORT={{if eq .MODE "development"}}50000{{else}}51000{{end}}
+          bunx --no-install bun
+          --conditions {{.TARGET_AND_MODE_CONDITION}}
+          --conditions {{.MODE_CONDITION}}
+          {{.BUNDLE_DIST_DIR}}/server.js
+        if: '{{eq .TARGET "local"}}'
+      - cmd: >
+          bunx --no-install bun
+          --conditions {{.TARGET_AND_MODE_CONDITION}}
+          --conditions {{.MODE_CONDITION}}
+          {{.BUNDLE_DIST_DIR}}/server.js
+        if: '{{ne .TARGET "local"}}'

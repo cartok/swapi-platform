@@ -2,13 +2,8 @@ import type express from 'express'
 
 import { env } from '#internal/env'
 
-if (!process.env['NG_ALLOWED_HOSTS']) {
-  throw new Error('NG_ALLOWED_HOSTS is not set.')
-}
-
 const allowedHosts: Readonly<Set<string>> = new Set(
-  process.env['NG_ALLOWED_HOSTS']
-    .split(',')
+  env.NG_ALLOWED_HOSTS.split(',')
     .map((x) => x.trim().toLowerCase())
     .filter(Boolean),
 )

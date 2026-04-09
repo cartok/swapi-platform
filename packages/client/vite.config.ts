@@ -25,7 +25,7 @@ export default defineConfig(({ isSsrBuild }) => {
   ) satisfies Record<string, string | boolean | number>
 
   const config: UserConfig = {
-    base: buildEnv.SWAPI_PUBLIC_BASE_PATH,
+    base: buildEnv.SWAPI_CLIENT_PUBLIC_BASE_PATH,
     clearScreen: false,
     envDir: false,
     mode: browserEnv.SWAPI_OUTPUT_MODE,
@@ -112,12 +112,12 @@ export default defineConfig(({ isSsrBuild }) => {
     const developmentServerConfig: UserConfig = {
       server: {
         host: 'localhost',
-        port: buildEnv.SWAPI_DEV_SERVER_PORT,
+        port: buildEnv.SWAPI_CLIENT_DEV_SERVER_PORT,
         strictPort: true,
       },
       preview: {
         host: 'localhost',
-        port: buildEnv.SWAPI_PREVIEW_SERVER_PORT,
+        port: buildEnv.SWAPI_CLIENT_PREVIEW_SERVER_PORT,
         strictPort: true,
       },
     }
