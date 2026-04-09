@@ -128,5 +128,9 @@
   "yaml.schemas": {
     "https://taskfile.dev/schema.json": ["**/Taskfile.yml", "**/Taskfile.*.yml"],
     "https://json-schema.org/draft/2020-12/schema": ["**/*.schema.yml", "**/schema.*.yml"]
+  },
+  // EXTENSION: tamasfe.even-better-toml
+  "evenBetterToml.schema.associations": {
+    "fly.toml": "https://www.schemastore.org/fly.json"
   }
 }

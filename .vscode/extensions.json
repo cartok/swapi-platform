@@ -11,7 +11,8 @@
     "esbenp.prettier-vscode",
     "YoavBls.pretty-ts-errors",
     "redhat.vscode-yaml",
-    "task.vscode-task"
+    "task.vscode-task",
+    "tamasfe.even-better-toml"
   ],
   "unwantedRecommendations": [
     "firsttris.vscode-jest-runner",
@@ -22,6 +23,7 @@
     "cpylua.language-postcss",
     "ricard.PostCSS",
     "paulvarache.vscode-taskfile",
-    "iulian-radu-at.taskfile-launcher"
+    "iulian-radu-at.taskfile-launcher",
+    "be5invis.toml"
   ]
 }
