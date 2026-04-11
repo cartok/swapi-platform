@@ -204,7 +204,9 @@ tasks:
       - ./.env/.env.output.{{.MODE}}
     sources:
       - ./tsconfig/tsconfig.server.bundle.json
+      - ./tsconfig/tsconfig.server.docker.json
       - ./rolldown.config.ts
+      - ./docker/**/*.ts
       - '{{.BUILD_DIST_DIR}}/**/*'
     generates:
       - '{{.BUNDLE_DIST_DIR}}/**/*'
@@ -215,7 +217,6 @@ tasks:
           --conditions {{.TARGET_AND_MODE_CONDITION}}
           --conditions {{.MODE_CONDITION}}
           "$(bunx --no-install bun pm bin)/rolldown"
-          --dir '{{.BUNDLE_DIST_DIR}}'
           --config
         if: '{{eq .TARGET "local"}}'
       - cmd: >
@@ -223,7 +224,6 @@ tasks:
           --conditions {{.TARGET_AND_MODE_CONDITION}}
           --conditions {{.MODE_CONDITION}}
           "$(bunx --no-install bun pm bin)/rolldown"
-          --dir '{{.BUNDLE_DIST_DIR}}'
           --config
         if: '{{ne .TARGET "local"}}'
 

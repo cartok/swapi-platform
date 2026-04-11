@@ -45,6 +45,7 @@ COPY ./packages/server/rolldown.config.ts ./packages/server/
 
 COPY ./packages/shared/generators/ ./packages/shared/generators
 COPY ./packages/shared/src/ ./packages/shared/src
+COPY ./packages/server/docker/ ./packages/server/docker
 COPY ./packages/server/src/ ./packages/server/src
 COPY ./packages/client/src/ ./packages/client/src
 
@@ -78,15 +79,12 @@ COPY ./package.json ./
 COPY ./packages/shared/package.json ./packages/shared/package.json
 COPY ./packages/client/package.json ./packages/client/package.json
 
-COPY ./packages/shared/src/environment/env.ts ./packages/shared/src/environment/env.ts
-
-COPY ./packages/server/docker/create-bundle-link.ts ./
-COPY ./packages/server/docker/start-server-bundle.ts ./
+COPY --from=build-bundle /app/packages/server/dist/${TARGET}/${MODE}/bundle/scripts/ ./
 
 ENV SWAPI_TARGET=${TARGET}
 ENV SWAPI_OUTPUT_MODE=${MODE}
-RUN ["bun", "--conditions", "@swapi/source", "./create-bundle-link.ts"]
+RUN ["bun", "./scripts/create-bundle-link.js"]
 
 ENV SWAPI_SERVER_PORT=51000
 EXPOSE ${SWAPI_SERVER_PORT}
-CMD ["--conditions", "@swapi/source", "./start-server-bundle.ts"]
+CMD ["./scripts/start-server-bundle.js"]
