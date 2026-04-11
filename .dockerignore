@@ -24,7 +24,12 @@ docs/
 eslint.config.*
 prettier.config.*
 
-# Env files
+# Packages content
 .env
-!.env.output.production
+!.env.mode.development
+!.env.mode.production
 !.env.target.local
+!.env.target.test
+!.env.target.production
+.tsconfig.spec.json
+.tsconfig.*.spec.json

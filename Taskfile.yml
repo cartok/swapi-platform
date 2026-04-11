@@ -101,10 +101,42 @@ tasks:
       - bunx --no-install prettier --write --list-different ./
 
   docker:build:
+    vars:
+      MODE:
+        ref: .SWAPI_OUTPUT_MODE | default .MODE | default "development"
+      TARGET:
+        ref: .SWAPI_TARGET | default .TARGET | default "local"
+    requires:
+      vars:
+        - name: MODE
+          enum: [development, production]
+        - name: TARGET
+          enum: [local, testing, production]
     cmds:
-      - docker buildx build --load --tag swapi-angular:local ./
+      - >
+        docker buildx build --load
+        --build-arg TARGET={{.TARGET}}
+        --build-arg MODE={{.MODE}}
+        --tag swapi-angular:{{.TARGET}}-{{.MODE}}
+        ./
 
   docker:start:
+    vars:
+      MODE:
+        ref: .SWAPI_OUTPUT_MODE | default .MODE | default "development"
+      TARGET:
+        ref: .SWAPI_TARGET | default .TARGET | default "local"
+    requires:
+      vars:
+        - name: MODE
+          enum: [development, production]
+        - name: TARGET
+          enum: [local, testing, production]
+    deps:
+      - task: docker:build
+        vars:
+          MODE: '{{.MODE}}'
+          TARGET: '{{.TARGET}}'
     cmds:
       - |
         zsh -c '
@@ -113,5 +145,8 @@ tasks:
           }
           trap cleanup EXIT INT TERM
           cleanup
-          docker run --rm --publish 51000:51000 --name swapi-angular swapi-angular:local
+          docker run --rm \
+            --publish 51000:51000 \
+            --name swapi-angular \
+            swapi-angular:{{.TARGET}}-{{.MODE}}
         '
