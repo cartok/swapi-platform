@@ -2,6 +2,7 @@
   "files": [],
   "references": [
     { "path": "./tsconfig/tsconfig.app.json" },
+    { "path": "./tsconfig/tsconfig.dist-paths.json" },
     { "path": "./tsconfig/tsconfig.spec.json" },
     { "path": "./tsconfig/tsconfig.vite.json" }
   ]

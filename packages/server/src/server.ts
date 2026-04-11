@@ -4,10 +4,10 @@ import { access, constants } from 'node:fs/promises'
 import { normalize, resolve, sep } from 'node:path'
 
 import { CommonEngine } from '@angular/ssr/node'
+import { browserDistPath, indexHtmlPath, ssgDistPath } from '@swapi/client/dist-paths'
 import express from 'express'
 
 import { enableAngularServerMode } from '#internal/angular-server-mode'
-import { CLIENT_DIST_FOLDER, CLIENT_SSG_FOLDER, INDEX_HTML } from '#internal/client-dist'
 import { env } from '#internal/env'
 import { addDeviceContextHandler } from '#internal/handler/device-context.handler'
 import { addDeviceCookieHandler } from '#internal/handler/device-cookie.handler'
@@ -44,7 +44,7 @@ addDeviceContextHandler(server)
 addDeviceRedirectHandler(server)
 
 server.use(
-  express.static(CLIENT_DIST_FOLDER, {
+  express.static(browserDistPath, {
     maxAge: env.SWAPI_TARGET !== 'local' ? '7d' : 0,
   }),
 )
@@ -55,7 +55,7 @@ server.use(async (req, res, next) => {
   }
 
   const ssgFilePath = resolveSsgFilePath(req.path)
-  if (!isInsideDirectory(ssgFilePath, CLIENT_SSG_FOLDER)) {
+  if (!isInsideDirectory(ssgFilePath, ssgDistPath)) {
     return next()
   }
 
@@ -82,7 +82,7 @@ server.use(async (req, res, next) => {
     const url = `${req.protocol}://${req.host}${req.url}`
     const html = await angular.render({
       url,
-      documentFilePath: INDEX_HTML,
+      documentFilePath: indexHtmlPath,
     })
     console.log(`SSR: Rendered ${url}`)
 
@@ -143,7 +143,7 @@ function isFileRequestPath(pathname: string): boolean {
 
 function resolveSsgFilePath(pathname: string): string {
   const normalizedPath = pathname.replace(/^\/+|\/+$/g, '')
-  return resolve(CLIENT_SSG_FOLDER, normalizedPath, 'index.html')
+  return resolve(ssgDistPath, normalizedPath, 'index.html')
 }
 
 function isInsideDirectory(filePath: string, dirPath: string): boolean {

@@ -79,6 +79,10 @@ tasks:
         - name: TARGET
           enum: [local, pages, testing, production]
     deps:
+      - task: build:dist-paths
+        vars:
+          MODE: '{{.MODE}}'
+          TARGET: '{{.TARGET}}'
       - task: :shared:build
         vars:
           MODE: '{{.MODE}}'
@@ -117,6 +121,10 @@ tasks:
         - name: TARGET
           enum: [local, testing, production]
     deps:
+      - task: build:dist-paths
+        vars:
+          MODE: '{{.MODE}}'
+          TARGET: '{{.TARGET}}'
       - task: :shared:build
         vars:
           MODE: '{{.MODE}}'
@@ -139,6 +147,26 @@ tasks:
         bunx --no-install vite build
         --ssr ./src/main.server.ts
         --outDir '{{.DIST_DIR}}'
+
+  build:dist-paths:
+    vars:
+      MODE:
+        ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"
+      TARGET:
+        ref: .SWAPI_TARGET | default .TARGET | default "local"
+      BUILD_VARIANT_PATH: '{{.TARGET}}/{{.MODE}}'
+      DIST_PATH: './dist/{{.BUILD_VARIANT_PATH}}'
+    requires:
+      vars:
+        - name: MODE
+          enum: [development, production]
+        - name: TARGET
+          enum: [local, testing, production]
+    cmds:
+      - >
+        bunx --no-install tsc
+        --project ./tsconfig/tsconfig.dist-paths.json
+        --outDir '{{.DIST_PATH}}'
 
   start:
     vars:

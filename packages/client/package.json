@@ -38,6 +38,17 @@
       "@swapi/production/development": "./dist/production/development/ssr/main.server.js",
       "@swapi/production/production": "./dist/production/production/ssr/main.server.js",
       "default": "./dist/local/production/ssr/main.server.js"
+    },
+    "./dist-paths": {
+      "types": "./src/dist-paths.ts",
+      "@swapi/source": "./src/dist-paths.ts",
+      "@swapi/local/development": "./dist/local/development/dist-paths.js",
+      "@swapi/local/production": "./dist/local/production/dist-paths.js",
+      "@swapi/testing/development": "./dist/testing/development/dist-paths.js",
+      "@swapi/testing/production": "./dist/testing/production/dist-paths.js",
+      "@swapi/production/development": "./dist/production/development/dist-paths.js",
+      "@swapi/production/production": "./dist/production/production/dist-paths.js",
+      "default": "./dist/local/production/dist-paths.js"
     }
   }
 }

@@ -1,0 +1,9 @@
+{
+  "extends": [
+    "@swapi/tsconfig/tsconfig.base",
+    "@swapi/tsconfig/tsconfig.rules",
+    "@swapi/tsconfig/tsconfig.node",
+    "@swapi/tsconfig/tsconfig.lib"
+  ],
+  "files": ["../src/dist-paths.ts"]
+}

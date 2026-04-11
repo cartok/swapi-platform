@@ -18,6 +18,7 @@
     "../../../packages/shared/src/**/*.ts"
   ],
   "exclude": [
+    "../src/dist-paths.ts",
     "../src/**/*.spec.ts",
     "../../../packages/shared/src/**/*.d.ts"
   ]
