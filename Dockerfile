@@ -63,28 +63,29 @@ ARG TARGET
 ARG MODE
 WORKDIR /app
 
+# TODO: Get rid of node_modules but right now @angular is defined as external
+# dependency as workaround...
 COPY --from=deps /app/node_modules/ ./node_modules
+
+# Needed files:
+# The client dist-dirs.js has to stay in it's dist dir, must not be bundled and
+# the root and client package.json's have to exist aswell to have it resolvable.
+# It also needs client dist's browser assets, index.html and the ssg files.
+COPY ./package.json ./
+COPY ./packages/client/package.json ./packages/client/package.json
+COPY --from=build-bundle /app/packages/client/dist/${TARGET}/${MODE}/ \
+  ./packages/client/dist/${TARGET}/${MODE}
 
 COPY ./packages/server/.env/ ./packages/server/.env
 
-COPY --from=build-bundle \
-  /app/packages/server/dist/${TARGET}/${MODE}/bundle/ \
+COPY --from=build-bundle /app/packages/server/dist/${TARGET}/${MODE}/bundle/ \
   ./packages/server/dist/${TARGET}/${MODE}/bundle/
-
-COPY --from=build-bundle \
-  /app/packages/client/dist/${TARGET}/${MODE}/ \
-  ./packages/client/dist/${TARGET}/${MODE}/
-
-COPY ./package.json ./
-COPY ./packages/shared/package.json ./packages/shared/package.json
-COPY ./packages/client/package.json ./packages/client/package.json
 
 COPY --from=build-bundle /app/packages/server/dist/${TARGET}/${MODE}/bundle/scripts/ ./
 
 ENV SWAPI_TARGET=${TARGET}
 ENV SWAPI_OUTPUT_MODE=${MODE}
-RUN ["bun", "./scripts/create-bundle-link.js"]
-
+RUN ["bun", "./create-bundle-link.js"]
 ENV SWAPI_SERVER_PORT=51000
 EXPOSE ${SWAPI_SERVER_PORT}
-CMD ["./scripts/start-server-bundle.js"]
+CMD ["./start-server-bundle.js"]
