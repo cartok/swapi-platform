@@ -165,6 +165,8 @@ tasks:
     sources:
       - ./tsconfig/tsconfig.dist-paths.json
       - ./src/dist-paths.ts
+    generates:
+      - '{{.DIST_PATH}}/dist-paths.js'
     cmds:
       - >
         bunx --no-install tsc
