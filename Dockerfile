@@ -40,18 +40,18 @@ COPY ./packages/client/tsconfig/*.json ./packages/client/tsconfig/
 
 COPY ./Taskfile.yml ./
 COPY ./scripts/Taskfile.yml ./scripts/
-COPY ./packages/shared/Taskfile.yml ./packages/shared/
-COPY ./packages/server/Taskfile.yml ./packages/server/
-COPY ./packages/client/Taskfile.yml ./packages/client/
-
-COPY ./packages/shared/generators/ ./packages/shared/generators
 
 COPY ./packages/client/vite.config.ts ./packages/client/
 COPY ./packages/server/rolldown.config.ts ./packages/server/
 
+COPY ./packages/shared/generators/ ./packages/shared/generators
 COPY ./packages/shared/src/ ./packages/shared/src
 COPY ./packages/server/src/ ./packages/server/src
 COPY ./packages/client/src/ ./packages/client/src
+
+COPY ./packages/shared/Taskfile.yml ./packages/shared/
+COPY ./packages/server/Taskfile.yml ./packages/server/
+COPY ./packages/client/Taskfile.yml ./packages/client/
 
 FROM code AS build-bundle
 ARG TARGET
