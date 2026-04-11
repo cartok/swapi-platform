@@ -109,8 +109,10 @@ server.use((error: unknown, req: express.Request, res: express.Response) => {
 })
 
 const port = env.SWAPI_SERVER_PORT
-server.listen(port, () => {
-  console.log(`Server listening on port ${port}`)
+const host = env.SWAPI_SERVER_HOST_INTERNAL
+
+server.listen(port, host, () => {
+  console.log(`Server listening on ${host}:${port}`)
 })
 
 function isHtmlDocumentRequest(req: express.Request): boolean {

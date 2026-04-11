@@ -12,6 +12,7 @@ const AppServerEnvSchema = Type.Intersect(
     Type.Object({
       NODE_ENV: Type.Readonly(OutputModeSchema),
       SWAPI_ALLOWED_HOSTS: Type.Readonly(Type.String({ minLength: 1 })),
+      SWAPI_SERVER_HOST_INTERNAL: Type.Readonly(Type.String({ minLength: 1 })),
       SWAPI_SERVER_HOST: Type.Readonly(Type.String({ minLength: 1 })),
       SWAPI_SERVER_PORT: Type.Readonly(Type.Integer({ minimum: 49152, maximum: 65535 })),
     }),
@@ -26,6 +27,7 @@ export const env = parseEnv(
     ...parseCommonEnv(),
     NODE_ENV: process.env['NODE_ENV'],
     SWAPI_ALLOWED_HOSTS: process.env['SWAPI_ALLOWED_HOSTS'],
+    SWAPI_SERVER_HOST_INTERNAL: process.env['SWAPI_SERVER_HOST_INTERNAL'],
     SWAPI_SERVER_HOST: process.env['SWAPI_SERVER_HOST'],
     SWAPI_SERVER_PORT: process.env['SWAPI_SERVER_PORT'],
   },

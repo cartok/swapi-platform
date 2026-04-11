@@ -162,6 +162,9 @@ tasks:
           enum: [development, production]
         - name: TARGET
           enum: [local, testing, production]
+    sources:
+      - ./tsconfig/tsconfig.dist-paths.json
+      - ./src/dist-paths.ts
     cmds:
       - >
         bunx --no-install tsc
