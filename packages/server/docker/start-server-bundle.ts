@@ -15,14 +15,10 @@ assertFileExists(serverEntryPath)
 const serverProcess = Bun.spawn(
   [
     process.execPath,
-    '--conditions',
-    `@swapi/${env.SWAPI_TARGET}/${env.SWAPI_OUTPUT_MODE}`,
-    '--conditions',
-    `@swapi/${env.SWAPI_OUTPUT_MODE}`,
-    '--env-file',
-    outputEnvFilePath,
-    '--env-file',
-    targetEnvFilePath,
+    ...['--conditions', `@swapi/${env.SWAPI_TARGET}/${env.SWAPI_OUTPUT_MODE}`],
+    ...['--conditions', `@swapi/${env.SWAPI_OUTPUT_MODE}`],
+    ...['--env-file', outputEnvFilePath],
+    ...['--env-file', targetEnvFilePath],
     serverEntryPath,
   ],
   {
