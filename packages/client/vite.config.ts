@@ -4,6 +4,7 @@ import angular from '@analogjs/vite-plugin-angular'
 import type { UserConfig } from 'vite'
 import {
   defaultClientConditions,
+  defaultServerConditions,
   defineConfig,
   mergeConfig,
   transformWithOxc,
@@ -28,11 +29,11 @@ export default defineConfig(({ isSsrBuild }) => {
     base: buildEnv.SWAPI_CLIENT_PUBLIC_BASE_PATH,
     clearScreen: false,
     envDir: false,
-    mode: browserEnv.SWAPI_OUTPUT_MODE,
+    mode: buildEnv.SWAPI_OUTPUT_MODE,
     build: {
       emptyOutDir: true,
-      minify: browserEnv.SWAPI_OUTPUT_MODE === 'production',
-      sourcemap: browserEnv.SWAPI_OUTPUT_MODE === 'production',
+      minify: buildEnv.SWAPI_OUTPUT_MODE === 'production',
+      sourcemap: buildEnv.SWAPI_OUTPUT_MODE === 'production',
     },
     define: {
       ...definedBrowserEnv,
@@ -54,6 +55,14 @@ export default defineConfig(({ isSsrBuild }) => {
           replacement: fileURLToPath(new URL('./src/app/', import.meta.url)),
         },
       ],
+    },
+    ssr: {
+      resolve: {
+        conditions:
+          browserEnv.SWAPI_OUTPUT_MODE === 'development'
+            ? ['@swapi/source', ...defaultServerConditions]
+            : undefined,
+      },
     },
     css: {
       transformer: 'lightningcss',
@@ -112,12 +121,12 @@ export default defineConfig(({ isSsrBuild }) => {
     const developmentServerConfig: UserConfig = {
       server: {
         host: 'localhost',
-        port: buildEnv.SWAPI_CLIENT_DEV_SERVER_PORT,
+        port: buildEnv.SWAPI_CLIENT_SERVER_PORT_DEV,
         strictPort: true,
       },
       preview: {
         host: 'localhost',
-        port: buildEnv.SWAPI_CLIENT_PREVIEW_SERVER_PORT,
+        port: buildEnv.SWAPI_CLIENT_SERVER_PORT_PREVIEW,
         strictPort: true,
       },
     }

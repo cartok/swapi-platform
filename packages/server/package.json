@@ -27,6 +27,7 @@
   },
   "devDependencies": {
     "@go-task/cli": "catalog:tooling",
+    "@types/bun": "catalog:",
     "@types/cookie-parser": "^1.4.10",
     "@types/express": "^5.0.6",
     "@types/node": "catalog:",

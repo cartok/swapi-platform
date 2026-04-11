@@ -1,5 +1,9 @@
 {
-  "extends": ["@swapi/tsconfig/tsconfig.base", "@swapi/tsconfig/tsconfig.rules", "@swapi/tsconfig/tsconfig.node"],
+  "extends": [
+    "@swapi/tsconfig/tsconfig.base",
+    "@swapi/tsconfig/tsconfig.rules",
+    "@swapi/tsconfig/tsconfig.node"
+  ],
   "compilerOptions": {
     "noEmit": true
   },

@@ -1,17 +1,10 @@
 import { existsSync, symlinkSync } from 'node:fs'
 
-const target = process.env['SWAPI_TARGET']
-const outputMode = process.env['SWAPI_OUTPUT_MODE']
+import { parseBuildEnv } from '@swapi/shared/environment/env'
 
-if (!target) {
-  throw new Error('SWAPI_TARGET is not set')
-}
+const env = parseBuildEnv()
 
-if (!outputMode) {
-  throw new Error('SWAPI_OUTPUT_MODE is not set')
-}
-
-const bundleDirectory = `./packages/server/dist/${target}/${outputMode}/bundle`
+const bundleDirectory = `./packages/server/dist/${env.SWAPI_TARGET}/${env.SWAPI_OUTPUT_MODE}/bundle`
 const symlinkPath = './bundle-link'
 
 if (!existsSync(bundleDirectory)) {

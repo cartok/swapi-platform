@@ -39,7 +39,6 @@ COPY ./packages/server/tsconfig/*.json ./packages/server/tsconfig/
 COPY ./packages/client/tsconfig/*.json ./packages/client/tsconfig/
 
 COPY ./Taskfile.yml ./
-COPY ./scripts/Taskfile.yml ./scripts/
 
 COPY ./packages/client/vite.config.ts ./packages/client/
 COPY ./packages/server/rolldown.config.ts ./packages/server/
@@ -63,22 +62,31 @@ ARG TARGET
 ARG MODE
 WORKDIR /app
 
-COPY --from=build-bundle /app/package.json ./
-COPY --from=build-bundle /app/node_modules/ ./node_modules
+COPY --from=deps /app/node_modules/ ./node_modules
 
-COPY --from=build-bundle \
-  /app/packages/client/dist/${TARGET}/${MODE}/ \
-  ./packages/client/dist/${TARGET}/${MODE}/
+COPY ./packages/server/.env/ ./packages/server/.env
 
 COPY --from=build-bundle \
   /app/packages/server/dist/${TARGET}/${MODE}/bundle/ \
   ./packages/server/dist/${TARGET}/${MODE}/bundle/
 
-COPY ./scripts/docker/create-bundle-link.ts ./
+COPY --from=build-bundle \
+  /app/packages/client/dist/${TARGET}/${MODE}/ \
+  ./packages/client/dist/${TARGET}/${MODE}/
+
+COPY ./package.json ./
+COPY ./packages/shared/package.json ./packages/shared/package.json
+COPY ./packages/client/package.json ./packages/client/package.json
+
+COPY ./packages/shared/src/environment/env.ts ./packages/shared/src/environment/env.ts
+
+COPY ./packages/server/docker/create-bundle-link.ts ./
+COPY ./packages/server/docker/start-server-bundle.ts ./
+
 ENV SWAPI_TARGET=${TARGET}
 ENV SWAPI_OUTPUT_MODE=${MODE}
-RUN ["bun", "./create-bundle-link.ts"]
+RUN ["bun", "--conditions", "@swapi/source", "./create-bundle-link.ts"]
 
 ENV SWAPI_SERVER_PORT=51000
 EXPOSE ${SWAPI_SERVER_PORT}
-CMD ["--env-file=./packages/server/.env/.env.output.${MODE}", "--env-file=./packages/server/.env/.env.output.${TARGET}", "./bundle-link/server.js"]
+CMD ["--conditions", "@swapi/source", "./start-server-bundle.ts"]

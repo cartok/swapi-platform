@@ -2,6 +2,7 @@ import { Type } from '@sinclair/typebox'
 import {
   CommonEnvSchema,
   OutputModeSchema,
+  parseCommonEnv,
   parseEnv,
 } from '@swapi/shared/environment/env'
 
@@ -22,13 +23,11 @@ const AppServerEnvSchema = Type.Intersect(
 
 export const env = parseEnv(
   {
+    ...parseCommonEnv(),
     NG_ALLOWED_HOSTS: process.env['NG_ALLOWED_HOSTS'],
     NODE_ENV: process.env['NODE_ENV'],
-    SWAPI_LOG_LEVEL: process.env['SWAPI_LOG_LEVEL'],
-    SWAPI_OUTPUT_MODE: process.env['SWAPI_OUTPUT_MODE'],
     SWAPI_SERVER_HOST: process.env['SWAPI_SERVER_HOST'],
     SWAPI_SERVER_PORT: process.env['SWAPI_SERVER_PORT'],
-    SWAPI_TARGET: process.env['SWAPI_TARGET'],
   },
   AppServerEnvSchema,
 )

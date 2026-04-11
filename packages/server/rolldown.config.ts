@@ -1,12 +1,22 @@
+import { parseBuildEnv } from '@swapi/shared/environment/env'
 import { defineConfig } from 'rolldown'
 
-import { env } from '#internal/env'
+const env = parseBuildEnv()
+const buildVariantPath = `${env.SWAPI_TARGET}/${env.SWAPI_OUTPUT_MODE}`
 
 export default defineConfig({
-  input: `./dist/${env.SWAPI_TARGET}/${env.SWAPI_OUTPUT_MODE}/build/server.js`,
+  input: `./dist/${buildVariantPath}/build/server.js`,
   tsconfig: './tsconfig/tsconfig.server.bundle.json',
   platform: 'node',
-  external: (id) => id.startsWith('@angular/'),
+  resolve: {
+    conditionNames: [
+      `@swapi/${buildVariantPath}`,
+      `@swapi/${env.SWAPI_OUTPUT_MODE}`,
+      'node',
+      'default',
+    ],
+  },
+  external: (id) => id.startsWith('@angular/') || id === '@swapi/client/dist-paths',
   output: {
     cleanDir: true,
     banner: "import '@angular/compiler';",

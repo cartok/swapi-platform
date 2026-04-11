@@ -13,9 +13,6 @@ includes:
   shared:
     taskfile: ./packages/shared
     dir: ./packages/shared
-  scripts:
-    taskfile: ./scripts
-    dir: ./scripts
 
 tasks:
   clean:
@@ -23,7 +20,6 @@ tasks:
       - task: client:clean
       - task: shared:clean
       - task: server:clean
-      - task: scripts:clean
       - rm -rf ./.cache || true
 
   lint:
@@ -59,14 +55,12 @@ tasks:
       - task: shared:lint
         vars:
           MODE: '{{.MODE}}'
-      - task: scripts:lint
 
   lint:eslint:
     sources:
       - ./eslint.config.mjs
       - ./package.json
       - ./packages/**/*.{ts,json}
-      - ./scripts/**/*.{ts,json}
     cmds:
       - bunx --no-install eslint ./
 
@@ -76,7 +70,6 @@ tasks:
       - ./package.json
       - ./prettier.config.mjs
       - ./packages/**/*.{ts,json}
-      - ./scripts/**/*.{ts,json}
     cmds:
       - bunx --no-install prettier --check ./
 
@@ -85,7 +78,6 @@ tasks:
       - ./eslint.config.mjs
       - ./package.json
       - ./packages/**/*.{ts,json}
-      - ./scripts/**/*.{ts,json}
     cmds:
       - bunx --no-install eslint . --fix
       - task: format
@@ -96,7 +88,6 @@ tasks:
       - ./package.json
       - ./prettier.config.mjs
       - ./packages/**/*.{ts,json}
-      - ./scripts/**/*.{ts,json}
     cmds:
       - bunx --no-install prettier --write --list-different ./
 
@@ -141,7 +132,7 @@ tasks:
       - |
         zsh -c '
           cleanup() {
-            docker rm --force swapi-angular || true
+            docker rm --force swapi-angular >/dev/null 2>&1 || true
           }
           trap cleanup EXIT INT TERM
           cleanup
