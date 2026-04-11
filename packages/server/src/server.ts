@@ -8,7 +8,7 @@ import { browserDistPath, indexHtmlPath, ssgDistPath } from '@swapi/client/dist-
 import express from 'express'
 
 import { enableAngularServerMode } from '#internal/angular-server-mode'
-import { env } from '#internal/env'
+import { allowedHosts, env } from '#internal/env'
 import { addDeviceContextHandler } from '#internal/handler/device-context.handler'
 import { addDeviceCookieHandler } from '#internal/handler/device-cookie.handler'
 import { addDeviceRedirectHandler } from '#internal/handler/device-redirect.handler'
@@ -32,6 +32,7 @@ function getAngularRenderEngine(): Promise<CommonEngine> {
     const { default: bootstrap } = await import('@swapi/client/main.server')
     return new CommonEngine({
       bootstrap,
+      allowedHosts,
     })
   })()
 

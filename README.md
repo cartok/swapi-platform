@@ -31,7 +31,7 @@ Live Demo (GitHub Pages, CSR only):
 
 ### Request and rendering flow
 
-1. Validate host/protocol (`NG_ALLOWED_HOSTS`, target-aware HTTP/HTTPS checks).
+1. Validate host/protocol (`SWAPI_ALLOWED_HOSTS`, target-aware HTTP/HTTPS checks).
 2. Read device context from Client Hints headers (`Sec-CH-UA-*`, viewport hints).
 3. Normalize URL to a device-context prefix segment like `r;format=mobile;width=768`.
 4. Serve static assets from the built browser output.
@@ -154,7 +154,7 @@ Main runtime variables:
 - `SWAPI_OUTPUT_MODE` (`development|production`)
 - `SWAPI_SERVER_PORT`
 - `SWAPI_SERVER_HOST`
-- `NG_ALLOWED_HOSTS`
+- `SWAPI_ALLOWED_HOSTS`
 
 ## Documentation Index
 

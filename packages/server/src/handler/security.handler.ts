@@ -1,12 +1,9 @@
 import type express from 'express'
 
-import { env } from '#internal/env'
+import { allowedHosts, env } from '#internal/env'
 
-const allowedHosts: Readonly<Set<string>> = new Set(
-  env.NG_ALLOWED_HOSTS.split(',')
-    .map((x) => x.trim().toLowerCase())
-    .filter(Boolean),
-)
+const allowedHostSet: Readonly<Set<string>> = new Set(allowedHosts)
+
 export function addSecurityHandler(server: express.Express) {
   server.use((req, res, next) => {
     const protocol = req.protocol
@@ -25,7 +22,7 @@ export function addSecurityHandler(server: express.Express) {
       return res.status(400).send('Missing host header.')
     }
 
-    if (!isHostAllowed(hostname, allowedHosts)) {
+    if (!isHostAllowed(hostname, allowedHostSet)) {
       return res.status(400).send('Host not allowed.')
     }
 

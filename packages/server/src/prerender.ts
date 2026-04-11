@@ -10,7 +10,7 @@ import { HOME_PATH } from '@swapi/shared/routing/paths'
 import { SSG_PATHS } from '@swapi/shared/routing/ssg-paths'
 
 import { enableAngularServerMode } from '#internal/angular-server-mode'
-import { env } from '#internal/env'
+import { allowedHosts, env } from '#internal/env'
 
 enableAngularServerMode()
 
@@ -18,6 +18,7 @@ const { default: bootstrap } = await import('@swapi/client/main.server')
 
 const angular = new CommonEngine({
   bootstrap,
+  allowedHosts,
   providers: [{ provide: ɵSERVER_CONTEXT, useValue: 'ssg' }],
 })
 
