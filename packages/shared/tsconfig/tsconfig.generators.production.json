@@ -1,7 +1,3 @@
 {
-  "extends": [
-    "./tsconfig.generators.json",
-    "@swapi/tsconfig/tsconfig.production",
-    "@swapi/tsconfig/tsconfig.production.node"
-  ]
+  "extends": ["./tsconfig.generators.json", "@swapi/tsconfig/tsconfig.production"]
 }

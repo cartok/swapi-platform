@@ -1,5 +1,5 @@
 {
-  "extends": ["./tsconfig.base.json"],
+  "extends": ["./tsconfig.app.base.json"],
   "compilerOptions": {
     "outDir": "../dist/spec",
     "types": ["vite/client", "vitest/globals"]

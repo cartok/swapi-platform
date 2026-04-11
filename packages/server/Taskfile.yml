@@ -12,7 +12,7 @@ tasks:
     vars:
       MODE:
         ref: .SWAPI_OUTPUT_MODE | default .MODE | default "development"
-      TSCONFIG: './tsconfig/tsconfig.server.lint{{if eq .MODE "production"}}.production{{end}}.json'
+      TSCONFIG: './tsconfig/tsconfig.server{{if eq .MODE "production"}}.production{{end}}.json'
     requires:
       vars:
         - name: MODE
@@ -31,7 +31,8 @@ tasks:
         ref: .SWAPI_OUTPUT_MODE | default .MODE | default "development"
       TARGET:
         ref: .SWAPI_TARGET | default .TARGET | default "local"
-      TARGET_AND_MODE_CONDITION: '@swapi/{{.TARGET}}/{{.MODE}}'
+      BUILD_VARIANT_PATH: '{{.TARGET}}/{{.MODE}}'
+      TARGET_AND_MODE_CONDITION: '@swapi/{{.BUILD_VARIANT_PATH}}'
       MODE_CONDITION: '@swapi/{{.MODE}}'
     requires:
       vars:
@@ -72,11 +73,9 @@ tasks:
         ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"
       TARGET:
         ref: .SWAPI_TARGET | default .TARGET | default "local"
-      BUILD_DIST_DIR: './dist/{{.TARGET}}/{{.MODE}}/build'
-      CLIENT_DIST_ROOT: '../client/dist/{{.TARGET}}/{{.MODE}}'
-      CLIENT_SSG_DIST_DIR: '{{.CLIENT_DIST_ROOT}}/ssg'
-      CLIENT_SSR_ENTRY: '{{.CLIENT_DIST_ROOT}}/ssr/main.server.js'
-      TARGET_AND_MODE_CONDITION: '@swapi/{{.TARGET}}/{{.MODE}}'
+      BUILD_VARIANT_PATH: '{{.TARGET}}/{{.MODE}}'
+      BUILD_DIST_DIR: './dist/{{.BUILD_VARIANT_PATH}}/build'
+      TARGET_AND_MODE_CONDITION: '@swapi/{{.BUILD_VARIANT_PATH}}'
       MODE_CONDITION: '@swapi/{{.MODE}}'
       TSCONFIG: './tsconfig/tsconfig.server{{if eq .MODE "production"}}.production{{end}}.json'
     requires:
@@ -101,10 +100,6 @@ tasks:
       - ./.env/.env.output.{{.MODE}}
       - ./.env/.env.target.{{.TARGET}}
       - '{{.BUILD_DIST_DIR}}/prerender.js'
-      - '{{.CLIENT_SSR_ENTRY}}'
-    generates:
-      - '{{.CLIENT_SSG_DIST_DIR}}/index.html'
-      - '{{.CLIENT_SSG_DIST_DIR}}/**/*/index.html'
     cmds:
       - cmd: >
           SWAPI_SERVER_PORT={{if eq .MODE "development"}}50000{{else}}51000{{end}}
@@ -152,7 +147,8 @@ tasks:
         ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"
       TARGET:
         ref: .SWAPI_TARGET | default .TARGET | default "local"
-      BUILD_DIST_DIR: './dist/{{.TARGET}}/{{.MODE}}/build'
+      BUILD_VARIANT_PATH: '{{.TARGET}}/{{.MODE}}'
+      BUILD_DIST_DIR: './dist/{{.BUILD_VARIANT_PATH}}/build'
       TSCONFIG: './tsconfig/tsconfig.server{{if eq .MODE "production"}}.production{{end}}.json'
     requires:
       vars:
@@ -189,10 +185,11 @@ tasks:
         ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"
       TARGET:
         ref: .SWAPI_TARGET | default .TARGET | default "local"
-      DIST_ROOT: './dist/{{.TARGET}}/{{.MODE}}'
+      BUILD_VARIANT_PATH: '{{.TARGET}}/{{.MODE}}'
+      DIST_ROOT: './dist/{{.BUILD_VARIANT_PATH}}'
       BUILD_DIST_DIR: '{{.DIST_ROOT}}/build'
       BUNDLE_DIST_DIR: '{{.DIST_ROOT}}/bundle'
-      TARGET_AND_MODE_CONDITION: '@swapi/{{.TARGET}}/{{.MODE}}'
+      TARGET_AND_MODE_CONDITION: '@swapi/{{.BUILD_VARIANT_PATH}}'
       MODE_CONDITION: '@swapi/{{.MODE}}'
     requires:
       vars:
@@ -222,7 +219,7 @@ tasks:
           --conditions {{.TARGET_AND_MODE_CONDITION}}
           --conditions {{.MODE_CONDITION}}
           "$(bunx --no-install bun pm bin)/rolldown"
-          --dir {{.BUNDLE_DIST_DIR}}
+          --dir '{{.BUNDLE_DIST_DIR}}'
           --config
         if: '{{eq .TARGET "local"}}'
       - cmd: >
@@ -230,7 +227,7 @@ tasks:
           --conditions {{.TARGET_AND_MODE_CONDITION}}
           --conditions {{.MODE_CONDITION}}
           "$(bunx --no-install bun pm bin)/rolldown"
-          --dir {{.BUNDLE_DIST_DIR}}
+          --dir '{{.BUNDLE_DIST_DIR}}'
           --config
         if: '{{ne .TARGET "local"}}'
 
@@ -240,8 +237,9 @@ tasks:
         ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"
       TARGET:
         ref: .SWAPI_TARGET | default .TARGET | default "local"
-      BUILD_DIST_DIR: './dist/{{.TARGET}}/{{.MODE}}/build'
-      TARGET_AND_MODE_CONDITION: '@swapi/{{.TARGET}}/{{.MODE}}'
+      BUILD_VARIANT_PATH: '{{.TARGET}}/{{.MODE}}'
+      BUILD_DIST_DIR: './dist/{{.BUILD_VARIANT_PATH}}/build'
+      TARGET_AND_MODE_CONDITION: '@swapi/{{.BUILD_VARIANT_PATH}}'
       MODE_CONDITION: '@swapi/{{.MODE}}'
     requires:
       vars:
@@ -294,8 +292,9 @@ tasks:
         ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"
       TARGET:
         ref: .SWAPI_TARGET | default .TARGET | default "local"
-      BUNDLE_DIST_DIR: './dist/{{.TARGET}}/{{.MODE}}/bundle'
-      TARGET_AND_MODE_CONDITION: '@swapi/{{.TARGET}}/{{.MODE}}'
+      BUILD_VARIANT_PATH: '{{.TARGET}}/{{.MODE}}'
+      BUNDLE_DIST_DIR: './dist/{{.BUILD_VARIANT_PATH}}/bundle'
+      TARGET_AND_MODE_CONDITION: '@swapi/{{.BUILD_VARIANT_PATH}}'
       MODE_CONDITION: '@swapi/{{.MODE}}'
     requires:
       vars:

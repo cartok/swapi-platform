@@ -145,7 +145,6 @@ Taskfiles load environment values from checked-in `.env` files:
 
 - `packages/client/.env/.env.target.*`
 - `packages/client/.env/.env.output.*`
-- `packages/server/.env/.env.base`
 - `packages/server/.env/.env.target.*`
 - `packages/server/.env/.env.output.*`
 

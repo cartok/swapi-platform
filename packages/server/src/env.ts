@@ -1,12 +1,16 @@
 import { Type } from '@sinclair/typebox'
-import { CommonEnvSchema, OutputMode, parseEnv } from '@swapi/shared/environment/env'
+import {
+  CommonEnvSchema,
+  OutputModeSchema,
+  parseEnv,
+} from '@swapi/shared/environment/env'
 
 const AppServerEnvSchema = Type.Intersect(
   [
     CommonEnvSchema,
     Type.Object({
       NG_ALLOWED_HOSTS: Type.Readonly(Type.String({ minLength: 1 })),
-      NODE_ENV: Type.Readonly(OutputMode),
+      NODE_ENV: Type.Readonly(OutputModeSchema),
       SWAPI_SERVER_HOST: Type.Readonly(Type.String({ minLength: 1 })),
       SWAPI_SERVER_PACKAGE_DIR: Type.Readonly(Type.String({ minLength: 1 })),
       SWAPI_SERVER_PORT: Type.Readonly(Type.Integer({ minimum: 49152, maximum: 65535 })),

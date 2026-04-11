@@ -1,5 +1,5 @@
 {
-  "extends": ["./tsconfig.base.json"],
+  "extends": ["./tsconfig.app.base.json"],
   "compilerOptions": {
     "types": ["vite/client"]
   },
@@ -17,9 +17,9 @@
     "../../../packages/shared/src/**/*.ts"
   ],
   "exclude": [
-    "../src/**/*.spec.ts",
-    "../../../packages/shared/src/**/*.d.ts",
+    "../src/env.schema.ts",
     "../src/env.ts",
-    "../src/env.schema.ts"
+    "../src/**/*.spec.ts",
+    "../../../packages/shared/src/**/*.d.ts"
   ]
 }

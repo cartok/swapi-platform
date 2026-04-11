@@ -1,5 +1,5 @@
 {
-  "extends": ["./tsconfig.base.json"],
+  "extends": ["./tsconfig.app.base.json"],
   "compilerOptions": {
     "types": ["node", "vite/client"]
   },
@@ -17,5 +17,8 @@
     // still happens via workspace package names and `package.json` exports.
     "../../../packages/shared/src/**/*.ts"
   ],
-  "exclude": ["../src/**/*.spec.ts", "../../../packages/shared/src/**/*.d.ts"]
+  "exclude": [
+    "../src/**/*.spec.ts",
+    "../../../packages/shared/src/**/*.d.ts"
+  ]
 }

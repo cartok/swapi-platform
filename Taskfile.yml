@@ -68,7 +68,7 @@ tasks:
       - ./packages/**/*.{ts,json}
       - ./scripts/**/*.{ts,json}
     cmds:
-      - bunx --no-install eslint .
+      - bunx --no-install eslint ./
 
   lint:prettier:
     sources:
@@ -78,7 +78,7 @@ tasks:
       - ./packages/**/*.{ts,json}
       - ./scripts/**/*.{ts,json}
     cmds:
-      - bunx --no-install prettier --check .
+      - bunx --no-install prettier --check ./
 
   fix:
     sources:

@@ -30,6 +30,7 @@
   "exports": {
     "./main.server": {
       "types": "./src/main.server.d.ts",
+      "@swapi/source": "./src/main.server.ts",
       "@swapi/local/development": "./dist/local/development/ssr/main.server.js",
       "@swapi/local/production": "./dist/local/production/ssr/main.server.js",
       "@swapi/testing/development": "./dist/testing/development/ssr/main.server.js",

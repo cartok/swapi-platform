@@ -35,7 +35,6 @@ export default defineConfig(
       import: eslintPluginImport,
     },
     rules: {
-      '@stylistic/no-multiple-empty-lines': ['error', { max: 1, maxEOF: 1, maxBOF: 0 }],
       'import/consistent-type-specifier-style': ['error', 'prefer-top-level'],
       'import/first': 'error',
       'import/newline-after-import': [

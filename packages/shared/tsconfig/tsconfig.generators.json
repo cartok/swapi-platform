@@ -4,5 +4,8 @@
     "@swapi/tsconfig/tsconfig.rules",
     "@swapi/tsconfig/tsconfig.node.script"
   ],
+  "compilerOptions": {
+    "noEmit": true
+  },
   "include": ["../generators/**/*.ts", "../generators/**/*.json", "../src/**/*.ts"]
 }

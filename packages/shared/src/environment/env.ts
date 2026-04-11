@@ -2,14 +2,14 @@ import type { Static, TSchema } from '@sinclair/typebox'
 import { Type } from '@sinclair/typebox'
 import { AssertError, Value } from '@sinclair/typebox/value'
 
-const LogLevel = Type.Union([
+const LogLevelSchema = Type.Union([
   Type.Literal('debug'),
   Type.Literal('info'),
   Type.Literal('warn'),
   Type.Literal('error'),
 ])
 
-export const OutputMode = Type.Union([
+export const OutputModeSchema = Type.Union([
   Type.Literal('development'),
   Type.Literal('production'),
 ])
@@ -22,8 +22,8 @@ const TargetSchema = Type.Union([
 ])
 
 export const CommonEnvSchema = Type.Object({
-  SWAPI_LOG_LEVEL: Type.Readonly(LogLevel),
-  SWAPI_OUTPUT_MODE: Type.Readonly(OutputMode),
+  SWAPI_LOG_LEVEL: Type.Readonly(LogLevelSchema),
+  SWAPI_OUTPUT_MODE: Type.Readonly(OutputModeSchema),
   SWAPI_TARGET: Type.Readonly(TargetSchema),
 })
 

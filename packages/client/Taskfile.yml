@@ -19,7 +19,7 @@ tasks:
       - ./package.json
       - ./vite.config.ts
       - ./tsconfig/tsconfig.app.json
-      - ./tsconfig/tsconfig.base.json
+      - ./tsconfig/tsconfig.app.base.json
       - '{{.TSCONFIG}}'
       - ./src/**/*
     cmds:
@@ -69,7 +69,8 @@ tasks:
         ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"
       TARGET:
         ref: .SWAPI_TARGET | default .TARGET | default "local"
-      DIST_DIR: './dist/{{.TARGET}}/{{.MODE}}/browser'
+      BUILD_VARIANT_PATH: '{{.TARGET}}/{{.MODE}}'
+      DIST_DIR: './dist/{{.BUILD_VARIANT_PATH}}/browser'
       TSCONFIG: './tsconfig/tsconfig.vite{{if eq .MODE "production"}}.production{{end}}.json'
     requires:
       vars:
@@ -90,7 +91,7 @@ tasks:
       - ./.env/.env.output.{{.MODE}}
       - ./.env/.env.target.{{.TARGET}}
       - ./tsconfig/tsconfig.app.json
-      - ./tsconfig/tsconfig.base.json
+      - ./tsconfig/tsconfig.app.base.json
       - '{{.TSCONFIG}}'
       - ./{src,public}/**/*
     generates:
@@ -98,7 +99,7 @@ tasks:
     cmds:
       - >
         bunx --no-install vite build
-        --outDir {{.DIST_DIR}}
+        --outDir '{{.DIST_DIR}}'
 
   build:ssr:
     vars:
@@ -106,7 +107,8 @@ tasks:
         ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"
       TARGET:
         ref: .SWAPI_TARGET | default .TARGET | default "local"
-      DIST_DIR: './dist/{{.TARGET}}/{{.MODE}}/ssr'
+      BUILD_VARIANT_PATH: '{{.TARGET}}/{{.MODE}}'
+      DIST_DIR: './dist/{{.BUILD_VARIANT_PATH}}/ssr'
       TSCONFIG: './tsconfig/tsconfig.vite{{if eq .MODE "production"}}.production{{end}}.json'
     requires:
       vars:
@@ -127,7 +129,7 @@ tasks:
       - ./.env/.env.output.{{.MODE}}
       - ./.env/.env.target.{{.TARGET}}
       - ./tsconfig/tsconfig.app.json
-      - ./tsconfig/tsconfig.base.json
+      - ./tsconfig/tsconfig.app.base.json
       - '{{.TSCONFIG}}'
       - ./{src,public}/**/*
     generates:
@@ -136,7 +138,7 @@ tasks:
       - >
         bunx --no-install vite build
         --ssr ./src/main.server.ts
-        --outDir {{.DIST_DIR}}
+        --outDir '{{.DIST_DIR}}'
 
   start:
     vars:
@@ -144,7 +146,8 @@ tasks:
         ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"
       TARGET:
         ref: .SWAPI_TARGET | default .TARGET | default "local"
-      DIST_DIR: './dist/{{.TARGET}}/{{.MODE}}/browser'
+      BUILD_VARIANT_PATH: '{{.TARGET}}/{{.MODE}}'
+      DIST_DIR: './dist/{{.BUILD_VARIANT_PATH}}/browser'
     requires:
       vars:
         - name: MODE
@@ -160,7 +163,7 @@ tasks:
       - ./.env/.env.target.{{.TARGET}}
       - ./.env/.env.output.{{.MODE}}
     cmds:
-      - bunx --no-install vite preview --outDir {{.DIST_DIR}}
+      - bunx --no-install vite preview --outDir '{{.DIST_DIR}}'
 
   test:
     deps:
