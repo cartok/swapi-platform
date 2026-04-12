@@ -64,6 +64,9 @@ tasks:
       TARGET_AND_MODE_CONDITION: '@swapi/{{.BUILD_VARIANT_PATH}}'
       MODE_CONDITION: '@swapi/{{.MODE}}'
       TSCONFIG: './tsconfig/tsconfig.server{{if eq .MODE "production"}}.production{{end}}.json'
+      CLIENT_DIST_ROOT: '../client/dist/{{.BUILD_VARIANT_PATH}}'
+      CLIENT_SSG_DIST_DIR: '{{.CLIENT_DIST_ROOT}}/ssg'
+      CLIENT_SSR_ENTRY: '{{.CLIENT_DIST_ROOT}}/ssr/main.server.js'
     requires:
       vars:
         - name: MODE
@@ -84,6 +87,10 @@ tasks:
       - ./.env/.env.output.{{.MODE}}
       - ./.env/.env.target.{{.TARGET}}
       - '{{.BUILD_DIST_DIR}}/prerender.js'
+      - '{{.CLIENT_SSR_ENTRY}}'
+    generates:
+      - '{{.CLIENT_SSG_DIST_DIR}}/index.html'
+      - '{{.CLIENT_SSG_DIST_DIR}}/**/*/index.html'
     cmds:
       - >
         bunx --no-install bun
