@@ -1,11 +1,9 @@
 import { existsSync } from 'node:fs'
 
-import { parseBuildEnv } from '@swapi/shared/environment/env'
+import { buildEnv } from '@swapi/shared/environment/env'
 
-const env = parseBuildEnv()
-
-const outputEnvFilePath = `./packages/server/.env/.env.output.${env.SWAPI_OUTPUT_MODE}`
-const targetEnvFilePath = `./packages/server/.env/.env.target.${env.SWAPI_TARGET}`
+const outputEnvFilePath = `./packages/server/.env/.env.output.${buildEnv.SWAPI_OUTPUT_MODE}`
+const targetEnvFilePath = `./packages/server/.env/.env.target.${buildEnv.SWAPI_TARGET}`
 const serverEntryPath = './bundle-link/server.js'
 
 assertFileExists(outputEnvFilePath)
@@ -15,8 +13,8 @@ assertFileExists(serverEntryPath)
 const serverProcess = Bun.spawn(
   [
     process.execPath,
-    ...['--conditions', `@swapi/${env.SWAPI_TARGET}/${env.SWAPI_OUTPUT_MODE}`],
-    ...['--conditions', `@swapi/${env.SWAPI_OUTPUT_MODE}`],
+    ...['--conditions', `@swapi/${buildEnv.SWAPI_TARGET}/${buildEnv.SWAPI_OUTPUT_MODE}`],
+    ...['--conditions', `@swapi/${buildEnv.SWAPI_OUTPUT_MODE}`],
     ...['--env-file', outputEnvFilePath],
     ...['--env-file', targetEnvFilePath],
     serverEntryPath,

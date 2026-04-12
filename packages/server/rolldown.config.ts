@@ -1,8 +1,7 @@
-import { parseBuildEnv } from '@swapi/shared/environment/env'
+import { buildEnv } from '@swapi/shared/environment/env'
 import { defineConfig } from 'rolldown'
 
-const env = parseBuildEnv()
-const buildVariantPath = `${env.SWAPI_TARGET}/${env.SWAPI_OUTPUT_MODE}`
+const buildVariantPath = `${buildEnv.SWAPI_TARGET}/${buildEnv.SWAPI_OUTPUT_MODE}`
 
 const serverBundleConfig = defineConfig({
   input: `./dist/${buildVariantPath}/build/server.js`,
@@ -11,7 +10,7 @@ const serverBundleConfig = defineConfig({
   resolve: {
     conditionNames: [
       `@swapi/${buildVariantPath}`,
-      `@swapi/${env.SWAPI_OUTPUT_MODE}`,
+      `@swapi/${buildEnv.SWAPI_OUTPUT_MODE}`,
       'node',
       'default',
     ],
@@ -21,8 +20,8 @@ const serverBundleConfig = defineConfig({
     dir: `./dist/${buildVariantPath}/bundle`,
     cleanDir: true,
     banner: "import '@angular/compiler';",
-    minify: env.SWAPI_OUTPUT_MODE === 'production',
-    comments: env.SWAPI_OUTPUT_MODE === 'development',
+    minify: buildEnv.SWAPI_OUTPUT_MODE === 'production',
+    comments: buildEnv.SWAPI_OUTPUT_MODE === 'development',
   },
 })
 
@@ -36,7 +35,7 @@ const dockerScriptsBundleConfig = defineConfig({
   resolve: {
     conditionNames: [
       `@swapi/${buildVariantPath}`,
-      `@swapi/${env.SWAPI_OUTPUT_MODE}`,
+      `@swapi/${buildEnv.SWAPI_OUTPUT_MODE}`,
       'node',
       'default',
     ],
@@ -46,8 +45,8 @@ const dockerScriptsBundleConfig = defineConfig({
     cleanDir: true,
     entryFileNames: '[name].js',
     chunkFileNames: 'docker-script-chunk-[hash].js',
-    minify: env.SWAPI_OUTPUT_MODE === 'production',
-    comments: env.SWAPI_OUTPUT_MODE === 'development',
+    minify: buildEnv.SWAPI_OUTPUT_MODE === 'production',
+    comments: buildEnv.SWAPI_OUTPUT_MODE === 'development',
   },
 })
 
