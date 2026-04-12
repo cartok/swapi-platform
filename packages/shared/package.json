@@ -6,9 +6,9 @@
     "#internal/*": {
       "types": "./src/*.ts",
       "@swapi/shared/source": "./src/*.ts",
-      "@swapi/development": "./dist/development/*.js",
-      "@swapi/production": "./dist/production/*.js",
-      "default": "./dist/production/*.js"
+      "@swapi/debug": "./dist/debug/*.js",
+      "@swapi/release": "./dist/release/*.js",
+      "default": "./dist/release/*.js"
     }
   },
   "exports": {
@@ -22,9 +22,9 @@
     "./*": {
       "types": "./src/*.ts",
       "@swapi/shared/source": "./src/*.ts",
-      "@swapi/development": "./dist/development/*.js",
-      "@swapi/production": "./dist/production/*.js",
-      "default": "./dist/production/*.js"
+      "@swapi/debug": "./dist/debug/*.js",
+      "@swapi/release": "./dist/release/*.js",
+      "default": "./dist/release/*.js"
     }
   },
   "dependencies": {

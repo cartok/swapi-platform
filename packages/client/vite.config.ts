@@ -11,11 +11,14 @@ import {
 } from 'vite'
 
 import { browserEnv, buildEnv } from './src/env'
-import type { AppBrowserEnv } from './src/env.schema'
+import type { AppBrowserEnv, AppBuildEnv } from './src/env.schema'
 
-// TODO: Use new variable SWAPI_RUN_MODE instead.
-const runDirect =
-  buildEnv.SWAPI_OUTPUT_MODE === 'development' && buildEnv.SWAPI_TARGET === 'local'
+const clientResolveConditions: string[] = createResolveConditions(defaultClientConditions)
+const serverResolveConditions: string[] = createResolveConditions(defaultServerConditions)
+const viteMode: UserConfig['mode'] = toViteMode(buildEnv.SWAPI_PROFILE)
+const buildSourcemap: boolean | 'inline' | 'hidden' = toViteSourcemap(
+  buildEnv.SWAPI_BUILD_SOURCEMAP,
+)
 
 export default defineConfig(({ isSsrBuild }) => {
   const definedBrowserEnv = Object.fromEntries(
@@ -33,20 +36,19 @@ export default defineConfig(({ isSsrBuild }) => {
     base: buildEnv.SWAPI_CLIENT_PUBLIC_BASE_PATH,
     clearScreen: false,
     envDir: false,
-    mode: buildEnv.SWAPI_OUTPUT_MODE,
+    mode: viteMode,
     build: {
       emptyOutDir: true,
-      minify: buildEnv.SWAPI_OUTPUT_MODE === 'production',
-      sourcemap: buildEnv.SWAPI_OUTPUT_MODE === 'production',
+      minify: buildEnv.SWAPI_BUILD_MINIFY,
+      sourcemap: buildSourcemap,
     },
     define: {
       ...definedBrowserEnv,
+      VITE_MODE: JSON.stringify(viteMode),
       ngServerMode: isSsrBuild,
     },
     resolve: {
-      conditions: runDirect
-        ? ['@swapi/shared/source', ...defaultClientConditions]
-        : undefined,
+      conditions: clientResolveConditions,
       mainFields: ['module'],
       alias: [
         {
@@ -61,9 +63,7 @@ export default defineConfig(({ isSsrBuild }) => {
     },
     ssr: {
       resolve: {
-        conditions: runDirect
-          ? ['@swapi/shared/source', ...defaultServerConditions]
-          : undefined,
+        conditions: serverResolveConditions,
       },
     },
     css: {
@@ -138,3 +138,38 @@ export default defineConfig(({ isSsrBuild }) => {
 
   return config
 })
+
+function createResolveConditions(
+  defaultConditions: string[] | readonly string[],
+): string[] {
+  const sharedCondition =
+    buildEnv.SWAPI_RUN_MODE === 'source'
+      ? '@swapi/shared/source'
+      : `@swapi/${buildEnv.SWAPI_PROFILE}`
+
+  return [sharedCondition, ...defaultConditions]
+}
+
+function toViteMode(profile: AppBuildEnv['SWAPI_PROFILE']): 'development' | 'production' {
+  switch (profile) {
+    case 'release':
+      return 'production'
+    case 'debug':
+      return 'development'
+  }
+}
+
+function toViteSourcemap(
+  sourceMap: AppBuildEnv['SWAPI_BUILD_SOURCEMAP'],
+): boolean | 'inline' | 'hidden' {
+  switch (sourceMap) {
+    case 'external':
+      return true
+    case 'hidden':
+      return 'hidden'
+    case 'inline':
+      return 'inline'
+    case 'none':
+      return false
+  }
+}

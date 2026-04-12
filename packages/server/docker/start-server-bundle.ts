@@ -2,21 +2,22 @@ import { existsSync } from 'node:fs'
 
 import { buildEnv } from '@swapi/shared/environment/env'
 
-const outputEnvFilePath = `./packages/server/.env/.env.output.${buildEnv.SWAPI_OUTPUT_MODE}`
-const targetEnvFilePath = `./packages/server/.env/.env.target.${buildEnv.SWAPI_TARGET}`
+const envFilePath = `./packages/server/.env/.env.${buildEnv.SWAPI_TARGET}.${buildEnv.SWAPI_PROFILE}`
+const dockerEnvFilePath = `${envFilePath}.docker`
 const serverEntryPath = './bundle-link/server.js'
 
-assertFileExists(outputEnvFilePath)
-assertFileExists(targetEnvFilePath)
+assertFileExists(envFilePath)
+assertFileExists(dockerEnvFilePath)
 assertFileExists(serverEntryPath)
 
 const serverProcess = Bun.spawn(
   [
     process.execPath,
-    ...['--conditions', `@swapi/${buildEnv.SWAPI_TARGET}/${buildEnv.SWAPI_OUTPUT_MODE}`],
-    ...['--conditions', `@swapi/${buildEnv.SWAPI_OUTPUT_MODE}`],
-    ...['--env-file', outputEnvFilePath],
-    ...['--env-file', targetEnvFilePath],
+    ...['--conditions', `@swapi/${buildEnv.SWAPI_TARGET}/${buildEnv.SWAPI_PROFILE}`],
+    ...['--conditions', `@swapi/${buildEnv.SWAPI_PROFILE}`],
+    // Bun applies later --env-file entries with higher priority.
+    ...['--env-file', envFilePath],
+    ...['--env-file', dockerEnvFilePath],
     serverEntryPath,
   ],
   {

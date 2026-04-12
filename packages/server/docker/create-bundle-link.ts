@@ -2,7 +2,7 @@ import { existsSync, symlinkSync } from 'node:fs'
 
 import { buildEnv } from '@swapi/shared/environment/env'
 
-const bundleDirectory = `./packages/server/dist/${buildEnv.SWAPI_TARGET}/${buildEnv.SWAPI_OUTPUT_MODE}/bundle`
+const bundleDirectory = `./packages/server/dist/${buildEnv.SWAPI_TARGET}/${buildEnv.SWAPI_PROFILE}/bundle`
 const symlinkPath = './bundle-link'
 
 if (!existsSync(bundleDirectory)) {

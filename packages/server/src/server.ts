@@ -108,8 +108,8 @@ server.use((error: unknown, req: express.Request, res: express.Response) => {
   return res.redirect(302, '/error')
 })
 
-const port = env.SWAPI_SERVER_PORT
 const host = env.SWAPI_SERVER_HOST_INTERNAL
+const port = env.SWAPI_SERVER_PORT
 
 server.listen(port, host, () => {
   console.log(`Server listening on ${host}:${port}`)

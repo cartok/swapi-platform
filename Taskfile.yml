@@ -24,37 +24,37 @@ tasks:
 
   lint:
     vars:
-      MODE:
-        ref: .SWAPI_OUTPUT_MODE | default .MODE | default "development"
+      PROFILE:
+        ref: .SWAPI_PROFILE | default .PROFILE | default "debug"
     requires:
       vars:
-        - name: MODE
-          enum: [development, production]
+        - name: PROFILE
+          enum: [debug, release]
     cmds:
       - task: lint:tsc
         vars:
-          MODE: '{{.MODE}}'
+          PROFILE: '{{.PROFILE}}'
       - task: lint:eslint
       - task: lint:prettier
 
   lint:tsc:
     vars:
-      MODE:
-        ref: .SWAPI_OUTPUT_MODE | default .MODE | default "development"
+      PROFILE:
+        ref: .SWAPI_PROFILE | default .PROFILE | default "debug"
     requires:
       vars:
-        - name: MODE
-          enum: [development, production]
+        - name: PROFILE
+          enum: [debug, release]
     deps:
       - task: client:lint
         vars:
-          MODE: '{{.MODE}}'
+          PROFILE: '{{.PROFILE}}'
       - task: server:lint
         vars:
-          MODE: '{{.MODE}}'
+          PROFILE: '{{.PROFILE}}'
       - task: shared:lint
         vars:
-          MODE: '{{.MODE}}'
+          PROFILE: '{{.PROFILE}}'
 
   lint:eslint:
     sources:
@@ -93,44 +93,47 @@ tasks:
 
   docker:build:
     vars:
-      MODE:
-        ref: .SWAPI_OUTPUT_MODE | default .MODE | default "development"
+      PROFILE:
+        ref: .SWAPI_PROFILE | default .PROFILE | default "debug"
       TARGET:
         ref: .SWAPI_TARGET | default .TARGET | default "local"
     requires:
       vars:
-        - name: MODE
-          enum: [development, production]
+        - name: PROFILE
+          enum: [debug, release]
         - name: TARGET
           enum: [local, testing, production]
+    dotenv:
+      - ./packages/server/.env/.env.{{.TARGET}}.{{.PROFILE}}.docker
+      - ./packages/server/.env/.env.{{.TARGET}}.{{.PROFILE}}
     cmds:
       - >
         docker buildx build --load
         --build-arg TARGET={{.TARGET}}
-        --build-arg MODE={{.MODE}}
-        --tag swapi-angular:{{.TARGET}}-{{.MODE}}
+        --build-arg PROFILE={{.PROFILE}}
+        --tag swapi-angular:{{.TARGET}}-{{.PROFILE}}
         ./
 
   docker:start:
     vars:
-      MODE:
-        ref: .SWAPI_OUTPUT_MODE | default .MODE | default "development"
+      PROFILE:
+        ref: .SWAPI_PROFILE | default .PROFILE | default "debug"
       TARGET:
         ref: .SWAPI_TARGET | default .TARGET | default "local"
     requires:
       vars:
-        - name: MODE
-          enum: [development, production]
+        - name: PROFILE
+          enum: [debug, release]
         - name: TARGET
           enum: [local, testing, production]
     deps:
       - task: docker:build
         vars:
-          MODE: '{{.MODE}}'
+          PROFILE: '{{.PROFILE}}'
           TARGET: '{{.TARGET}}'
     dotenv:
-      - ./packages/server/.env/.env.target.{{.TARGET}}
-      - ./packages/server/.env/.env.output.{{.MODE}}
+      - ./packages/server/.env/.env.{{.TARGET}}.{{.PROFILE}}.docker
+      - ./packages/server/.env/.env.{{.TARGET}}.{{.PROFILE}}
     cmds:
       - |
         zsh -c '
@@ -142,5 +145,5 @@ tasks:
           docker run --rm \
             --publish 127.0.0.1:${SWAPI_SERVER_PORT}:${SWAPI_SERVER_PORT} \
             --name swapi-angular \
-            swapi-angular:{{.TARGET}}-{{.MODE}}
+            swapi-angular:{{.TARGET}}-{{.PROFILE}}
         '

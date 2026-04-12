@@ -1,7 +1,10 @@
-import { buildEnv } from '@swapi/shared/environment/env'
 import { defineConfig } from 'rolldown'
 
-const buildVariantPath = `${buildEnv.SWAPI_TARGET}/${buildEnv.SWAPI_OUTPUT_MODE}`
+import { env } from './src/env.js'
+
+const buildVariantPath = `${env.SWAPI_TARGET}/${env.SWAPI_PROFILE}`
+const isMinifyEnabled = env.SWAPI_BUILD_MINIFY
+const buildSourcemap = toRolldownSourcemap(env.SWAPI_BUILD_SOURCEMAP)
 
 const serverBundleConfig = defineConfig({
   input: `./dist/${buildVariantPath}/build/server.js`,
@@ -10,7 +13,7 @@ const serverBundleConfig = defineConfig({
   resolve: {
     conditionNames: [
       `@swapi/${buildVariantPath}`,
-      `@swapi/${buildEnv.SWAPI_OUTPUT_MODE}`,
+      `@swapi/${env.SWAPI_PROFILE}`,
       'node',
       'default',
     ],
@@ -20,8 +23,9 @@ const serverBundleConfig = defineConfig({
     dir: `./dist/${buildVariantPath}/bundle`,
     cleanDir: true,
     banner: "import '@angular/compiler';",
-    minify: buildEnv.SWAPI_OUTPUT_MODE === 'production',
-    comments: buildEnv.SWAPI_OUTPUT_MODE === 'development',
+    minify: isMinifyEnabled,
+    comments: !isMinifyEnabled,
+    sourcemap: buildSourcemap,
   },
 })
 
@@ -35,7 +39,7 @@ const dockerScriptsBundleConfig = defineConfig({
   resolve: {
     conditionNames: [
       `@swapi/${buildVariantPath}`,
-      `@swapi/${buildEnv.SWAPI_OUTPUT_MODE}`,
+      `@swapi/${env.SWAPI_PROFILE}`,
       'node',
       'default',
     ],
@@ -45,9 +49,25 @@ const dockerScriptsBundleConfig = defineConfig({
     cleanDir: true,
     entryFileNames: '[name].js',
     chunkFileNames: 'docker-script-chunk-[hash].js',
-    minify: buildEnv.SWAPI_OUTPUT_MODE === 'production',
-    comments: buildEnv.SWAPI_OUTPUT_MODE === 'development',
+    minify: isMinifyEnabled,
+    comments: !isMinifyEnabled,
+    sourcemap: buildSourcemap,
   },
 })
 
 export default defineConfig([serverBundleConfig, dockerScriptsBundleConfig])
+
+function toRolldownSourcemap(
+  sourceMap: typeof env.SWAPI_BUILD_SOURCEMAP,
+): boolean | 'hidden' | 'inline' {
+  switch (sourceMap) {
+    case 'external':
+      return true
+    case 'hidden':
+      return 'hidden'
+    case 'inline':
+      return 'inline'
+    case 'none':
+      return false
+  }
+}

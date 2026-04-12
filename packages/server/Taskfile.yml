@@ -10,13 +10,13 @@ tasks:
 
   lint:
     vars:
-      MODE:
-        ref: .SWAPI_OUTPUT_MODE | default .MODE | default "development"
-      TSCONFIG: './tsconfig/tsconfig.server{{if eq .MODE "production"}}.production{{end}}.json'
+      PROFILE:
+        ref: .SWAPI_PROFILE | default .PROFILE | default "debug"
+      TSCONFIG: './tsconfig/tsconfig.server{{if eq .PROFILE "release"}}.release{{end}}.json'
     requires:
       vars:
-        - name: MODE
-          enum: [development, production]
+        - name: PROFILE
+          enum: [debug, release]
     deps:
       - task: :shared:generate
     sources:
@@ -30,62 +30,63 @@ tasks:
 
   dev:
     vars:
-      MODE:
-        ref: .SWAPI_OUTPUT_MODE | default .MODE | default "development"
+      PROFILE:
+        ref: .SWAPI_PROFILE | default .PROFILE | default "debug"
     requires:
       vars:
-        - name: MODE
-          enum: [development, production]
+        - name: PROFILE
+          enum: [debug, release]
     deps:
       - task: :client:build
         vars:
-          MODE: '{{.MODE}}'
+          PROFILE: '{{.PROFILE}}'
           TARGET: local
     dotenv:
-      - ./.env/.env.target.local
-      - ./.env/.env.output.{{.MODE}}
+      - ./.env/.env.local.{{.PROFILE}}
+    env:
+      SWAPI_RUN_MODE: source
     interactive: true
     cmds:
       - >
         bunx --no-install bun
         --conditions @swapi/shared/source
         --conditions @swapi/server/source
-        --conditions @swapi/local/{{.MODE}}
+        --conditions @swapi/local/{{.PROFILE}}
         --watch ./src/server.ts
 
   build:with-ssg:
     vars:
-      MODE:
-        ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"
+      PROFILE:
+        ref: .SWAPI_PROFILE | default .PROFILE | default "release"
       TARGET:
         ref: .SWAPI_TARGET | default .TARGET | default "local"
-      BUILD_VARIANT_PATH: '{{.TARGET}}/{{.MODE}}'
+      BUILD_VARIANT_PATH: '{{.TARGET}}/{{.PROFILE}}'
       BUILD_DIST_DIR: './dist/{{.BUILD_VARIANT_PATH}}/build'
-      TARGET_AND_MODE_CONDITION: '@swapi/{{.BUILD_VARIANT_PATH}}'
-      MODE_CONDITION: '@swapi/{{.MODE}}'
-      TSCONFIG: './tsconfig/tsconfig.server{{if eq .MODE "production"}}.production{{end}}.json'
+      TARGET_AND_PROFILE_CONDITION: '@swapi/{{.BUILD_VARIANT_PATH}}'
+      PROFILE_CONDITION: '@swapi/{{.PROFILE}}'
+      TSCONFIG: './tsconfig/tsconfig.server{{if eq .PROFILE "release"}}.release{{end}}.json'
       CLIENT_DIST_ROOT: '../client/dist/{{.BUILD_VARIANT_PATH}}'
       CLIENT_SSG_DIST_DIR: '{{.CLIENT_DIST_ROOT}}/ssg'
       CLIENT_SSR_ENTRY: '{{.CLIENT_DIST_ROOT}}/ssr/main.server.js'
     requires:
       vars:
-        - name: MODE
-          enum: [development, production]
+        - name: PROFILE
+          enum: [debug, release]
         - name: TARGET
           enum: [local, testing, production]
     deps:
       - task: build
         vars:
-          MODE: '{{.MODE}}'
+          PROFILE: '{{.PROFILE}}'
           TARGET: '{{.TARGET}}'
     dotenv:
-      - ./.env/.env.target.{{.TARGET}}
-      - ./.env/.env.output.{{.MODE}}
+      - ./.env/.env.{{.TARGET}}.{{.PROFILE}}
+    env:
+      SWAPI_RUN_MODE: build
     sources:
       - '{{.TSCONFIG}}'
       - ./package.json
-      - ./.env/.env.output.{{.MODE}}
-      - ./.env/.env.target.{{.TARGET}}
+      - ./.env/.env.{{.TARGET}}.{{.PROFILE}}
       - '{{.BUILD_DIST_DIR}}/prerender.js'
       - '{{.CLIENT_SSR_ENTRY}}'
     generates:
@@ -94,62 +95,59 @@ tasks:
     cmds:
       - >
         bunx --no-install bun
-        --conditions {{.TARGET_AND_MODE_CONDITION}}
-        --conditions {{.MODE_CONDITION}}
+        --conditions {{.TARGET_AND_PROFILE_CONDITION}}
+        --conditions {{.PROFILE_CONDITION}}
         {{.BUILD_DIST_DIR}}/prerender.js
 
   build:
     vars:
-      MODE:
-        ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"
+      PROFILE:
+        ref: .SWAPI_PROFILE | default .PROFILE | default "release"
       TARGET:
         ref: .SWAPI_TARGET | default .TARGET | default "local"
     requires:
       vars:
-        - name: MODE
-          enum: [development, production]
+        - name: PROFILE
+          enum: [debug, release]
         - name: TARGET
           enum: [local, testing, production]
     deps:
       - task: build:compile
         vars:
-          MODE: '{{.MODE}}'
+          PROFILE: '{{.PROFILE}}'
           TARGET: '{{.TARGET}}'
       - task: :client:build
         vars:
-          MODE: '{{.MODE}}'
+          PROFILE: '{{.PROFILE}}'
           TARGET: '{{.TARGET}}'
-    dotenv:
-      - ./.env/.env.target.{{.TARGET}}
-      - ./.env/.env.output.{{.MODE}}
 
   build:compile:
     vars:
-      MODE:
-        ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"
+      PROFILE:
+        ref: .SWAPI_PROFILE | default .PROFILE | default "release"
       TARGET:
         ref: .SWAPI_TARGET | default .TARGET | default "local"
-      BUILD_VARIANT_PATH: '{{.TARGET}}/{{.MODE}}'
+      BUILD_VARIANT_PATH: '{{.TARGET}}/{{.PROFILE}}'
       BUILD_DIST_DIR: './dist/{{.BUILD_VARIANT_PATH}}/build'
-      TSCONFIG: './tsconfig/tsconfig.server{{if eq .MODE "production"}}.production{{end}}.json'
+      TSCONFIG: './tsconfig/tsconfig.server{{if eq .PROFILE "release"}}.release{{end}}.json'
     requires:
       vars:
-        - name: MODE
-          enum: [development, production]
+        - name: PROFILE
+          enum: [debug, release]
         - name: TARGET
           enum: [local, testing, production]
     deps:
       - task: :shared:build
         vars:
-          MODE: '{{.MODE}}'
+          PROFILE: '{{.PROFILE}}'
     dotenv:
-      - ./.env/.env.target.{{.TARGET}}
-      - ./.env/.env.output.{{.MODE}}
+      - ./.env/.env.{{.TARGET}}.{{.PROFILE}}
+    env:
+      SWAPI_RUN_MODE: build
     sources:
       - '{{.TSCONFIG}}'
       - ./package.json
-      - ./.env/.env.output.{{.MODE}}
-      - ./.env/.env.target.{{.TARGET}}
+      - ./.env/.env.{{.TARGET}}.{{.PROFILE}}
       - ./src/**/*
     generates:
       - '{{.BUILD_DIST_DIR}}/**/*'
@@ -161,30 +159,31 @@ tasks:
 
   build:bundle:
     vars:
-      MODE:
-        ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"
+      PROFILE:
+        ref: .SWAPI_PROFILE | default .PROFILE | default "release"
       TARGET:
         ref: .SWAPI_TARGET | default .TARGET | default "local"
-      BUILD_VARIANT_PATH: '{{.TARGET}}/{{.MODE}}'
+      BUILD_VARIANT_PATH: '{{.TARGET}}/{{.PROFILE}}'
       DIST_ROOT: './dist/{{.BUILD_VARIANT_PATH}}'
       BUILD_DIST_DIR: '{{.DIST_ROOT}}/build'
       BUNDLE_DIST_DIR: '{{.DIST_ROOT}}/bundle'
-      TARGET_AND_MODE_CONDITION: '@swapi/{{.BUILD_VARIANT_PATH}}'
-      MODE_CONDITION: '@swapi/{{.MODE}}'
+      TARGET_AND_PROFILE_CONDITION: '@swapi/{{.BUILD_VARIANT_PATH}}'
+      PROFILE_CONDITION: '@swapi/{{.PROFILE}}'
     requires:
       vars:
-        - name: MODE
-          enum: [development, production]
+        - name: PROFILE
+          enum: [debug, release]
         - name: TARGET
           enum: [local, testing, production]
     deps:
       - task: build:with-ssg
         vars:
-          MODE: '{{.MODE}}'
+          PROFILE: '{{.PROFILE}}'
           TARGET: '{{.TARGET}}'
     dotenv:
-      - ./.env/.env.target.{{.TARGET}}
-      - ./.env/.env.output.{{.MODE}}
+      - ./.env/.env.{{.TARGET}}.{{.PROFILE}}
+    env:
+      SWAPI_RUN_MODE: build
     sources:
       - ./tsconfig/tsconfig.server.bundle.json
       - ./tsconfig/tsconfig.server.docker.json
@@ -196,69 +195,71 @@ tasks:
     cmds:
       - >
         bunx --no-install bun
-        --conditions {{.TARGET_AND_MODE_CONDITION}}
-        --conditions {{.MODE_CONDITION}}
+        --conditions {{.TARGET_AND_PROFILE_CONDITION}}
+        --conditions {{.PROFILE_CONDITION}}
         "$(bunx --no-install bun pm bin)/rolldown"
         --config
 
   start:
     vars:
-      MODE:
-        ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"
+      PROFILE:
+        ref: .SWAPI_PROFILE | default .PROFILE | default "release"
       TARGET:
         ref: .SWAPI_TARGET | default .TARGET | default "local"
-      BUILD_VARIANT_PATH: '{{.TARGET}}/{{.MODE}}'
+      BUILD_VARIANT_PATH: '{{.TARGET}}/{{.PROFILE}}'
       BUILD_DIST_DIR: './dist/{{.BUILD_VARIANT_PATH}}/build'
-      TARGET_AND_MODE_CONDITION: '@swapi/{{.BUILD_VARIANT_PATH}}'
-      MODE_CONDITION: '@swapi/{{.MODE}}'
+      TARGET_AND_PROFILE_CONDITION: '@swapi/{{.BUILD_VARIANT_PATH}}'
+      PROFILE_CONDITION: '@swapi/{{.PROFILE}}'
     requires:
       vars:
-        - name: MODE
-          enum: [development, production]
+        - name: PROFILE
+          enum: [debug, release]
         - name: TARGET
           enum: [local, testing, production]
     deps:
       - task: build:with-ssg
         vars:
-          MODE: '{{.MODE}}'
+          PROFILE: '{{.PROFILE}}'
           TARGET: '{{.TARGET}}'
     dotenv:
-      - ./.env/.env.target.{{.TARGET}}
-      - ./.env/.env.output.{{.MODE}}
+      - ./.env/.env.{{.TARGET}}.{{.PROFILE}}
+    env:
+      SWAPI_RUN_MODE: build
     cmds:
       - >
         bunx --no-install bun
-        --conditions {{.TARGET_AND_MODE_CONDITION}}
-        --conditions {{.MODE_CONDITION}}
+        --conditions {{.TARGET_AND_PROFILE_CONDITION}}
+        --conditions {{.PROFILE_CONDITION}}
         {{.BUILD_DIST_DIR}}/server.js
 
   start:bundle:
     vars:
-      MODE:
-        ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"
+      PROFILE:
+        ref: .SWAPI_PROFILE | default .PROFILE | default "release"
       TARGET:
         ref: .SWAPI_TARGET | default .TARGET | default "local"
-      BUILD_VARIANT_PATH: '{{.TARGET}}/{{.MODE}}'
+      BUILD_VARIANT_PATH: '{{.TARGET}}/{{.PROFILE}}'
       BUNDLE_DIST_DIR: './dist/{{.BUILD_VARIANT_PATH}}/bundle'
-      TARGET_AND_MODE_CONDITION: '@swapi/{{.BUILD_VARIANT_PATH}}'
-      MODE_CONDITION: '@swapi/{{.MODE}}'
+      TARGET_AND_PROFILE_CONDITION: '@swapi/{{.BUILD_VARIANT_PATH}}'
+      PROFILE_CONDITION: '@swapi/{{.PROFILE}}'
     requires:
       vars:
-        - name: MODE
-          enum: [development, production]
+        - name: PROFILE
+          enum: [debug, release]
         - name: TARGET
           enum: [local, testing, production]
     deps:
-      - task: bundle
+      - task: build:bundle
         vars:
-          MODE: '{{.MODE}}'
+          PROFILE: '{{.PROFILE}}'
           TARGET: '{{.TARGET}}'
     dotenv:
-      - ./.env/.env.target.{{.TARGET}}
-      - ./.env/.env.output.{{.MODE}}
+      - ./.env/.env.{{.TARGET}}.{{.PROFILE}}
+    env:
+      SWAPI_RUN_MODE: build
     cmds:
       - >
         bunx --no-install bun
-        --conditions {{.TARGET_AND_MODE_CONDITION}}
-        --conditions {{.MODE_CONDITION}}
+        --conditions {{.TARGET_AND_PROFILE_CONDITION}}
+        --conditions {{.PROFILE_CONDITION}}
         {{.BUNDLE_DIST_DIR}}/server.js

@@ -18,7 +18,7 @@ import { httpRetryInterceptor } from '@/api/swapi/shared/http/http-retry.interce
 import { routes } from '@/app.routes'
 import { DeviceService } from '@/services/DeviceService'
 
-if (SWAPI_OUTPUT_MODE === 'production') {
+if (VITE_MODE === 'production') {
   enableProdMode()
 }
 

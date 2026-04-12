@@ -1,10 +1,10 @@
 ARG BUN_VERSION=1.3.12
 ARG TARGET
-ARG MODE
+ARG PROFILE
 
 FROM oven/bun:${BUN_VERSION}-slim AS deps
 ARG TARGET
-ARG MODE
+ARG PROFILE
 WORKDIR /app
 
 COPY ./.node-version ./
@@ -20,7 +20,7 @@ RUN bun install --frozen-lockfile
 
 FROM deps AS code
 ARG TARGET
-ARG MODE
+ARG PROFILE
 WORKDIR /app
 
 COPY ./.taskrc.yml ./
@@ -55,12 +55,12 @@ COPY ./packages/client/Taskfile.yml ./packages/client/
 
 FROM code AS build-bundle
 ARG TARGET
-ARG MODE
-RUN bunx --no-install task server:build:bundle TARGET=${TARGET} MODE=${MODE}
+ARG PROFILE
+RUN bunx --no-install task server:build:bundle TARGET=${TARGET} PROFILE=${PROFILE}
 
 FROM oven/bun:${BUN_VERSION}-distroless AS runtime
 ARG TARGET
-ARG MODE
+ARG PROFILE
 WORKDIR /app
 
 # TODO: Get rid of node_modules but right now @angular is defined as external
@@ -73,19 +73,17 @@ COPY --from=deps /app/node_modules/ ./node_modules
 # It also needs client dist's browser assets, index.html and the ssg files.
 COPY ./package.json ./
 COPY ./packages/client/package.json ./packages/client/package.json
-COPY --from=build-bundle /app/packages/client/dist/${TARGET}/${MODE}/ \
-  ./packages/client/dist/${TARGET}/${MODE}
+COPY --from=build-bundle /app/packages/client/dist/${TARGET}/${PROFILE}/ \
+  ./packages/client/dist/${TARGET}/${PROFILE}
 
 COPY ./packages/server/.env/ ./packages/server/.env
 
-COPY --from=build-bundle /app/packages/server/dist/${TARGET}/${MODE}/bundle/ \
-  ./packages/server/dist/${TARGET}/${MODE}/bundle/
+COPY --from=build-bundle /app/packages/server/dist/${TARGET}/${PROFILE}/bundle/ \
+  ./packages/server/dist/${TARGET}/${PROFILE}/bundle/
 
-COPY --from=build-bundle /app/packages/server/dist/${TARGET}/${MODE}/bundle/scripts/ ./
+COPY --from=build-bundle /app/packages/server/dist/${TARGET}/${PROFILE}/bundle/scripts/ ./
 
+ENV SWAPI_PROFILE=${PROFILE}
 ENV SWAPI_TARGET=${TARGET}
-ENV SWAPI_OUTPUT_MODE=${MODE}
 RUN ["bun", "./create-bundle-link.js"]
-ENV SWAPI_SERVER_PORT=51000
-EXPOSE ${SWAPI_SERVER_PORT}
 CMD ["./start-server-bundle.js"]

@@ -8,13 +8,13 @@ tasks:
 
   lint:
     vars:
-      MODE:
-        ref: .SWAPI_OUTPUT_MODE | default .MODE | default "development"
-      TSCONFIG: './tsconfig/tsconfig.vite{{if eq .MODE "production"}}.production{{end}}.json'
+      PROFILE:
+        ref: .SWAPI_PROFILE | default .PROFILE | default "debug"
+      TSCONFIG: './tsconfig/tsconfig.vite{{if eq .PROFILE "release"}}.release{{end}}.json'
     requires:
       vars:
-        - name: MODE
-          enum: [development, production]
+        - name: PROFILE
+          enum: [debug, release]
     sources:
       - ./package.json
       - ./vite.config.ts
@@ -29,64 +29,65 @@ tasks:
     deps:
       - task: :shared:generate
     dotenv:
-      - ./.env/.env.target.local
-      - ./.env/.env.output.development
+      - ./.env/.env.local.debug
+    env:
+      SWAPI_RUN_MODE: source
     cmds:
       - bunx --no-install vite dev --configLoader runner
 
   build:
     vars:
-      MODE:
-        ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"
+      PROFILE:
+        ref: .SWAPI_PROFILE | default .PROFILE | default "release"
       TARGET:
         ref: .SWAPI_TARGET | default .TARGET | default "local"
     requires:
       vars:
-        - name: MODE
-          enum: [development, production]
+        - name: PROFILE
+          enum: [debug, release]
         - name: TARGET
           enum: [local, testing, production]
     deps:
       - task: build:browser
         vars:
-          MODE: '{{.MODE}}'
+          PROFILE: '{{.PROFILE}}'
           TARGET: '{{.TARGET}}'
       - task: build:ssr
         vars:
-          MODE: '{{.MODE}}'
+          PROFILE: '{{.PROFILE}}'
           TARGET: '{{.TARGET}}'
 
   build:browser:
     vars:
-      MODE:
-        ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"
+      PROFILE:
+        ref: .SWAPI_PROFILE | default .PROFILE | default "release"
       TARGET:
         ref: .SWAPI_TARGET | default .TARGET | default "local"
-      BUILD_VARIANT_PATH: '{{.TARGET}}/{{.MODE}}'
+      BUILD_VARIANT_PATH: '{{.TARGET}}/{{.PROFILE}}'
       DIST_DIR: './dist/{{.BUILD_VARIANT_PATH}}/browser'
-      TSCONFIG: './tsconfig/tsconfig.vite{{if eq .MODE "production"}}.production{{end}}.json'
+      TSCONFIG: './tsconfig/tsconfig.vite{{if eq .PROFILE "release"}}.release{{end}}.json'
     requires:
       vars:
-        - name: MODE
-          enum: [development, production]
+        - name: PROFILE
+          enum: [debug, release]
         - name: TARGET
           enum: [local, pages, testing, production]
     deps:
       - task: build:dist-paths
         vars:
-          MODE: '{{.MODE}}'
+          PROFILE: '{{.PROFILE}}'
           TARGET: '{{.TARGET}}'
       - task: :shared:build
         vars:
-          MODE: '{{.MODE}}'
+          PROFILE: '{{.PROFILE}}'
     dotenv:
-      - ./.env/.env.target.{{.TARGET}}
-      - ./.env/.env.output.{{.MODE}}
+      - ./.env/.env.{{.TARGET}}.{{.PROFILE}}
+    env:
+      SWAPI_RUN_MODE: build
     sources:
       - ./package.json
       - ./vite.config.ts
-      - ./.env/.env.output.{{.MODE}}
-      - ./.env/.env.target.{{.TARGET}}
+      - ./.env/.env.{{.TARGET}}.{{.PROFILE}}
       - ./tsconfig/tsconfig.app.json
       - ./tsconfig/tsconfig.app.base.json
       - '{{.TSCONFIG}}'
@@ -100,35 +101,35 @@ tasks:
 
   build:ssr:
     vars:
-      MODE:
-        ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"
+      PROFILE:
+        ref: .SWAPI_PROFILE | default .PROFILE | default "release"
       TARGET:
         ref: .SWAPI_TARGET | default .TARGET | default "local"
-      BUILD_VARIANT_PATH: '{{.TARGET}}/{{.MODE}}'
+      BUILD_VARIANT_PATH: '{{.TARGET}}/{{.PROFILE}}'
       DIST_DIR: './dist/{{.BUILD_VARIANT_PATH}}/ssr'
-      TSCONFIG: './tsconfig/tsconfig.vite{{if eq .MODE "production"}}.production{{end}}.json'
+      TSCONFIG: './tsconfig/tsconfig.vite{{if eq .PROFILE "release"}}.release{{end}}.json'
     requires:
       vars:
-        - name: MODE
-          enum: [development, production]
+        - name: PROFILE
+          enum: [debug, release]
         - name: TARGET
           enum: [local, testing, production]
     deps:
       - task: build:dist-paths
         vars:
-          MODE: '{{.MODE}}'
+          PROFILE: '{{.PROFILE}}'
           TARGET: '{{.TARGET}}'
       - task: :shared:build
         vars:
-          MODE: '{{.MODE}}'
+          PROFILE: '{{.PROFILE}}'
     dotenv:
-      - ./.env/.env.target.{{.TARGET}}
-      - ./.env/.env.output.{{.MODE}}
+      - ./.env/.env.{{.TARGET}}.{{.PROFILE}}
+    env:
+      SWAPI_RUN_MODE: build
     sources:
       - ./package.json
       - ./vite.config.ts
-      - ./.env/.env.output.{{.MODE}}
-      - ./.env/.env.target.{{.TARGET}}
+      - ./.env/.env.{{.TARGET}}.{{.PROFILE}}
       - ./tsconfig/tsconfig.app.json
       - ./tsconfig/tsconfig.app.base.json
       - '{{.TSCONFIG}}'
@@ -143,18 +144,18 @@ tasks:
 
   build:dist-paths:
     vars:
-      MODE:
-        ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"
+      PROFILE:
+        ref: .SWAPI_PROFILE | default .PROFILE | default "release"
       TARGET:
         ref: .SWAPI_TARGET | default .TARGET | default "local"
-      BUILD_VARIANT_PATH: '{{.TARGET}}/{{.MODE}}'
+      BUILD_VARIANT_PATH: '{{.TARGET}}/{{.PROFILE}}'
       DIST_PATH: './dist/{{.BUILD_VARIANT_PATH}}'
     requires:
       vars:
-        - name: MODE
-          enum: [development, production]
+        - name: PROFILE
+          enum: [debug, release]
         - name: TARGET
-          enum: [local, testing, production]
+          enum: [local, pages, testing, production]
     sources:
       - ./tsconfig/tsconfig.dist-paths.json
       - ./src/dist-paths.ts
@@ -168,26 +169,27 @@ tasks:
 
   start:
     vars:
-      MODE:
-        ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"
+      PROFILE:
+        ref: .SWAPI_PROFILE | default .PROFILE | default "release"
       TARGET:
         ref: .SWAPI_TARGET | default .TARGET | default "local"
-      BUILD_VARIANT_PATH: '{{.TARGET}}/{{.MODE}}'
+      BUILD_VARIANT_PATH: '{{.TARGET}}/{{.PROFILE}}'
       DIST_DIR: './dist/{{.BUILD_VARIANT_PATH}}/browser'
     requires:
       vars:
-        - name: MODE
-          enum: [development, production]
+        - name: PROFILE
+          enum: [debug, release]
         - name: TARGET
           enum: [local, testing, production]
     deps:
       - task: build:browser
         vars:
-          MODE: '{{.MODE}}'
+          PROFILE: '{{.PROFILE}}'
           TARGET: '{{.TARGET}}'
     dotenv:
-      - ./.env/.env.target.{{.TARGET}}
-      - ./.env/.env.output.{{.MODE}}
+      - ./.env/.env.{{.TARGET}}.{{.PROFILE}}
+    env:
+      SWAPI_RUN_MODE: build
     cmds:
       - bunx --no-install vite preview --outDir '{{.DIST_DIR}}'
 
@@ -195,10 +197,11 @@ tasks:
     deps:
       - task: :shared:build
         vars:
-          MODE: development
+          PROFILE: debug
     dotenv:
-      - ./.env/.env.target.{{.TARGET}}
-      - ./.env/.env.output.development
+      - ./.env/.env.local.debug
+    env:
+      SWAPI_RUN_MODE: source
     cmds:
       - bunx --no-install vitest --configLoader runner run
 
@@ -206,10 +209,11 @@ tasks:
     deps:
       - task: :shared:build
         vars:
-          MODE: development
+          PROFILE: debug
     dotenv:
-      - ./.env/.env.target.{{.TARGET}}
-      - ./.env/.env.output.development
+      - ./.env/.env.local.debug
+    env:
+      SWAPI_RUN_MODE: source
     interactive: true
     cmds:
       - bunx --no-install vitest --configLoader runner

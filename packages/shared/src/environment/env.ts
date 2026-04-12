@@ -9,9 +9,15 @@ const LogLevelSchema = Type.Union([
   Type.Literal('error'),
 ])
 
-export const OutputModeSchema = Type.Union([
-  Type.Literal('development'),
-  Type.Literal('production'),
+export const ProfileSchema = Type.Union([Type.Literal('debug'), Type.Literal('release')])
+
+export const RunModeSchema = Type.Union([Type.Literal('source'), Type.Literal('build')])
+
+export const BuildSourcemapSchema = Type.Union([
+  Type.Literal('none'),
+  Type.Literal('external'),
+  Type.Literal('hidden'),
+  Type.Literal('inline'),
 ])
 
 const TargetSchema = Type.Union([
@@ -23,18 +29,18 @@ const TargetSchema = Type.Union([
 
 export const CommonEnvSchema = Type.Object({
   SWAPI_LOG_LEVEL: Type.Readonly(LogLevelSchema),
-  SWAPI_OUTPUT_MODE: Type.Readonly(OutputModeSchema),
+  SWAPI_PROFILE: Type.Readonly(ProfileSchema),
   SWAPI_TARGET: Type.Readonly(TargetSchema),
 })
 
 export const BuildEnvSchema = Type.Object({
-  SWAPI_OUTPUT_MODE: Type.Readonly(OutputModeSchema),
+  SWAPI_PROFILE: Type.Readonly(ProfileSchema),
   SWAPI_TARGET: Type.Readonly(TargetSchema),
 })
 
 export const buildEnv = parseEnv(
   {
-    SWAPI_OUTPUT_MODE: process.env['SWAPI_OUTPUT_MODE'],
+    SWAPI_PROFILE: process.env['SWAPI_PROFILE'],
     SWAPI_TARGET: process.env['SWAPI_TARGET'],
   },
   BuildEnvSchema,

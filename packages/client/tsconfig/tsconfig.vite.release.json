@@ -1,5 +1,5 @@
 {
-  "extends": ["./tsconfig.vite.json", "@swapi/tsconfig/tsconfig.production"],
+  "extends": ["./tsconfig.vite.json", "@swapi/tsconfig/tsconfig.release"],
   // Workaround: The Angular compiler options are already set by @swapi/tsconfig/tsconfig.angular.
   // I've set `strictTemplates` here to get around wrong language service warnings.
   // Don't extend the options here.

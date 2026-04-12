@@ -87,7 +87,7 @@ task client:start
 # Full server pipeline (security + device context + SSG + SSR)
 task server:dev
 
-# Full server pipeline in production mode
+# Full server pipeline in release profile
 task server:start
 ```
 
@@ -114,9 +114,9 @@ task client:test
 
 ### Build matrix
 
-Use `MODE` and `TARGET` explicitly when needed:
+Use `PROFILE` and `TARGET` explicitly when needed:
 
-- `MODE`: `development` or `production`
+- `PROFILE`: `debug` or `release`
 - `TARGET`:
   - server: `local`, `testing`, `production`
   - client browser build also supports `pages`
@@ -124,9 +124,9 @@ Use `MODE` and `TARGET` explicitly when needed:
 Examples:
 
 ```bash
-task server:build:with-ssg MODE=production TARGET=local
-task server:bundle MODE=production TARGET=local
-task server:start:bundle MODE=production TARGET=local
+task server:build:with-ssg PROFILE=release TARGET=local
+task server:build:bundle PROFILE=release TARGET=local
+task server:start:bundle PROFILE=release TARGET=local
 ```
 
 ## Docker
@@ -142,15 +142,15 @@ The container exposes the server on port `51000` by default.
 
 Taskfiles load environment values from checked-in `.env` files:
 
-- `packages/client/.env/.env.target.*`
-- `packages/client/.env/.env.output.*`
-- `packages/server/.env/.env.target.*`
-- `packages/server/.env/.env.output.*`
+- `packages/client/.env/.env.<target>.<profile>`
+- `packages/server/.env/.env.<target>.<profile>`
+- Docker runtime variants use `packages/server/.env/.env.<target>.<profile>.docker`
 
 Main runtime variables:
 
 - `SWAPI_TARGET` (`local|testing|production`)
-- `SWAPI_OUTPUT_MODE` (`development|production`)
+- `SWAPI_PROFILE` (`debug|release`)
+- `SWAPI_RUN_MODE` (`source|build`)
 - `SWAPI_SERVER_PORT`
 - `SWAPI_SERVER_HOST`
 - `SWAPI_ALLOWED_HOSTS`
