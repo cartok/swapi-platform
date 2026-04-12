@@ -32,24 +32,17 @@ tasks:
     vars:
       MODE:
         ref: .SWAPI_OUTPUT_MODE | default .MODE | default "development"
-      TARGET:
-        ref: .SWAPI_TARGET | default .TARGET | default "local"
-      BUILD_VARIANT_PATH: '{{.TARGET}}/{{.MODE}}'
-      TARGET_AND_MODE_CONDITION: '@swapi/{{.BUILD_VARIANT_PATH}}'
-      MODE_CONDITION: '@swapi/{{.MODE}}'
     requires:
       vars:
         - name: MODE
           enum: [development, production]
-        - name: TARGET
-          enum: [local, testing, production]
     deps:
       - task: :client:build
         vars:
           MODE: '{{.MODE}}'
-          TARGET: '{{.TARGET}}'
+          TARGET: local
     dotenv:
-      - ./.env/.env.target.{{.TARGET}}
+      - ./.env/.env.target.local
       - ./.env/.env.output.{{.MODE}}
     interactive: true
     cmds:
