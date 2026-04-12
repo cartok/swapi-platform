@@ -159,7 +159,7 @@ tasks:
         --project '{{.TSCONFIG}}'
         --outDir '{{.BUILD_DIST_DIR}}'
 
-  bundle:
+  build:bundle:
     vars:
       MODE:
         ref: .SWAPI_OUTPUT_MODE | default .MODE | default "production"

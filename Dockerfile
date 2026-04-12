@@ -56,7 +56,7 @@ COPY ./packages/client/Taskfile.yml ./packages/client/
 FROM code AS build-bundle
 ARG TARGET
 ARG MODE
-RUN bunx --no-install task server:bundle TARGET=${TARGET} MODE=${MODE}
+RUN bunx --no-install task server:build:bundle TARGET=${TARGET} MODE=${MODE}
 
 FROM oven/bun:${BUN_VERSION}-distroless AS runtime
 ARG TARGET
