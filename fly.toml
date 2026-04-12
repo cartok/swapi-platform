@@ -15,11 +15,11 @@ primary_region = 'fra'
   processes = ['app']
   [http_service.concurrency]
     type = 'requests'
-    soft_limit = 30
-    hard_limit = 50
+    soft_limit = 60
+    hard_limit = 100
 
 [[vm]]
   size = 'shared-cpu-1x'
-  memory = '256mb'
+  memory = '512MB'
   cpu_kind = 'shared'
   cpus = 1
