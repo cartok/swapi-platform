@@ -38,12 +38,12 @@ jobs:
       - name: Build Angular app
         env:
           SWAPI_CLIENT_PUBLIC_BASE_PATH: /${{ env.REPO_NAME }}/
-        run: bunx --no-install task client:build:browser TARGET=pages
+        run: bunx --no-install task client:build:browser TARGET=pages PROFILE=release
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          path: packages/client/dist/pages/production/browser
+          path: packages/client/dist/pages/release/browser
 
   deploy:
     needs: build
