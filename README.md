@@ -1,12 +1,14 @@
-# Angular SSR/SSG web platform
+# Angular SSR/SSG web platform for SWAPI
 
 This repository started as a successful application challenge implementation of a frontend for the Star Wars API (SWAPI) and has been evolved into a production-oriented Angular monorepo template optimized for responsive server-first rendering and ready for custom APIs and services.
 
 - [UI Mockups / Design](https://xd.adobe.com/view/b3c98134-11a8-44c2-5dd2-477b8550307f-c5f8/)
 
-Live Demo (GitHub Pages, CSR only):
+## Live Demos
 
-- [https://cartok.github.io/swapi-platform/](https://cartok.github.io/swapi-platform/)
+- [Fly.io production mode build - SSR/SSG](https://swapi-platform.fly.dev/): Might lag initially as it is configured to entirely shutdown until I have Cloudflare WAF and more in place.
+
+- [Github Pages - CSR-only](https://cartok.github.io/swapi-platform/)
 
 ## What This Project Demonstrates
 
@@ -95,7 +97,8 @@ Local URLs:
 
 - Client dev server: `http://localhost:4200`
 - Client preview server: `http://localhost:4300`
-- SSR/SSG server: `http://localhost:51000`
+- SSR/SSG dev server: `http://localhost:50000`
+- SSR/SSG preview server: `http://localhost:51000`
 
 ## Build, Bundle, and Quality
 
