@@ -128,6 +128,9 @@ tasks:
         vars:
           MODE: '{{.MODE}}'
           TARGET: '{{.TARGET}}'
+    dotenv:
+      - ./packages/server/.env/.env.target.{{.TARGET}}
+      - ./packages/server/.env/.env.output.{{.MODE}}
     cmds:
       - |
         zsh -c '
@@ -137,7 +140,7 @@ tasks:
           trap cleanup EXIT INT TERM
           cleanup
           docker run --rm \
-            --publish 51000:51000 \
+            --publish 127.0.0.1:${SWAPI_SERVER_PORT}:${SWAPI_SERVER_PORT} \
             --name swapi-angular \
             swapi-angular:{{.TARGET}}-{{.MODE}}
         '

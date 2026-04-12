@@ -110,7 +110,7 @@ tasks:
     cmds:
       - >
         bunx --no-install bun
-        --conditions @swapi/source
+        --conditions @swapi/shared/source
         ./generators/device-cookie.validator.generator.ts
 
   generate:custom-media-tokens:
@@ -122,5 +122,5 @@ tasks:
     cmds:
       - >
         bunx --no-install bun
-        --conditions @swapi/source
+        --conditions @swapi/shared/source
         ./generators/custom-media-tokens.generator.ts

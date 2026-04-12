@@ -13,6 +13,10 @@ import {
 import { browserEnv, buildEnv } from './src/env'
 import type { AppBrowserEnv } from './src/env.schema'
 
+// TODO: Use new variable SWAPI_RUN_MODE instead.
+const runDirect =
+  buildEnv.SWAPI_OUTPUT_MODE === 'development' && buildEnv.SWAPI_TARGET === 'local'
+
 export default defineConfig(({ isSsrBuild }) => {
   const definedBrowserEnv = Object.fromEntries(
     (
@@ -40,10 +44,9 @@ export default defineConfig(({ isSsrBuild }) => {
       ngServerMode: isSsrBuild,
     },
     resolve: {
-      conditions:
-        browserEnv.SWAPI_OUTPUT_MODE === 'development'
-          ? ['@swapi/source', ...defaultClientConditions]
-          : undefined,
+      conditions: runDirect
+        ? ['@swapi/shared/source', ...defaultClientConditions]
+        : undefined,
       mainFields: ['module'],
       alias: [
         {
@@ -58,10 +61,9 @@ export default defineConfig(({ isSsrBuild }) => {
     },
     ssr: {
       resolve: {
-        conditions:
-          browserEnv.SWAPI_OUTPUT_MODE === 'development'
-            ? ['@swapi/source', ...defaultServerConditions]
-            : undefined,
+        conditions: runDirect
+          ? ['@swapi/shared/source', ...defaultServerConditions]
+          : undefined,
       },
     },
     css: {
@@ -117,7 +119,7 @@ export default defineConfig(({ isSsrBuild }) => {
     ],
   }
 
-  if (browserEnv.SWAPI_TARGET === 'local') {
+  if (buildEnv.SWAPI_TARGET === 'local') {
     const developmentServerConfig: UserConfig = {
       server: {
         host: 'localhost',

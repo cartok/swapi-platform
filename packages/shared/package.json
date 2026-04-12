@@ -5,7 +5,7 @@
   "imports": {
     "#internal/*": {
       "types": "./src/*.ts",
-      "@swapi/source": "./src/*.ts",
+      "@swapi/shared/source": "./src/*.ts",
       "@swapi/development": "./dist/development/*.js",
       "@swapi/production": "./dist/production/*.js",
       "default": "./dist/production/*.js"
@@ -21,7 +21,7 @@
     },
     "./*": {
       "types": "./src/*.ts",
-      "@swapi/source": "./src/*.ts",
+      "@swapi/shared/source": "./src/*.ts",
       "@swapi/development": "./dist/development/*.js",
       "@swapi/production": "./dist/production/*.js",
       "default": "./dist/production/*.js"

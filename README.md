@@ -95,8 +95,7 @@ Local URLs:
 
 - Client dev server: `http://localhost:4200`
 - Client preview server: `http://localhost:4300`
-- SSR/SSG server (`development`): `http://localhost:50000`
-- SSR/SSG server (`production`): `http://localhost:51000`
+- SSR/SSG server: `http://localhost:51000`
 
 ## Build, Bundle, and Quality
 

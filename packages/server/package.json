@@ -5,7 +5,7 @@
   "imports": {
     "#internal/*": {
       "types": "./src/*.ts",
-      "@swapi/source": "./src/*.ts",
+      "@swapi/server/source": "./src/*.ts",
       "@swapi/local/development": "./dist/local/development/build/*.js",
       "@swapi/local/production": "./dist/local/production/build/*.js",
       "@swapi/testing/development": "./dist/testing/development/build/*.js",
