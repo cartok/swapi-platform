@@ -37,7 +37,7 @@
   width: 100%;
   object-fit: cover;
   -webkit-user-drag: none;
-  touch-action: none;
+  touch-action: pan-y;
 }
 
 .indicators {
