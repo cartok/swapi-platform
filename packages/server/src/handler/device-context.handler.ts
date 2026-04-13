@@ -4,20 +4,22 @@ import {
   findClosestHeightBreakpoint,
   findClosestWidthBreakpoint,
 } from '@swapi/shared/device/context'
-import type express from 'express'
+import type { Hono } from 'hono'
 import { parseItem, parseList } from 'structured-headers'
 
-type HeaderType = ReturnType<express.Request['get']>
+import type { ServerEnv } from '#internal/server.types'
 
-export function addDeviceContextHandler(server: express.Express): void {
-  server.get(/.*/, (req, res, next) => {
+type HeaderType = string | undefined
+
+export function addDeviceContextHandler(server: Hono<ServerEnv>): void {
+  server.get('*', (c, next) => {
     // Get client hints from low-entropy headers.
-    const mobileHeader = req.get('sec-ch-ua-mobile')
+    const mobileHeader = c.req.header('sec-ch-ua-mobile')
 
     // Get client hints from high-entropy headers.
-    const formFactorsHeader = req.get('sec-ch-ua-form-factors')
-    const widthHeader = req.get('sec-ch-viewport-width')
-    const heightHeader = req.get('sec-ch-viewport-height')
+    const formFactorsHeader = c.req.header('sec-ch-ua-form-factors')
+    const widthHeader = c.req.header('sec-ch-viewport-width')
+    const heightHeader = c.req.header('sec-ch-viewport-height')
 
     // Parse headers and store them.
     const headerDeviceFormat = parseDeviceFormatHeaders({
@@ -50,15 +52,15 @@ export function addDeviceContextHandler(server: express.Express): void {
       width: validDeviceWidth,
       height: validDeviceHeight,
     }
-    res.locals['deviceContext'] = deviceContext
+    c.set('deviceContext', deviceContext)
 
     // Request high-entropy client hints (available from the next navigation/request).
-    res.setHeader(
+    c.header(
       'accept-ch',
       'sec-ch-ua-form-factors, sec-ch-viewport-width, sec-ch-viewport-height',
     )
-    res.setHeader('vary', 'sec-ch-ua-form-factors')
-    next()
+    c.header('vary', 'sec-ch-ua-form-factors')
+    return next()
   })
 }
 

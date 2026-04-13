@@ -1,16 +1,19 @@
-import { access, constants } from 'node:fs/promises'
+import { access, constants, readFile } from 'node:fs/promises'
 import { normalize, resolve, sep } from 'node:path'
 
 import { ssgDistPath } from '@swapi/client/dist-paths'
-import type express from 'express'
+import type { Hono } from 'hono'
 
-export function addSsgHandler(server: express.Express): void {
-  server.use(async (req, res, next) => {
-    if (!isHtmlDocumentRequest(req)) {
+import { isFileRequestPath } from '#internal/handler/request-path.utils'
+import type { ServerEnv } from '#internal/server.types'
+
+export function addSsgHandler(server: Hono<ServerEnv>): void {
+  server.use('*', async (c, next) => {
+    if (!isHtmlDocumentRequest(c.req.method, c.req.path, c.req.header('accept'))) {
       return next()
     }
 
-    const ssgFilePath = resolveSsgFilePath(req.path)
+    const ssgFilePath = resolveSsgFilePath(c.req.path)
     if (!isInsideDirectory(ssgFilePath, ssgDistPath)) {
       return next()
     }
@@ -18,31 +21,31 @@ export function addSsgHandler(server: express.Express): void {
     try {
       await access(ssgFilePath, constants.F_OK)
       console.log('SSG: Serve', ssgFilePath)
-      return res.sendFile(ssgFilePath, (error) => {
-        if (error) {
-          return next(error)
-        }
-      })
+      const html = await readFile(ssgFilePath, 'utf8')
+      return c.html(html, 200)
     } catch (error) {
       if (isErrorCode(error, 'ENOENT')) {
         return next()
       }
 
-      return next(error)
+      throw error
     }
   })
 }
 
-function isHtmlDocumentRequest(req: express.Request): boolean {
-  if (req.method !== 'GET' && req.method !== 'HEAD') {
+function isHtmlDocumentRequest(
+  method: string,
+  path: string,
+  accept: string | undefined,
+): boolean {
+  if (method !== 'GET' && method !== 'HEAD') {
     return false
   }
 
-  if (isFileRequestPath(req.path)) {
+  if (isFileRequestPath(path)) {
     return false
   }
 
-  const accept = req.get('accept')
   if (!accept) {
     return true
   }
@@ -52,14 +55,6 @@ function isHtmlDocumentRequest(req: express.Request): boolean {
     accept.includes('application/xhtml+xml') ||
     accept.includes('*/*')
   )
-}
-
-function isFileRequestPath(pathname: string): boolean {
-  try {
-    return /\.[a-zA-Z0-9]+$/.test(decodeURIComponent(pathname))
-  } catch {
-    return /\.[a-zA-Z0-9]+$/.test(pathname)
-  }
 }
 
 function resolveSsgFilePath(pathname: string): string {

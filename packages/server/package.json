@@ -20,8 +20,7 @@
     "@angular/ssr": "catalog:angular",
     "@swapi/client": "workspace:*",
     "@swapi/shared": "workspace:*",
-    "cookie-parser": "^1.4.7",
-    "express": "^5.2.1",
+    "hono": "^4.12.12",
     "structured-headers": "^2.0.2",
     "tslib": "catalog:"
   },
@@ -30,8 +29,6 @@
     "@go-task/cli": "catalog:tooling",
     "@types/babel__core": "^7.20.5",
     "@types/bun": "catalog:",
-    "@types/cookie-parser": "^1.4.10",
-    "@types/express": "^5.0.6",
     "@types/node": "catalog:",
     "bun": "catalog:",
     "rolldown": "catalog:tooling",

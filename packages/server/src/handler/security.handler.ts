@@ -1,12 +1,14 @@
-import type express from 'express'
+import type { Hono } from 'hono'
 
 import { allowedHosts, env } from '#internal/env'
+import type { ServerEnv } from '#internal/server.types'
 
 const allowedHostSet: Readonly<Set<string>> = new Set(allowedHosts)
 
-export function addSecurityHandler(server: express.Express) {
-  server.use((req, res, next) => {
-    const protocol = req.protocol
+export function addSecurityHandler(server: Hono<ServerEnv>): void {
+  server.use('*', async (c, next) => {
+    const requestUrl = new URL(c.req.url)
+    const protocol = requestUrl.protocol.slice(0, -1)
     if (env.SWAPI_TARGET === 'local') {
       if (!/^http$/.test(protocol)) {
         throw new Error(`Invalid protocol ${protocol}.`)
@@ -17,13 +19,14 @@ export function addSecurityHandler(server: express.Express) {
       }
     }
 
-    const hostname = req.hostname?.toLowerCase()
-    if (!hostname) {
-      return res.status(400).send('Missing host header.')
+    const hostHeader = c.req.header('host')
+    if (!hostHeader) {
+      return c.text('Missing host header.', 400)
     }
 
+    const hostname = requestUrl.hostname.toLowerCase()
     if (!isHostAllowed(hostname, allowedHostSet)) {
-      return res.status(400).send('Host not allowed.')
+      return c.text('Host not allowed.', 400)
     }
 
     return next()

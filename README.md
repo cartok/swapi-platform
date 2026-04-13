@@ -27,7 +27,7 @@ This repository started as a successful job application challenge implementation
 | Package | Responsibility |
 | --- | --- |
 | `packages/client` | Angular app (browser + server entry, routes, pages, UI blocks/components) |
-| `packages/server` | Express host for security checks, device context handling, redirects, SSG file serving, SSR fallback |
+| `packages/server` | Hono host for security checks, device context handling, redirects, SSG file serving, SSR fallback |
 | `packages/shared` | Shared runtime/types, routing constants, device context schema, code generators |
 | `scripts` | Helper scripts for build/runtime tasks |
 

@@ -4,4 +4,6 @@ if (!angularCompiler.VERSION.full) {
   throw new Error('Angular compiler failed to load.')
 }
 
-await import('./server.js')
+const { default: server } = await import('./server.js')
+
+export default server
