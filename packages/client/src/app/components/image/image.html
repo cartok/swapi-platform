@@ -1,0 +1,30 @@
+@if (!loaded()) {
+  <svg
+    class="placeholder"
+    width="100%"
+    height="100%"
+    viewBox="0 0 100 100"
+    preserveAspectRatio="none"
+    focusable="false"
+    [attr.role]="loadError() ? 'img' : null"
+    [attr.aria-hidden]="loadError() ? null : 'true'"
+    [attr.aria-label]="loadError() ? 'Image could not be loaded.' : null"
+  >
+    <use x="0" y="0" width="100%" height="100%" [attr.href]="placeholder()" />
+  </svg>
+}
+<img
+  class="image"
+  decoding="async"
+  [class.hidden]="!loaded()"
+  [class.not-draggable]="!draggable()"
+  [ngSrc]="ngSrc()"
+  [width]="width()"
+  [height]="height()"
+  [alt]="alt()"
+  [priority]="priority()"
+  [fill]="fill()"
+  [draggable]="draggable()"
+  (load)="onImageLoad()"
+  (error)="onImageError()"
+/>
