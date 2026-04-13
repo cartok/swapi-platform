@@ -1,8 +1,8 @@
 # Frontend Roadmap
 
-- Fix slider swipe behavior (mobile and Firefox on desktop).
+- [x] Fix slider swipe behavior (mobile and Firefox on desktop).
 - Add a global page cursor style and use it while dragging the image slider.
-- Add image placeholders and fallbacks.
+- [x] Add image placeholders and fallbacks.
 - Improve accessibility.
 - Fix console warnings related to images.
 - Improve the `DeviceService` API.

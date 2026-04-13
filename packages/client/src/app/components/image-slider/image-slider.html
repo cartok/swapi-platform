@@ -16,13 +16,11 @@
     >
       @for (image of images(); track image.url) {
         <div class="slide">
-          <img
+          <app-image
             class="image"
-            decoding="async"
+            fill
             [ngSrc]="image.url"
             [alt]="image.alt"
-            [width]="image.width"
-            [height]="image.height"
             [priority]="$first"
             [draggable]="false"
           />

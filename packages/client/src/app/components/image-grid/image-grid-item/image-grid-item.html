@@ -1,9 +1,8 @@
 <div class="image-grid-item">
   <div class="image-wrapper">
     @let i = index();
-    <img
+    <app-image
       class="image"
-      decoding="async"
       fill
       [ngSrc]="imageUrl()"
       [alt]="imageAlt()"
