@@ -3,7 +3,7 @@ primary_region = 'fra'
 
 [build]
   [build.args]
-    PROFILE="debug"
+    PROFILE="release"
     TARGET="testing"
 
 [http_service]

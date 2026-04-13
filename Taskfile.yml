@@ -94,7 +94,7 @@ tasks:
   docker:build:
     vars:
       PROFILE:
-        ref: .SWAPI_PROFILE | default .PROFILE | default "debug"
+        ref: .SWAPI_PROFILE | default .PROFILE | default "release"
       TARGET:
         ref: .SWAPI_TARGET | default .TARGET | default "local"
     requires:
@@ -117,7 +117,7 @@ tasks:
   docker:start:
     vars:
       PROFILE:
-        ref: .SWAPI_PROFILE | default .PROFILE | default "debug"
+        ref: .SWAPI_PROFILE | default .PROFILE | default "release"
       TARGET:
         ref: .SWAPI_TARGET | default .TARGET | default "local"
     requires:
