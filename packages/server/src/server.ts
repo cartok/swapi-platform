@@ -1,5 +1,3 @@
-import '@angular/compiler'
-
 import { CommonEngine } from '@angular/ssr/node'
 import { browserDistPath, indexHtmlPath } from '@swapi/client/dist-paths'
 import express from 'express'

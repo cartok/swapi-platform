@@ -52,7 +52,7 @@ tasks:
         --conditions @swapi/shared/source
         --conditions @swapi/server/source
         --conditions @swapi/local/{{.PROFILE}}
-        --watch ./src/server.ts
+        --watch ./src/server.jit.ts
 
   build:with-ssg:
     vars:
@@ -230,7 +230,7 @@ tasks:
         bunx --no-install bun
         --conditions {{.TARGET_AND_PROFILE_CONDITION}}
         --conditions {{.PROFILE_CONDITION}}
-        {{.BUILD_DIST_DIR}}/server.js
+        {{.BUILD_DIST_DIR}}/server.jit.js
 
   start:bundle:
     vars:
