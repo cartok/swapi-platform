@@ -1,14 +1,14 @@
 # Angular SSR/SSG web platform for SWAPI
 
-This repository started as a successful application challenge implementation of a frontend for the Star Wars API (SWAPI) and has been evolved into a production-oriented Angular monorepo template optimized for responsive server-first rendering and ready for custom APIs and services.
+This repository started as a successful job application challenge implementation of a frontend for the Star Wars API (SWAPI) and has been evolved into a production-oriented Angular monorepo template optimized for responsive server-first rendering and ready for custom APIs and services.
 
-- [UI Mockups / Design](https://xd.adobe.com/view/b3c98134-11a8-44c2-5dd2-477b8550307f-c5f8/)
+- [UI Mockups / Design given by job application challange](https://xd.adobe.com/view/b3c98134-11a8-44c2-5dd2-477b8550307f-c5f8/)
 
 ## Live Demos
 
-- [Fly.io production mode build - SSR/SSG](https://swapi-platform.fly.dev/): Might lag initially as it is configured to entirely shutdown until I have Cloudflare WAF and more in place.
-
-- [Github Pages - CSR-only](https://cartok.github.io/swapi-platform/)
+- [Production domain (Fly.io behind Cloudflare)](https://swapi-platform.cartok.dev/)
+- [Fly.io default domain](https://swapi-platform.fly.dev/)
+- [GitHub Pages demo (CSR only)](https://cartok.github.io/swapi-platform/)
 
 ## What This Project Demonstrates
 
@@ -68,7 +68,7 @@ SWAPI is intentionally integrated defensively because of schema and data inconsi
 ### Prerequisites
 
 - Node.js `24.14.1`
-- Bun `1.3.9`
+- Bun `1.x`
 - Task runner: either `task` installed globally or via `bunx --no-install task`
 
 ### Install
@@ -86,7 +86,7 @@ task client:dev
 # Angular preview server after browser build
 task client:start
 
-# Full server pipeline (security + device context + SSG + SSR)
+# Full server pipeline (device context + SSG + SSR)
 task server:dev
 
 # Full server pipeline in release profile
@@ -132,6 +132,8 @@ task server:build:bundle PROFILE=release TARGET=local
 task server:start:bundle PROFILE=release TARGET=local
 ```
 
+> By default the all commands use TARGET=local, `dev` commands prefer to use `PROFILE=debug` and `build|start` commands use `PROFILE=release`.
+
 ## Docker
 
 ```bash
@@ -147,7 +149,7 @@ Taskfiles load environment values from checked-in `.env` files:
 
 - `packages/client/.env/.env.<target>.<profile>`
 - `packages/server/.env/.env.<target>.<profile>`
-- Docker runtime variants use `packages/server/.env/.env.<target>.<profile>.docker`
+- Docker runtime variants additionally use `packages/server/.env/.env.<target>.<profile>.docker`
 
 Main runtime variables:
 
@@ -158,9 +160,6 @@ Main runtime variables:
 - `SWAPI_SERVER_HOST`
 - `SWAPI_ALLOWED_HOSTS`
 
-## Documentation Index
+## Roadmap
 
-- Device context strategy and Client Hints notes: [docs/device-context.md](./docs/device-context.md)
-- SWAPI integration details: [docs/swapi.md](./docs/swapi.md)
-- Technical decisions and trade-offs: [docs/entscheidungen.md](./docs/entscheidungen.md)
-- Hosting roadmap (Fly.io, Cloudflare, later VPS): [docs/hosting.md](./docs/hosting.md)
+See the project roadmap documents in the [`docs/roadmap`](docs/roadmap/) folder.
