@@ -7,7 +7,9 @@ const isMinifyEnabled = env.SWAPI_BUILD_MINIFY
 const buildSourcemap = toRolldownSourcemap(env.SWAPI_BUILD_SOURCEMAP)
 
 const serverBundleConfig = defineConfig({
-  input: `./dist/${buildVariantPath}/build/server.js`,
+  input: {
+    server: `./dist/${buildVariantPath}/build/server.bundle.js`,
+  },
   tsconfig: './tsconfig/tsconfig.server.bundle.json',
   platform: 'node',
   resolve: {
@@ -18,11 +20,10 @@ const serverBundleConfig = defineConfig({
       'default',
     ],
   },
-  external: (id) => id.startsWith('@angular/') || id === '@swapi/client/dist-paths',
+  external: (id) => id === '@swapi/client/dist-paths',
   output: {
     dir: `./dist/${buildVariantPath}/bundle`,
     cleanDir: true,
-    banner: "import '@angular/compiler';",
     minify: isMinifyEnabled,
     comments: !isMinifyEnabled,
     sourcemap: buildSourcemap,

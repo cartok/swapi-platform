@@ -63,18 +63,16 @@ ARG TARGET
 ARG PROFILE
 WORKDIR /app
 
-# TODO: Get rid of node_modules but right now @angular is defined as external
-# dependency as workaround...
-COPY --from=deps /app/node_modules/ ./node_modules
-
 # Needed files:
 # The client dist-dirs.js has to stay in it's dist dir, must not be bundled and
 # the root and client package.json's have to exist aswell to have it resolvable.
+# To resolve unbundled monorepo files we also need to copy the symlinks in node_modules.
 # It also needs client dist's browser assets, index.html and the ssg files.
 COPY ./package.json ./
 COPY ./packages/client/package.json ./packages/client/package.json
 COPY --from=build-bundle /app/packages/client/dist/${TARGET}/${PROFILE}/ \
   ./packages/client/dist/${TARGET}/${PROFILE}
+COPY --from=deps /app/node_modules/@swapi/ ./node_modules/@swapi
 
 COPY ./packages/server/.env/ ./packages/server/.env
 
