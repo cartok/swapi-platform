@@ -3,7 +3,7 @@
   @let data = collection.data();
   @if (data.items.length > 0) {
     <app-image-grid>
-      @for (item of data.items; track $index) {
+      @for (item of data.items; track item.id) {
         <app-image-grid-item
           [imageUrl]="item.images[0].url"
           [imageAlt]="imageTitle(item)"
