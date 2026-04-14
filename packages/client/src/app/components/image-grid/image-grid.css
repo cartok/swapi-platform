@@ -1,7 +1,27 @@
+@import '@swapi/shared/generated/css/media';
+
 .image-grid {
   display: grid;
   width: 100%;
   gap: 53px;
-  grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   justify-content: center;
+}
+
+@media (--mw-1280) {
+  .image-grid {
+    gap: 40px;
+  }
+}
+
+@media (--mw-1100) {
+  .image-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (--mw-768) {
+  .image-grid {
+    grid-template-columns: repeat(1, 1fr);
+  }
 }
