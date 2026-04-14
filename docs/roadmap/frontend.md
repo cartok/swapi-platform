@@ -4,7 +4,7 @@
 - Add a global page cursor style and use it while dragging the image slider.
 - [x] Add image placeholders and fallbacks.
 - Improve accessibility.
-- Fix console warnings related to images.
+- [x] Fix console warnings related to preloaded but unused assets.
 - Prefix page requests + use url rewrite, so that html requests can be identified by checking a prefix like /page/ instead of filtering out things like /assets/ for better maintainance, robustness of the server handlers and speed.
 - Possibly cache the SSG files in memory so that file-system access does not occur every time.
 - Improve the `DeviceService` API.

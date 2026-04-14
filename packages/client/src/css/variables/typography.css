@@ -1,11 +1,3 @@
-@font-face {
-  font-family: 'Roboto';
-  src: '/fonts/Roboto-VariableFont_wdth,wght.woff2' format('woff2');
-  font-style: normal;
-  font-weight: 300 700;
-  font-display: block;
-}
-
 :root {
   --font-family-fallback: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   --font-family-roboto: 'Roboto', var(--font-family-fallback);
