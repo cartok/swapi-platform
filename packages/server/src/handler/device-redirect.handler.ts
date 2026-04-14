@@ -7,13 +7,23 @@ import type { Hono } from 'hono'
 import { deleteCookie, getCookie, setCookie } from 'hono/cookie'
 
 import { env } from '#internal/env'
-import { isFileRequestPath } from '#internal/handler/request-path.utils'
+import { isHtmlDocumentRequest } from '#internal/handler/request-path.utils'
 import type { ServerEnv } from '#internal/server.types'
 
 const JUST_REDIRECTED_COOKIE_KEY = 'justRedirected'
 
 export function addDeviceRedirectHandler(server: Hono<ServerEnv>): void {
   server.get('*', (c, next) => {
+    if (
+      !isHtmlDocumentRequest({
+        method: c.req.method,
+        pathname: c.req.path,
+        acceptHeader: c.req.header('accept'),
+      })
+    ) {
+      return next()
+    }
+
     const justRedirectedCookie = getCookie(c, JUST_REDIRECTED_COOKIE_KEY)
 
     if (justRedirectedCookie === 'true') {
@@ -22,10 +32,6 @@ export function addDeviceRedirectHandler(server: Hono<ServerEnv>): void {
     }
 
     if (c.req.path.startsWith(`/${ERROR_PATH}`)) {
-      return next()
-    }
-
-    if (isFileRequestPath(c.req.path)) {
       return next()
     }
 

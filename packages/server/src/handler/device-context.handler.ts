@@ -7,12 +7,23 @@ import {
 import type { Hono } from 'hono'
 import { parseItem, parseList } from 'structured-headers'
 
+import { isHtmlDocumentRequest } from '#internal/handler/request-path.utils'
 import type { ServerEnv } from '#internal/server.types'
 
 type HeaderType = string | undefined
 
 export function addDeviceContextHandler(server: Hono<ServerEnv>): void {
   server.get('*', (c, next) => {
+    if (
+      !isHtmlDocumentRequest({
+        method: c.req.method,
+        pathname: c.req.path,
+        acceptHeader: c.req.header('accept'),
+      })
+    ) {
+      return next()
+    }
+
     // Get client hints from low-entropy headers.
     const mobileHeader = c.req.header('sec-ch-ua-mobile')
 

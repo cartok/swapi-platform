@@ -4,17 +4,23 @@ import { normalize, resolve, sep } from 'node:path'
 import { ssgDistPath } from '@swapi/client/dist-paths'
 import type { Hono } from 'hono'
 
-import { isFileRequestPath } from '#internal/handler/request-path.utils'
+import { isHtmlDocumentRequest } from '#internal/handler/request-path.utils'
 import type { ServerEnv } from '#internal/server.types'
 
 export function addSsgHandler(server: Hono<ServerEnv>): void {
   server.use('*', async (c, next) => {
-    if (!isHtmlDocumentRequest(c.req.method, c.req.path, c.req.header('accept'))) {
+    if (
+      !isHtmlDocumentRequest({
+        method: c.req.method,
+        pathname: c.req.path,
+        acceptHeader: c.req.header('accept'),
+      })
+    ) {
       return next()
     }
 
     const ssgFilePath = resolveSsgFilePath(c.req.path)
-    if (!isInsideDirectory(ssgFilePath, ssgDistPath)) {
+    if (!isInsideSsgDirectory(ssgFilePath, ssgDistPath)) {
       return next()
     }
 
@@ -33,36 +39,12 @@ export function addSsgHandler(server: Hono<ServerEnv>): void {
   })
 }
 
-function isHtmlDocumentRequest(
-  method: string,
-  path: string,
-  accept: string | undefined,
-): boolean {
-  if (method !== 'GET' && method !== 'HEAD') {
-    return false
-  }
-
-  if (isFileRequestPath(path)) {
-    return false
-  }
-
-  if (!accept) {
-    return true
-  }
-
-  return (
-    accept.includes('text/html') ||
-    accept.includes('application/xhtml+xml') ||
-    accept.includes('*/*')
-  )
-}
-
 function resolveSsgFilePath(pathname: string): string {
   const normalizedPath = pathname.replace(/^\/+|\/+$/g, '')
   return resolve(ssgDistPath, normalizedPath, 'index.html')
 }
 
-function isInsideDirectory(filePath: string, dirPath: string): boolean {
+function isInsideSsgDirectory(filePath: string, dirPath: string): boolean {
   const normalizedFilePath = normalize(filePath)
   const normalizedDirPath = normalize(resolve(dirPath))
   return (

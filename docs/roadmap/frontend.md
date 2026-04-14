@@ -5,6 +5,8 @@
 - [x] Add image placeholders and fallbacks.
 - Improve accessibility.
 - Fix console warnings related to images.
+- Prefix page requests + use url rewrite, so that html requests can be identified by checking a prefix like /page/ instead of filtering out things like /assets/ for better maintainance, robustness of the server handlers and speed.
+- Possibly cache the SSG files in memory so that file-system access does not occur every time.
 - Improve the `DeviceService` API.
 - Add a fallback for device feature detection (Firefox and Safari).
 - Finish the link-list component as defined in the designs.

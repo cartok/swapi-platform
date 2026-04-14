@@ -7,6 +7,7 @@ import { enableAngularServerMode } from '#internal/angular-server-mode'
 import { allowedHosts, env } from '#internal/env'
 import { addDeviceContextHandler } from '#internal/handler/device-context.handler'
 import { addDeviceRedirectHandler } from '#internal/handler/device-redirect.handler'
+import { isHtmlDocumentRequest } from '#internal/handler/request-path.utils'
 import { addSecurityHandler } from '#internal/handler/security.handler'
 import { addSsgHandler } from '#internal/handler/ssg.handler'
 import type { ServerEnv } from '#internal/server.types'
@@ -38,6 +39,16 @@ app.on(['GET', 'HEAD'], '*', staticAssetHandler)
 addSsgHandler(app)
 
 app.use('*', async (c) => {
+  if (
+    !isHtmlDocumentRequest({
+      method: c.req.method,
+      pathname: c.req.path,
+      acceptHeader: c.req.header('accept'),
+    })
+  ) {
+    return c.notFound()
+  }
+
   const angular = await getAngularRenderEngine()
   const url = c.req.url
   const html = await angular.render({
