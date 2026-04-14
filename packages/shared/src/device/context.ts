@@ -4,9 +4,10 @@ import { Value } from '@sinclair/typebox/value'
 
 export const DEVICE_FORMATS = ['desktop', 'mobile', 'tablet'] as const
 export const DEFAULT_DEVICE_FORMAT: DeviceFormat = 'mobile'
+
 export const BREAKPOINTS = {
   width: [1385, 1280, 1100, 768, 601, 430, 360],
-  height: [1000, 750, 500],
+  height: [1280, 915, 820, 430],
 } as const
 
 type DeviceFormat = (typeof DEVICE_FORMATS)[number]
