@@ -88,7 +88,9 @@ tasks:
       - ./package.json
       - ./.env/.env.{{.TARGET}}.{{.PROFILE}}
       - '{{.BUILD_DIST_DIR}}/prerender.js'
-      - '{{.CLIENT_SSR_ENTRY}}'
+      - '{{.CLIENT_DIST_ROOT}}/browser/**/*'
+      - '{{.CLIENT_DIST_ROOT}}/dist-paths.*'
+      - '{{.CLIENT_DIST_ROOT}}/ssr/**/*'
     generates:
       - '{{.CLIENT_SSG_DIST_DIR}}/index.html'
       - '{{.CLIENT_SSG_DIST_DIR}}/**/*/index.html'

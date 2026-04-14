@@ -85,6 +85,7 @@ tasks:
     env:
       SWAPI_RUN_MODE: build
     sources:
+      - ./index.html
       - ./package.json
       - ./vite.config.ts
       - ./.env/.env.{{.TARGET}}.{{.PROFILE}}
@@ -127,6 +128,7 @@ tasks:
     env:
       SWAPI_RUN_MODE: build
     sources:
+      - ./index.html
       - ./package.json
       - ./vite.config.ts
       - ./.env/.env.{{.TARGET}}.{{.PROFILE}}
