@@ -7,7 +7,7 @@ export const DEFAULT_DEVICE_FORMAT: DeviceFormat = 'mobile'
 
 export const BREAKPOINTS = {
   width: [1385, 1280, 1100, 768, 601, 430, 360],
-  height: [1280, 915, 820, 430],
+  height: [1280, 1080, 915, 820, 430],
 } as const
 
 type DeviceFormat = (typeof DEVICE_FORMATS)[number]
