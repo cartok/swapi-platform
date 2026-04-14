@@ -7,8 +7,8 @@ import {
 import type { Hono } from 'hono'
 import { parseItem, parseList } from 'structured-headers'
 
-import { isHtmlDocumentRequest } from '#internal/handler/request-path.utils'
 import type { ServerEnv } from '#internal/server.types'
+import { isHtmlDocumentRequest } from '#internal/shared/request-filter'
 
 type HeaderType = string | undefined
 

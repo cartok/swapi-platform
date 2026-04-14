@@ -3,14 +3,14 @@ import { browserDistPath, indexHtmlPath } from '@swapi/client/dist-paths'
 import { Hono } from 'hono'
 import { serveStatic } from 'hono/bun'
 
-import { enableAngularServerMode } from '#internal/angular-server-mode'
+import { addDeviceContextHandler } from '#internal/device/device-context.handler'
+import { addDeviceRedirectHandler } from '#internal/device/device-redirect.handler'
 import { allowedHosts, env } from '#internal/env'
-import { addDeviceContextHandler } from '#internal/handler/device-context.handler'
-import { addDeviceRedirectHandler } from '#internal/handler/device-redirect.handler'
-import { isHtmlDocumentRequest } from '#internal/handler/request-path.utils'
-import { addSecurityHandler } from '#internal/handler/security.handler'
-import { addSsgHandler } from '#internal/handler/ssg.handler'
+import { addSecurityHandler } from '#internal/security/security.handler'
 import type { ServerEnv } from '#internal/server.types'
+import { enableAngularServerMode } from '#internal/shared/angular-server-mode'
+import { isHtmlDocumentRequest } from '#internal/shared/request-filter'
+import { addSsgHandler } from '#internal/ssg/ssg.handler'
 
 enableAngularServerMode()
 

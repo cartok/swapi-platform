@@ -4,8 +4,8 @@ import { normalize, resolve, sep } from 'node:path'
 import { ssgDistPath } from '@swapi/client/dist-paths'
 import type { Hono } from 'hono'
 
-import { isHtmlDocumentRequest } from '#internal/handler/request-path.utils'
 import type { ServerEnv } from '#internal/server.types'
+import { isHtmlDocumentRequest } from '#internal/shared/request-filter'
 
 export function addSsgHandler(server: Hono<ServerEnv>): void {
   server.use('*', async (c, next) => {

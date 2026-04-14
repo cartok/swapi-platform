@@ -7,8 +7,8 @@ import type { Hono } from 'hono'
 import { deleteCookie, getCookie, setCookie } from 'hono/cookie'
 
 import { env } from '#internal/env'
-import { isHtmlDocumentRequest } from '#internal/handler/request-path.utils'
 import type { ServerEnv } from '#internal/server.types'
+import { isHtmlDocumentRequest } from '#internal/shared/request-filter'
 
 const JUST_REDIRECTED_COOKIE_KEY = 'justRedirected'
 

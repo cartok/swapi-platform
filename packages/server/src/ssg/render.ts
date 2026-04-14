@@ -9,8 +9,8 @@ import { indexHtmlPath, ssgDistPath } from '@swapi/client/dist-paths'
 import { HOME_PATH } from '@swapi/shared/routing/paths'
 import { SSG_PATHS } from '@swapi/shared/routing/ssg-paths'
 
-import { enableAngularServerMode } from '#internal/angular-server-mode'
 import { allowedHosts, env } from '#internal/env'
+import { enableAngularServerMode } from '#internal/shared/angular-server-mode'
 
 enableAngularServerMode()
 

@@ -87,7 +87,7 @@ tasks:
       - '{{.TSCONFIG}}'
       - ./package.json
       - ./.env/.env.{{.TARGET}}.{{.PROFILE}}
-      - '{{.BUILD_DIST_DIR}}/prerender.js'
+      - '{{.BUILD_DIST_DIR}}/ssg/render.js'
       - '{{.CLIENT_DIST_ROOT}}/browser/**/*'
       - '{{.CLIENT_DIST_ROOT}}/dist-paths.*'
       - '{{.CLIENT_DIST_ROOT}}/ssr/**/*'
@@ -99,7 +99,7 @@ tasks:
         bunx --no-install bun
         --conditions {{.TARGET_AND_PROFILE_CONDITION}}
         --conditions {{.PROFILE_CONDITION}}
-        {{.BUILD_DIST_DIR}}/prerender.js
+        {{.BUILD_DIST_DIR}}/ssg/render.js
 
   build:
     vars:
