@@ -1,3 +1,4 @@
+import type { OnInit } from '@angular/core'
 import {
   ChangeDetectionStrategy,
   Component,
@@ -16,7 +17,7 @@ import { SwipeDirective } from '@/shared/directives/swipe/swipe'
   styleUrl: './image-slider.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ImageSlider {
+export class ImageSlider implements OnInit {
   readonly images =
     input.required<{ url: string; alt: string; width: number; height: number }[]>()
   readonly viewportHeight = input.required<number>()
@@ -24,6 +25,12 @@ export class ImageSlider {
   private readonly _activeIndex = signal(0)
   readonly activeIndex = this._activeIndex.asReadonly()
   readonly slidesTranslateX = computed<string>(() => `-${this.activeIndex() * 100}%`)
+
+  initialImageUrl!: string
+
+  ngOnInit(): void {
+    this.initialImageUrl = this.images()[this.activeIndex()]?.url
+  }
 
   setActiveIndex(index: number): void {
     const imageCount = this.images().length

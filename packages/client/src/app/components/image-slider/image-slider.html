@@ -21,7 +21,7 @@
             fill
             [ngSrc]="image.url"
             [alt]="image.alt"
-            [priority]="$first"
+            [priority]="image.url === initialImageUrl"
             [draggable]="false"
           />
         </div>

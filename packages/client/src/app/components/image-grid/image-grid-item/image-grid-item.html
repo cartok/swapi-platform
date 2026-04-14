@@ -1,18 +1,11 @@
 <div class="image-grid-item">
   <div class="image-wrapper">
-    @let i = index();
     <app-image
       class="image"
       fill
       [ngSrc]="imageUrl()"
       [alt]="imageAlt()"
-      [priority]="
-        device.isMaxWidth(device.WIDTH.W768)
-          ? i <= 1
-          : device.isMaxWidth(device.WIDTH.W1100)
-            ? i <= 2
-            : i <= 4
-      "
+      [priority]="isInInitialViewPort"
     />
   </div>
   <div class="description-container">
