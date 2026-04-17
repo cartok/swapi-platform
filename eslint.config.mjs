@@ -95,7 +95,9 @@ export default defineConfig(
     },
   },
   {
-    files: ['./packages/client/src/app/components/link-list/link-list-item/link-list-item.ts'],
+    files: [
+      './packages/client/src/app/components/link-list/link-list-item/link-list-item.ts',
+    ],
     rules: {
       '@angular-eslint/component-selector': [
         'error',
@@ -109,7 +111,7 @@ export default defineConfig(
   },
   {
     files: ['./packages/client/src/**/*.html'],
-    extends: [angular.configs.templateAll],
+    extends: [angular.configs.templateAll, angular.configs.templateAccessibility],
     rules: {
       '@angular-eslint/template/i18n': [
         'off',
