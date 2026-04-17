@@ -18,6 +18,7 @@ generated/
 !.vscode/tasks.json
 
 # Application files
+.codex
 .DS_Store/
 .Trash-*/
 *.save
