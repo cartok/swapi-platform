@@ -28,16 +28,6 @@ body {
   text-decoration: none;
 }
 
-*:focus-visible {
-  outline-width: var(--width-focus-visible-outline);
-  outline-offset: 0;
-  outline-style: solid;
-}
-
-input:focus-visible {
-  outline: unset;
-}
-
 button {
   cursor: pointer;
   &:disabled {

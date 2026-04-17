@@ -6,8 +6,10 @@
 
 @import '@/css/variables/layout' layer(base);
 @import '@/css/variables/colors' layer(base);
+@import '@/css/variables/a11y' layer(base);
 @import '@/css/variables/typography' layer(base);
 
 @import '@/css/classes/layout' layer(global);
 @import '@/css/classes/typography' layer(global);
 @import '@/css/classes/truncation' layer(global);
+@import '@/css/classes/a11y' layer(global);

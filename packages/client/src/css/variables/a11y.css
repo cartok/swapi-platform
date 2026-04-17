@@ -1,0 +1,5 @@
+:root {
+  --focus-outline-width: 4px;
+  --focus-outline-offset: 6px;
+  --focus-outline-color: var(--color-tertriary);
+}

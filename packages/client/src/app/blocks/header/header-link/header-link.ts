@@ -1,8 +1,6 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core'
 import { RouterLink, RouterLinkActive } from '@angular/router'
 
-type HeaderRouterLink = RouterLink['routerLink']
-
 @Component({
   selector: 'app-header-link',
   imports: [RouterLink, RouterLinkActive],
@@ -12,6 +10,6 @@ type HeaderRouterLink = RouterLink['routerLink']
 })
 export class HeaderLink {
   readonly label = input.required<string>()
-  readonly routerLink = input.required<HeaderRouterLink>()
+  readonly to = input.required<RouterLink['to']>()
   readonly exact = input(false)
 }

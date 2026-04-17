@@ -16,7 +16,7 @@ export class ImageGridItem implements OnInit {
   readonly imageUrl = input.required<string>()
   readonly imageAlt = input.required<string>()
   readonly label = input.required<string>()
-  readonly linkUri = input.required<RouterLink['routerLink']>()
+  readonly linkUri = input.required<RouterLink['to']>()
   readonly index = input.required<number>()
 
   readonly device = inject(DeviceService)

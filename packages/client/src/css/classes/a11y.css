@@ -1,0 +1,59 @@
+*:not(input):focus-visible {
+  outline: var(--focus-outline-width) solid var(--focus-outline-color);
+  outline-offset: var(--focus-outline-offset);
+}
+
+.g-focus-outline {
+  position: relative;
+  --focus-outline-inset: calc(
+    (var(--focus-outline-offset) + var(--focus-outline-width)) * -1
+  );
+
+  &:focus-within::after {
+    content: '';
+    position: absolute;
+    inset: var(--focus-outline-inset);
+    border: var(--focus-outline-width) solid var(--focus-outline-color);
+    pointer-events: none;
+    opacity: 0;
+  }
+
+  &:has(:focus-visible)::after {
+    opacity: 1;
+  }
+
+  & > :focus-visible {
+    outline: none;
+    outline-offset: 0;
+  }
+}
+
+.g-focus-outline--inset {
+  --focus-outline-inset: 0;
+}
+
+.g-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+}
+
+.g-visually-hidden-focusable:not(:focus):not(:active) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+}

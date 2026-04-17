@@ -10,12 +10,19 @@
           </svg>
         </a>
         <nav class="navigation" aria-label="Primary">
-          <app-header-link label="Movies" routerLink="/movies" />
-          <app-header-link label="Characters" routerLink="/characters" />
-          <app-header-link label="Planets" routerLink="/planets" />
+          <app-header-link label="Movies" to="/movies" />
+          <app-header-link label="Characters" to="/characters" />
+          <app-header-link label="Planets" to="/planets" />
         </nav>
       </div>
-      <input class="search-bar" placeholder="Search" />
+      <div class="g-focus-outline g-focus-outline--inset">
+        <input
+          class="search-bar"
+          name="search"
+          placeholder="Search"
+          aria-label="This is only UI that has no functionality"
+        />
+      </div>
     </div>
   </div>
 </header>

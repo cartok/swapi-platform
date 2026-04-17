@@ -9,5 +9,5 @@ import { RouterLink } from '@angular/router'
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LinkListItem {
-  readonly linkUri = input<RouterLink['routerLink']>()
+  readonly linkUri = input<RouterLink['to']>()
 }
