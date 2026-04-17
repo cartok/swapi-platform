@@ -20,6 +20,7 @@
     "@analogjs/vite-plugin-angular": "catalog:angular",
     "@angular/build": "catalog:angular",
     "@angular/compiler-cli": "catalog:angular",
+    "@axe-core/cli": "catalog:testing",
     "@go-task/cli": "catalog:tooling",
     "bun": "catalog:",
     "jsdom": "catalog:testing",

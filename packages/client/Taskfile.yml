@@ -25,6 +25,17 @@ tasks:
     cmds:
       - bunx --no-install tsc --noEmit --project '{{.TSCONFIG}}'
 
+  lint:a11y:
+    sources:
+      - ./index.html
+      - ./package.json
+      - ./vite.config.ts
+      - ./tsconfig/**/*.json
+      - ./src/**/*.{ts,json,html,css}
+      - ../../../packages/shared/src/**/*.ts
+    cmds:
+      - bunx axe http://localhost:4200 --tags wcag2a,wcag2aa,wcag21a,wcag21aa --exit
+
   dev:
     deps:
       - task: :shared:generate
