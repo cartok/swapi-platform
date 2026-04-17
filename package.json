@@ -17,6 +17,7 @@
   "catalogs": {
     "angular": {
       "@analogjs/vite-plugin-angular": "^2.3.1",
+      "@angular/aria": "21.2.5",
       "@angular/build": "21.2.3",
       "@angular/common": "21.2.5",
       "@angular/compiler": "21.2.5",

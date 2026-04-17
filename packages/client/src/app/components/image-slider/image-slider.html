@@ -1,21 +1,21 @@
-<div class="image-slider">
+<div ngTabs class="image-slider">
   <div
-    class="viewport"
     appSwipe
+    class="viewport g-focus-outline g-focus-outline--inset"
+    [class.viewport-swiping]="isSwiping()"
     [style]="{ height: `${viewportHeight()}px` }"
-    (swipeStart)="enableDraggingCursor()"
-    (swipeEnd)="disableDraggingCursor()"
+    (mousedown)="enableDraggingCursor()"
+    (mouseleave)="disableDraggingCursor()"
+    (mouseup)="disableDraggingCursor()"
     (swipeCancel)="disableDraggingCursor()"
-    (swipeLeft)="incrementActiveIndex()"
-    (swipeRight)="decrementActiveIndex()"
+    (swipeEnd)="disableDraggingCursor()"
+    (swipeLeft)="onSwipeLeft()"
+    (swipeRight)="onSwipeRight()"
+    (swipeStart)="enableDraggingCursor()"
   >
-    <div
-      class="slides"
-      [class.slides-swiping]="isSwiping()"
-      [style]="{ transform: `translateX(${slidesTranslateX()})` }"
-    >
+    <div class="slides" [style]="{ transform: `translateX(${slidesTranslateX()})` }">
       @for (image of images(); track image.url) {
-        <div class="slide">
+        <div ngTabPanel class="slide" [value]="toTabValue($index)">
           <app-image
             class="image"
             fill
@@ -28,12 +28,24 @@
       }
     </div>
   </div>
-  <div class="indicators" aria-hidden="true">
+  <div
+    #indicators
+    ngTabList
+    class="indicators"
+    aria-label="Image selection"
+    focusMode="activedescendant"
+    [selectedTab]="selectedTab()"
+    (selectedTabChange)="onSelectedTabChange($event)"
+  >
     @for (image of images(); track image.url) {
       <button
+        ngTab
         type="button"
         class="indicator"
+        [attr.aria-label]="indicatorAriaLabel($index)"
+        [attr.data-indicator-index]="$index"
         [class.indicator-active]="$index === activeIndex()"
+        [value]="toTabValue($index)"
         (click)="setActiveIndex($index)"
       >
         <svg width="11" height="11" aria-hidden="true" focusable="false">
@@ -42,4 +54,7 @@
       </button>
     }
   </div>
+  <p class="g-visually-hidden" aria-live="polite" aria-atomic="true">
+    {{ activeImageAnnouncement() }}
+  </p>
 </div>

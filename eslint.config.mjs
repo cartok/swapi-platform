@@ -115,6 +115,12 @@ export default defineConfig(
     },
   },
   {
+    files: ['./packages/client/src/app/components/image-slider/**/*.ts'],
+    rules: {
+      '@angular-eslint/no-developer-preview': 'off',
+    },
+  },
+  {
     files: ['./packages/client/src/app/api/swapi/**/*.ts'],
     rules: {
       '@angular-eslint/no-experimental': ['off'],
