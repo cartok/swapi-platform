@@ -5,6 +5,8 @@
 - [x] Add image placeholders and fallbacks.
 - Improve accessibility.
 - [x] Fix console warnings related to preloaded but unused assets.
+- [x] Optimize for a11y
+  - [ ] Eventuall add global focus blur on esc key
 - [ ] Prefix page requests + use url rewrite, so that html requests can be identified by checking a prefix like /page/ instead of filtering out things like /assets/ for better maintainance, robustness of the server handlers and speed.
 - [ ] Possibly cache the SSG files in memory so that file-system access does not occur every time.
 - [ ] Improve the `DeviceService` API.

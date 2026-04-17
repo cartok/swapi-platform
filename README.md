@@ -53,7 +53,8 @@ This repository started as a successful job application challenge implementation
 - Routes: `home`, `movies`, `movie/:id`, `characters`, `character/:id`, `planets`, `planet/:id`, `error`
 - SWAPI resources: Films, People, Planets
 - HTTP retry interceptor and explicit SWAPI DTO/model mapping layer
-- Responsive UI blocks/components for list/detail pages
+- Responsive & a11y friendly UI
+  - _The search input in the header is only UI demonstration, and has no functionality._
 - DeviceService with route-aware and browser-aware breakpoint handling
 
 ## SWAPI Integration Notes
