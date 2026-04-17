@@ -1,0 +1,13 @@
+<nav class="header-nav" aria-label="Main Navigation">
+  @for (link of links; track link.to) {
+    <a
+      class="link"
+      routerLinkActive="is-active"
+      ariaCurrentWhenActive="page"
+      [routerLink]="link.to"
+      [routerLinkActiveOptions]="{ exact: link.exact }"
+    >
+      {{ link.label }}
+    </a>
+  }
+</nav>
