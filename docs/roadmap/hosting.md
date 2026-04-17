@@ -12,7 +12,7 @@
 - [x] Manage the custom domain in Cloudflare.
 - [x] Enable Cloudflare DNS/proxy.
 - [x] Enable CDN/asset caching.
-- Verify that device-specific HTML pages are cached correctly. The current URL-based redirection likely already addresses most cache-variant concerns.
+- [ ] Verify that device-specific HTML pages are cached correctly. The current URL-based redirection likely already addresses most cache-variant concerns.
 
 ## Phase 3: Cloudflare Worker in front of Fly.io
 

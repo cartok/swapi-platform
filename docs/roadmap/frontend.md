@@ -5,18 +5,19 @@
 - [x] Add image placeholders and fallbacks.
 - Improve accessibility.
 - [x] Fix console warnings related to preloaded but unused assets.
-- Prefix page requests + use url rewrite, so that html requests can be identified by checking a prefix like /page/ instead of filtering out things like /assets/ for better maintainance, robustness of the server handlers and speed.
-- Possibly cache the SSG files in memory so that file-system access does not occur every time.
-- Improve the `DeviceService` API.
-- Add a fallback for device feature detection (Firefox and Safari).
-- Finish the link-list component as defined in the designs.
-- Evaluate URL rewriting instead of redirecting for device feature routing, if cache configuration allows it.
-- Add SVG sprite-sheet generation.
-- Optimize composition and boundaries of UI components.
-- Try out Angulars dedicated App Shell feature.
-- Emphasize which breakpoints to focus on for mobile/tablet opimization in context.ts
-  - desktop prio:
+- [ ] Prefix page requests + use url rewrite, so that html requests can be identified by checking a prefix like /page/ instead of filtering out things like /assets/ for better maintainance, robustness of the server handlers and speed.
+- [ ] Possibly cache the SSG files in memory so that file-system access does not occur every time.
+- [ ] Improve the `DeviceService` API.
+- [ ] Add a fallback for device feature detection (Firefox and Safari).
+- [ ] Finish the link-list component as defined in the designs.
+- [ ] Evaluate URL rewriting instead of redirecting for device feature routing, if cache configuration allows it.
+- [ ] Add SVG sprite-sheet generation.
+- [ ] Optimize composition and boundaries of UI components.
+- [ ] Try out Angulars dedicated App Shell feature.
+- [ ] Emphasize which breakpoints to focus on for mobile/tablet opimization in context.ts
 
+  ```
+  desktop prio:
     "800x600",9.01
     "1280x1200",7.44
     "1280x720",3.67
@@ -26,8 +27,7 @@
     "2560x1440",3.08
     "3840x2160",5.26
 
-  - tablet prio:
-
+  tablet prio:
     "601x1007",3.65
     "601x962",3.07
     "768x1024",13.34
@@ -36,8 +36,7 @@
     "820x1180",9.28
     "1280x800",6.67
 
-    --- flipped
-
+  tablet prio (flipped):
     "800x1280",6.67
     "962x601",3.07
     "1007x601",3.65
@@ -46,8 +45,7 @@
     "1180x820",9.28
     "1280x800",7.45
 
-  - mobile prio:
-
+  mobile prio:
     "360x780",3.39
     "360x800",10.21
     "375x812",4.36
@@ -58,8 +56,7 @@
     "412x915",3.49
     "414x896",6.81
 
-    --- flipped
-
+  mobile prio (flipped):
     "780x360",3.39
     "800x360",10.21
     "812x375",4.36
@@ -69,3 +66,4 @@
     "873x393",4.75
     "896x414",6.81
     "915x412",3.49
+  ```
