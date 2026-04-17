@@ -34,16 +34,16 @@
         @if (characterItems().length) {
           <app-link-list>
             @for (character of characterItems(); track character.id) {
-              <app-link-list-item [linkUri]="['/character', character.id]">
+              <li app-link-list-item [linkUri]="['/character', character.id]">
                 {{ character.name }}
-              </app-link-list-item>
+              </li>
             }
           </app-link-list>
         }
       } @placeholder {
         <app-link-list inert>
           @for (characterId of data.characterIds; track characterId) {
-            <app-link-list-item />
+            <li app-link-list-item></li>
           }
         </app-link-list>
       }
@@ -61,16 +61,16 @@
         @if (planetItems().length) {
           <app-link-list>
             @for (planet of planetItems(); track planet.id) {
-              <app-link-list-item [linkUri]="['/planet', planet.id]">
+              <li app-link-list-item [linkUri]="['/planet', planet.id]">
                 {{ planet.name }}
-              </app-link-list-item>
+              </li>
             }
           </app-link-list>
         }
       } @placeholder {
         <app-link-list inert>
           @for (planetId of data.planetIds; track planetId) {
-            <app-link-list-item />
+            <li app-link-list-item></li>
           }
         </app-link-list>
       }

@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core'
 import { RouterLink } from '@angular/router'
 
 @Component({
-  selector: 'app-link-list-item',
+  selector: 'li[app-link-list-item]',
   imports: [RouterLink],
   templateUrl: './link-list-item.html',
   styleUrl: './link-list-item.css',

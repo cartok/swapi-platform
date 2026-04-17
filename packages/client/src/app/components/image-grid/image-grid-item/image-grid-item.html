@@ -18,10 +18,9 @@
       <ng-content />
     </div>
     <a
-      #link
       class="g-label-3 link"
       [routerLink]="linkUri()"
-      [attr.aria-label]="link.textContent.trim()"
+      [attr.aria-label]="`Details about ${label()}`"
     >
       More information...
     </a>

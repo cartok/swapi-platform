@@ -30,16 +30,16 @@
         @if (residentItems().length) {
           <app-link-list>
             @for (resident of residentItems(); track resident.id) {
-              <app-link-list-item [linkUri]="['/character', resident.id]">
+              <li app-link-list-item [linkUri]="['/character', resident.id]">
                 {{ resident.name }}
-              </app-link-list-item>
+              </li>
             }
           </app-link-list>
         }
       } @placeholder {
         <app-link-list inert>
           @for (residentId of data.residentIds; track residentId) {
-            <app-link-list-item />
+            <li app-link-list-item></li>
           }
         </app-link-list>
       }
@@ -52,16 +52,16 @@
         @if (filmItems().length) {
           <app-link-list>
             @for (film of filmItems(); track film.id) {
-              <app-link-list-item [linkUri]="['/movie', film.id]">
+              <li app-link-list-item [linkUri]="['/movie', film.id]">
                 {{ film.title }}
-              </app-link-list-item>
+              </li>
             }
           </app-link-list>
         }
       } @placeholder {
         <app-link-list inert>
           @for (filmId of data.filmIds; track filmId) {
-            <app-link-list-item />
+            <li app-link-list-item></li>
           }
         </app-link-list>
       }

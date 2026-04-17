@@ -95,6 +95,19 @@ export default defineConfig(
     },
   },
   {
+    files: ['./packages/client/src/app/components/link-list/link-list-item/link-list-item.ts'],
+    rules: {
+      '@angular-eslint/component-selector': [
+        'error',
+        {
+          type: 'attribute',
+          prefix: 'app',
+          style: 'kebab-case',
+        },
+      ],
+    },
+  },
+  {
     files: ['./packages/client/src/**/*.html'],
     extends: [angular.configs.templateAll],
     rules: {
