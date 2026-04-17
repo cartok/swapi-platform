@@ -16,12 +16,12 @@ tasks:
         - name: PROFILE
           enum: [debug, release]
     sources:
+      - ./index.html
       - ./package.json
       - ./vite.config.ts
-      - ./tsconfig/tsconfig.app.json
-      - ./tsconfig/tsconfig.app.base.json
-      - '{{.TSCONFIG}}'
-      - ./src/**/*
+      - ./tsconfig/**/*.json
+      - ./src/**/*.{ts,json}
+      - ../../../packages/shared/src/**/*.ts
     cmds:
       - bunx --no-install tsc --noEmit --project '{{.TSCONFIG}}'
 
