@@ -15,7 +15,6 @@ import { addSsrHandler } from '#internal/ssr/ssr.handler'
 
 const hono = new Hono<ServerEnv>({ strict: false })
 
-addErrorHandler(hono)
 addSecurityHandler(hono)
 addRequestContextHandler(hono)
 addDeviceContextHandler(hono)
@@ -23,6 +22,7 @@ addDeviceRedirectHandler(hono)
 addAssetHandler(hono)
 addSsgHandler(hono)
 addSsrHandler(hono)
+addErrorHandler(hono)
 
 const fetch = env.SWAPI_TARGET === 'local' ? hono.fetch : fetchWithForwardedProtocol(hono)
 
