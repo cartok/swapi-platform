@@ -4,23 +4,23 @@ import {
   findClosestHeightBreakpoint,
   findClosestWidthBreakpoint,
 } from '@swapi/shared/device/context'
-import type { Hono } from 'hono'
 import { parseItem, parseList } from 'structured-headers'
 
-import type { ServerEnv } from '#internal/server.types'
+import type { Handler } from '#internal/server.types'
 import { isHtmlDocumentRequest } from '#internal/shared/request-filter'
 
 type HeaderType = string | undefined
 
-export function addDeviceContextHandler(server: Hono<ServerEnv>): void {
-  server.get('*', (c, next) => {
-    if (
-      !isHtmlDocumentRequest({
-        method: c.req.method,
-        pathname: c.req.path,
-        acceptHeader: c.req.header('accept'),
-      })
-    ) {
+export const addDeviceContextHandler: Handler = (hono) => {
+  hono.get('*', (c, next) => {
+    const isDocumentRequest = isHtmlDocumentRequest({
+      method: c.req.method,
+      pathname: c.req.path,
+      acceptHeader: c.req.header('accept'),
+    })
+    c.set('isHtmlDocumentRequest', isDocumentRequest)
+
+    if (!isDocumentRequest) {
       return next()
     }
 

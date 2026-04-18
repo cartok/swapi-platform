@@ -1,14 +1,13 @@
-import type { Hono } from 'hono'
-
 import { allowedHosts, env } from '#internal/env'
-import type { ServerEnv } from '#internal/server.types'
+import type { Handler } from '#internal/server.types'
 
 const allowedHostSet: Readonly<Set<string>> = new Set(allowedHosts)
 
-export function addSecurityHandler(server: Hono<ServerEnv>): void {
-  server.use('*', async (c, next) => {
+export const addSecurityHandler: Handler = (hono) => {
+  hono.use('*', async (c, next) => {
     const requestUrl = new URL(c.req.url)
     const protocol = requestUrl.protocol.slice(0, -1)
+
     if (env.SWAPI_TARGET === 'local') {
       if (!/^http$/.test(protocol)) {
         throw new Error(`Invalid protocol ${protocol}.`)

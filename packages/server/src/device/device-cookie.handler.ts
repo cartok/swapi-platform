@@ -1,19 +1,19 @@
 import type { DeviceCookie } from '@swapi/shared/generated/types/device-cookie.types'
 import { validate } from '@swapi/shared/generated/validators/device-cookie.validator'
-import type { Context, Hono } from 'hono'
+import type { Context } from 'hono'
 import { bodyLimit } from 'hono/body-limit'
 import { deleteCookie, getCookie, setCookie } from 'hono/cookie'
 
 import { env } from '#internal/env'
-import type { ServerEnv } from '#internal/server.types'
+import type { Handler } from '#internal/server.types'
 
 const DEVICE_COOKIE_KEY = 'device'
 const DEVICE_COOKIE_BODY_LIMIT_BYTES = 200
 const PRODUCTION_DEVICE_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 7
 const LOCAL_DEVICE_COOKIE_MAX_AGE_SECONDS = 60 * 2
 
-export function addDeviceCookieHandler(server: Hono<ServerEnv>): void {
-  server.post(
+export const addDeviceCookieHandler: Handler = (hono) => {
+  hono.post(
     '/device-cookie',
     bodyLimit({
       maxSize: DEVICE_COOKIE_BODY_LIMIT_BYTES,

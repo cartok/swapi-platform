@@ -3,24 +3,16 @@ import {
   isDeviceContextPathSegment,
 } from '@swapi/shared/device/context'
 import { ERROR_PATH } from '@swapi/shared/routing/paths'
-import type { Hono } from 'hono'
 import { deleteCookie, getCookie, setCookie } from 'hono/cookie'
 
 import { env } from '#internal/env'
-import type { ServerEnv } from '#internal/server.types'
-import { isHtmlDocumentRequest } from '#internal/shared/request-filter'
+import type { Handler } from '#internal/server.types'
 
 const JUST_REDIRECTED_COOKIE_KEY = 'justRedirected'
 
-export function addDeviceRedirectHandler(server: Hono<ServerEnv>): void {
-  server.get('*', (c, next) => {
-    if (
-      !isHtmlDocumentRequest({
-        method: c.req.method,
-        pathname: c.req.path,
-        acceptHeader: c.req.header('accept'),
-      })
-    ) {
+export const addDeviceRedirectHandler: Handler = (hono) => {
+  hono.get('*', (c, next) => {
+    if (!c.get('isHtmlDocumentRequest')) {
       return next()
     }
 
@@ -39,10 +31,15 @@ export function addDeviceRedirectHandler(server: Hono<ServerEnv>): void {
     // Any existing device context parameter gets replaced.
     const deviceContext = c.get('deviceContext')
     const deviceContextPathSegment = deviceContextToPathSegment(deviceContext)
-    const currentUrl = createPathWithSearch(c.req.url)
-    const deviceContextUrl = createDeviceContextUrl(currentUrl, deviceContextPathSegment)
+    const requestUrl = new URL(c.req.url)
+    const relativeRequestUrl = requestUrl.pathname + requestUrl.search
+    const relativeDeviceContextUrl = createRelativeDeviceContextUrl({
+      pathname: requestUrl.pathname,
+      search: requestUrl.search,
+      deviceContextPathSegment,
+    })
 
-    if (deviceContextUrl === currentUrl) {
+    if (relativeDeviceContextUrl === relativeRequestUrl) {
       return next()
     }
 
@@ -54,22 +51,21 @@ export function addDeviceRedirectHandler(server: Hono<ServerEnv>): void {
       path: '/',
     })
 
-    return c.redirect(deviceContextUrl, 302)
+    return c.redirect(relativeDeviceContextUrl, 302)
   })
 }
 
-function createPathWithSearch(absoluteUrl: string): string {
-  const url = new URL(absoluteUrl)
-  return url.pathname + url.search
-}
-
-function createDeviceContextUrl(
-  originalUrl: string,
-  deviceContextPathSegment: string,
-): string {
-  const tempUrl = new URL(originalUrl, 'http://1337') // host is not necessary
-  const hadTrailingSlash = tempUrl.pathname.length > 1 && tempUrl.pathname.endsWith('/')
-  const segments = tempUrl.pathname.split('/')
+function createRelativeDeviceContextUrl({
+  pathname,
+  search,
+  deviceContextPathSegment,
+}: {
+  pathname: string
+  search: string
+  deviceContextPathSegment: string
+}): string {
+  const hadTrailingSlash = pathname.length > 1 && pathname.endsWith('/')
+  const segments = pathname.split('/')
   segments.shift()
 
   if (isDeviceContextPathSegment.test(segments[0])) {
@@ -81,9 +77,8 @@ function createDeviceContextUrl(
   }
 
   const path = '/' + [deviceContextPathSegment, ...segments].join('/')
-  const pathWithTrailingSlash =
-    hadTrailingSlash || tempUrl.pathname === '/' ? `${path}/` : path
-  const url = pathWithTrailingSlash + tempUrl.search
+  const pathWithTrailingSlash = hadTrailingSlash || pathname === '/' ? `${path}/` : path
+  const url = pathWithTrailingSlash + search
 
   return url
 }

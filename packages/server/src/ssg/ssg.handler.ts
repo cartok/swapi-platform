@@ -2,13 +2,12 @@ import { access, constants, readFile } from 'node:fs/promises'
 import { normalize, resolve, sep } from 'node:path'
 
 import { ssgDistPath } from '@swapi/client/dist-paths'
-import type { Hono } from 'hono'
 
-import type { ServerEnv } from '#internal/server.types'
+import type { Handler } from '#internal/server.types'
 import { isHtmlDocumentRequest } from '#internal/shared/request-filter'
 
-export function addSsgHandler(server: Hono<ServerEnv>): void {
-  server.use('*', async (c, next) => {
+export const addSsgHandler: Handler = (hono) => {
+  hono.use('*', async (c, next) => {
     if (
       !isHtmlDocumentRequest({
         method: c.req.method,
