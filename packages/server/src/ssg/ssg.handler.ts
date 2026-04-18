@@ -4,17 +4,10 @@ import { normalize, resolve, sep } from 'node:path'
 import { ssgDistPath } from '@swapi/client/dist-paths'
 
 import type { Handler } from '#internal/server.types'
-import { isHtmlDocumentRequest } from '#internal/shared/request-filter'
 
 export const addSsgHandler: Handler = (hono) => {
   hono.use('*', async (c, next) => {
-    if (
-      !isHtmlDocumentRequest({
-        method: c.req.method,
-        pathname: c.req.path,
-        acceptHeader: c.req.header('accept'),
-      })
-    ) {
+    if (!c.get('isHtmlDocumentRequest')) {
       return next()
     }
 

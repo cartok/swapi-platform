@@ -4,7 +4,6 @@ import { indexHtmlPath } from '@swapi/client/dist-paths'
 import { allowedHosts } from '#internal/env'
 import type { Handler } from '#internal/server.types'
 import { enableAngularServerMode } from '#internal/shared/angular-server-mode'
-import { isHtmlDocumentRequest } from '#internal/shared/request-filter'
 
 enableAngularServerMode()
 
@@ -14,13 +13,7 @@ void getAngularRenderEngine()
 
 export const addSsrHandler: Handler = (hono) => {
   hono.use('*', async (c) => {
-    if (
-      !isHtmlDocumentRequest({
-        method: c.req.method,
-        pathname: c.req.path,
-        acceptHeader: c.req.header('accept'),
-      })
-    ) {
+    if (!c.get('isHtmlDocumentRequest')) {
       return c.notFound()
     }
 

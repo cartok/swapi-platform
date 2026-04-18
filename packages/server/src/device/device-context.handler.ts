@@ -6,19 +6,12 @@ import {
 } from '@swapi/shared/device/context'
 
 import type { Handler } from '#internal/server.types'
-import { isHtmlDocumentRequest } from '#internal/shared/request-filter'
 
 type HeaderType = string | undefined
 
 export const addDeviceContextHandler: Handler = (hono) => {
   hono.get('*', (c, next) => {
-    const isDocumentRequest = isHtmlDocumentRequest({
-      method: c.req.method,
-      pathname: c.req.path,
-      acceptHeader: c.req.header('accept'),
-    })
-    c.set('isHtmlDocumentRequest', isDocumentRequest)
-
+    const isDocumentRequest = c.get('isHtmlDocumentRequest')
     if (!isDocumentRequest) {
       return next()
     }

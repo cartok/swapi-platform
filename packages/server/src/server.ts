@@ -6,6 +6,7 @@ import { addDeviceContextHandler } from '#internal/device/device-context.handler
 import { addDeviceRedirectHandler } from '#internal/device/device-redirect.handler'
 import { env } from '#internal/env'
 import { addErrorHandler } from '#internal/error/error.handler'
+import { addRequestContextHandler } from '#internal/request/request-context.handler'
 import { fetchWithForwardedProtocol } from '#internal/security/forwarded-headers.handler'
 import { addSecurityHandler } from '#internal/security/security.handler'
 import type { ServerEnv } from '#internal/server.types'
@@ -16,6 +17,7 @@ const hono = new Hono<ServerEnv>({ strict: false })
 
 addErrorHandler(hono)
 addSecurityHandler(hono)
+addRequestContextHandler(hono)
 addDeviceContextHandler(hono)
 addDeviceRedirectHandler(hono)
 addAssetHandler(hono)

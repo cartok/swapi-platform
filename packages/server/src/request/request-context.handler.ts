@@ -2,10 +2,19 @@ import { readdirSync } from 'node:fs'
 
 import { browserDistPath } from '@swapi/client/dist-paths'
 
-interface HtmlDocumentRequestInput {
-  method: string
-  pathname: string
-  acceptHeader: string | undefined
+import type { Handler } from '#internal/server.types'
+
+export const addRequestContextHandler: Handler = (hono) => {
+  hono.use('*', (c, next) => {
+    const isDocumentRequest = isHtmlDocumentRequest({
+      method: c.req.method,
+      pathname: c.req.path,
+      acceptHeader: c.req.header('accept'),
+    })
+
+    c.set('isHtmlDocumentRequest', isDocumentRequest)
+    return next()
+  })
 }
 
 const STATIC_DIRECTORY_EXCLUDED_PREFIXES: readonly string[] =
@@ -27,11 +36,15 @@ const DOCUMENT_REQUEST_EXCLUDED_PREFIXES: readonly string[] = [
   '/api/',
 ]
 
-export function isHtmlDocumentRequest({
+function isHtmlDocumentRequest({
   method,
   pathname,
   acceptHeader,
-}: HtmlDocumentRequestInput): boolean {
+}: {
+  method: string
+  pathname: string
+  acceptHeader: string | undefined
+}): boolean {
   if (method !== 'GET') {
     return false
   }
@@ -47,7 +60,7 @@ export function isHtmlDocumentRequest({
   return hasHtmlAcceptHeader(acceptHeader)
 }
 
-export function isFileRequestPath(pathname: string): boolean {
+function isFileRequestPath(pathname: string): boolean {
   try {
     return /\.[a-zA-Z0-9]+$/.test(decodeURIComponent(pathname))
   } catch {
