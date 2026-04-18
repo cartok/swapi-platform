@@ -4,7 +4,6 @@ import {
   findClosestHeightBreakpoint,
   findClosestWidthBreakpoint,
 } from '@swapi/shared/device/context'
-import { parseItem, parseList } from 'structured-headers'
 
 import type { Handler } from '#internal/server.types'
 import { isHtmlDocumentRequest } from '#internal/shared/request-filter'
@@ -83,7 +82,7 @@ function parseDeviceFormatHeaders({
   mobileHeader: HeaderType
 }): DeviceContext['format'] | null {
   const formFactor = parseFormFactorHeader(formFactorsHeader)
-  if (typeof formFactor !== 'undefined') {
+  if (formFactor !== null) {
     return formFactor
   }
 
@@ -99,29 +98,19 @@ function parseFormFactorHeader(header: HeaderType): DeviceContext['format'] | nu
     return null
   }
 
-  try {
-    const parsed = parseList(header)
-    for (const member of parsed) {
-      if (Array.isArray(member[0])) {
-        continue
-      }
+  const members = header.split(',')
 
-      const bareItem = member[0]
-      if (typeof bareItem !== 'string') {
-        continue
-      }
-
-      const normalized = bareItem.toLowerCase()
-      if (
-        normalized === 'desktop' ||
-        normalized === 'tablet' ||
-        normalized === 'mobile'
-      ) {
-        return normalized
-      }
+  for (const member of members) {
+    const normalizedMember = member.trim()
+    if (normalizedMember.startsWith('"Desktop"')) {
+      return 'desktop'
     }
-  } catch {
-    return null
+    if (normalizedMember.startsWith('"Mobile"')) {
+      return 'mobile'
+    }
+    if (normalizedMember.startsWith('"Tablet"')) {
+      return 'tablet'
+    }
   }
 
   return null
@@ -132,14 +121,19 @@ function parseViewportDimensionHeader(headerValue: HeaderType): number | null {
     return null
   }
 
-  try {
-    const [bareItem] = parseItem(headerValue)
-    if (typeof bareItem !== 'number' || !Number.isInteger(bareItem) || bareItem <= 0) {
-      return null
-    }
-
-    return bareItem
-  } catch {
+  const normalized = headerValue.trim()
+  if (normalized.length === 0) {
     return null
   }
+
+  if (!/^[1-9][0-9]*$/.test(normalized)) {
+    return null
+  }
+
+  const parsed = Number(normalized)
+  if (!Number.isInteger(parsed) || parsed <= 0) {
+    return null
+  }
+
+  return parsed
 }

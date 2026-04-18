@@ -21,7 +21,6 @@
     "@swapi/client": "workspace:*",
     "@swapi/shared": "workspace:*",
     "hono": "^4.12.12",
-    "structured-headers": "^2.0.2",
     "tslib": "catalog:"
   },
   "devDependencies": {
