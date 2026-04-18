@@ -7,10 +7,11 @@
 - [x] Fix console warnings related to preloaded but unused assets.
 - [x] Optimize for a11y
   - [ ] Eventuall add global focus blur on esc key
+- [ ] Add SVG sprite-sheet generation.
+- [ ] Refactor to Tailwind (4, via vite & lightningcss), as most people prefer tailwind (whyever)
 - [ ] Improve the `DeviceService` API.
 - [ ] Add a fallback for device feature detection (Firefox and Safari).
 - [ ] Finish the link-list component as defined in the designs.
-- [ ] Add SVG sprite-sheet generation.
 - [ ] Optimize composition and boundaries of UI components.
 - [ ] Try out Angulars dedicated App Shell feature.
 - [ ] Emphasize which breakpoints to focus on for mobile/tablet opimization in context.ts
