@@ -11,6 +11,7 @@ const buildVariantPath = `${env.SWAPI_TARGET}/${env.SWAPI_PROFILE}`
 const isMinifyEnabled = env.SWAPI_BUILD_MINIFY
 const rolldownSourcemap = toRolldownSourcemap(env.SWAPI_BUILD_SOURCEMAP)
 const babelSourcemap = toBabelSourcemap(env.SWAPI_BUILD_SOURCEMAP)
+const externalDependencies = new Set(['@swapi/client/dist-paths'])
 
 const serverBundleConfig = defineConfig({
   input: {
@@ -27,7 +28,7 @@ const serverBundleConfig = defineConfig({
       'default',
     ],
   },
-  external: (id) => id === '@swapi/client/dist-paths',
+  external: (id) => externalDependencies.has(id),
   output: {
     dir: `./dist/${buildVariantPath}/bundle`,
     cleanDir: true,
