@@ -16,7 +16,7 @@ COPY ./packages/shared/package.json ./packages/shared/
 COPY ./packages/server/package.json ./packages/server/
 COPY ./packages/client/package.json ./packages/client/
 
-RUN bun install --frozen-lockfile
+RUN bun install --frozen-lockfile --ignore-scripts
 
 FROM deps AS code
 ARG TARGET
