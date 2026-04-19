@@ -37,33 +37,7 @@ const serverBundleConfig = defineConfig({
   },
 })
 
-const dockerScriptsBundleConfig = defineConfig({
-  input: {
-    'create-bundle-link': './docker/create-bundle-link.ts',
-    'start-server-bundle': './docker/start-server-bundle.ts',
-  },
-  tsconfig: './tsconfig/tsconfig.server.docker.json',
-  platform: 'node',
-  resolve: {
-    conditionNames: [
-      `@swapi/${buildVariantPath}`,
-      `@swapi/${env.SWAPI_PROFILE}`,
-      'node',
-      'default',
-    ],
-  },
-  output: {
-    dir: `./dist/${buildVariantPath}/bundle/scripts`,
-    cleanDir: true,
-    entryFileNames: '[name].js',
-    chunkFileNames: 'docker-script-chunk-[hash].js',
-    minify: isMinifyEnabled,
-    comments: !isMinifyEnabled,
-    sourcemap: rolldownSourcemap,
-  },
-})
-
-export default defineConfig([serverBundleConfig, dockerScriptsBundleConfig])
+export default defineConfig([serverBundleConfig])
 
 function toRolldownSourcemap(
   sourceMap: typeof env.SWAPI_BUILD_SOURCEMAP,

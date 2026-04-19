@@ -2,7 +2,6 @@
   "files": [],
   "references": [
     { "path": "./tsconfig/tsconfig.server.bundle.json" },
-    { "path": "./tsconfig/tsconfig.server.docker.json" },
     { "path": "./tsconfig/tsconfig.server.json" }
   ]
 }

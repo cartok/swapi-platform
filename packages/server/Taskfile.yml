@@ -21,12 +21,10 @@ tasks:
       - task: :shared:generate
     sources:
       - '{{.TSCONFIG}}'
-      - ./tsconfig/tsconfig.server.docker.json
       - ./src/**/*
       - ./docker/**/*
     cmds:
       - bunx --no-install tsc --noEmit --project '{{.TSCONFIG}}'
-      - bunx --no-install tsc --project ./tsconfig/tsconfig.server.docker.json
 
   dev:
     vars:
@@ -188,7 +186,6 @@ tasks:
       SWAPI_RUN_MODE: build
     sources:
       - ./tsconfig/tsconfig.server.bundle.json
-      - ./tsconfig/tsconfig.server.docker.json
       - ./rolldown.config.ts
       - ./docker/**/*.ts
       - '{{.BUILD_DIST_DIR}}/**/*'
