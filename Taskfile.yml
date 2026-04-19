@@ -119,9 +119,10 @@ tasks:
     cmds:
       - >
         docker buildx build --load
-        --build-arg TARGET={{.TARGET}}
-        --build-arg PROFILE={{.PROFILE}}
-        --tag swapi-angular:{{.TARGET}}-{{.PROFILE}}
+        --build-arg NODE_ENV=${NODE_ENV}
+        --build-arg PROFILE=${SWAPI_PROFILE}
+        --build-arg TARGET=${SWAPI_TARGET}
+        --tag swapi-angular:${SWAPI_TARGET}-${SWAPI_PROFILE}
         ./
 
   docker:start:

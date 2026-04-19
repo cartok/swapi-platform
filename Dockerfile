@@ -1,8 +1,11 @@
 ARG BUN_VERSION=1.3.12
+ARG NODE_ENV
 ARG TARGET
 ARG PROFILE
 
 FROM oven/bun:${BUN_VERSION}-slim AS deps
+ARG NODE_ENV
+ENV NODE_ENV=${NODE_ENV}
 ARG TARGET
 ARG PROFILE
 WORKDIR /app
@@ -54,11 +57,15 @@ COPY ./packages/server/Taskfile.yml ./packages/server/
 COPY ./packages/client/Taskfile.yml ./packages/client/
 
 FROM code AS build-bundle
+ARG NODE_ENV
+ENV NODE_ENV=${NODE_ENV}
 ARG TARGET
 ARG PROFILE
 RUN bunx --no-install task server:build:bundle TARGET=${TARGET} PROFILE=${PROFILE}
 
 FROM oven/bun:${BUN_VERSION}-distroless AS runtime
+ARG NODE_ENV
+ENV NODE_ENV=${NODE_ENV}
 ARG TARGET
 ARG PROFILE
 WORKDIR /app
