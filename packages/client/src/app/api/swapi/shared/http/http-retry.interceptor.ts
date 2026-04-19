@@ -22,22 +22,22 @@ const RETRYABLE_HTTP_METHODS = new Set<string>(['GET', 'HEAD'])
 const DEFAULT_HTTP_RETRY_POLICY: HttpRetryPolicy = {
   enabled: true,
   retryCount: 2,
-  baseDelayMs: 150,
-  maxDelayMs: 2_000,
+  baseDelayMs: 100,
+  maxDelayMs: 1_000,
 }
 
 export const MINIMAL_HTTP_RETRY_POLICY: HttpRetryPolicy = {
   enabled: true,
   retryCount: 1,
   baseDelayMs: 150,
-  maxDelayMs: 200,
+  maxDelayMs: 300,
 }
 
 export const CRITICAL_HTTP_RETRY_POLICY: HttpRetryPolicy = {
   enabled: true,
-  retryCount: 5,
-  baseDelayMs: 50,
-  maxDelayMs: 5_000,
+  retryCount: 3,
+  baseDelayMs: 100,
+  maxDelayMs: 1_500,
 }
 
 export const HTTP_RETRY_POLICY = new HttpContextToken<HttpRetryPolicy>(() => ({
