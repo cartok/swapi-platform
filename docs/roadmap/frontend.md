@@ -14,6 +14,7 @@
 - [ ] Finish the link-list component as defined in the designs.
 - [ ] Optimize composition and boundaries of UI components.
 - [ ] Try out Angulars dedicated App Shell feature.
+- [ ] Webmanifest
 - [ ] Emphasize which breakpoints to focus on for mobile/tablet opimization in context.ts
 
   ```
