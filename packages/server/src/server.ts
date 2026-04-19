@@ -8,7 +8,7 @@ import { env } from '#internal/env'
 import { addErrorHandler } from '#internal/error/error.handler'
 import { addIndexingHandler } from '#internal/indexing/indexing.handler'
 import { addRequestContextHandler } from '#internal/request/request-context.handler'
-import { fetchWithForwardedProtocol } from '#internal/security/forwarded-headers.handler'
+import { honoFetchWithForwardedProtocol } from '#internal/security/forwarded-headers.handler'
 import { addSecurityHandler } from '#internal/security/security.handler'
 import type { ServerEnv } from '#internal/server.types'
 import { addSsgHandler } from '#internal/ssg/ssg.handler'
@@ -26,7 +26,8 @@ addSsgHandler(hono)
 addSsrHandler(hono)
 addErrorHandler(hono)
 
-const fetch = env.SWAPI_TARGET === 'local' ? hono.fetch : fetchWithForwardedProtocol(hono)
+const fetch =
+  env.SWAPI_TARGET === 'local' ? hono.fetch : honoFetchWithForwardedProtocol(hono)
 
 const bunServer = {
   hostname: env.SWAPI_SERVER_HOST_INTERNAL,

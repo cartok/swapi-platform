@@ -4,7 +4,9 @@ import { HTTPException } from 'hono/http-exception'
 import { env } from '#internal/env'
 import type { Handler, ServerEnv } from '#internal/server.types'
 
-export const fetchWithForwardedProtocol: Handler<Hono<ServerEnv>['fetch']> = (hono) => {
+export const honoFetchWithForwardedProtocol: Handler<Hono<ServerEnv>['fetch']> = (
+  hono,
+) => {
   return (request, ...rest) => {
     let rewrittenRequest: Request
 
