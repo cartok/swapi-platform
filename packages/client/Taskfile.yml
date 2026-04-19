@@ -74,8 +74,8 @@ tasks:
         ref: .SWAPI_PROFILE | default .PROFILE | default "release"
       TARGET:
         ref: .SWAPI_TARGET | default .TARGET | default "local"
-      BUILD_VARIANT_PATH: '{{.TARGET}}/{{.PROFILE}}'
-      DIST_DIR: './dist/{{.BUILD_VARIANT_PATH}}/browser'
+      VARIANT_PATH: '{{.TARGET}}/{{.PROFILE}}'
+      DIST_DIR: './dist/{{.VARIANT_PATH}}/browser'
       TSCONFIG: './tsconfig/tsconfig.vite{{if eq .PROFILE "release"}}.release{{end}}.json'
     requires:
       vars:
@@ -117,8 +117,8 @@ tasks:
         ref: .SWAPI_PROFILE | default .PROFILE | default "release"
       TARGET:
         ref: .SWAPI_TARGET | default .TARGET | default "local"
-      BUILD_VARIANT_PATH: '{{.TARGET}}/{{.PROFILE}}'
-      DIST_DIR: './dist/{{.BUILD_VARIANT_PATH}}/ssr'
+      VARIANT_PATH: '{{.TARGET}}/{{.PROFILE}}'
+      DIST_DIR: './dist/{{.VARIANT_PATH}}/ssr'
       TSCONFIG: './tsconfig/tsconfig.vite{{if eq .PROFILE "release"}}.release{{end}}.json'
     requires:
       vars:
@@ -161,8 +161,8 @@ tasks:
         ref: .SWAPI_PROFILE | default .PROFILE | default "release"
       TARGET:
         ref: .SWAPI_TARGET | default .TARGET | default "local"
-      BUILD_VARIANT_PATH: '{{.TARGET}}/{{.PROFILE}}'
-      DIST_PATH: './dist/{{.BUILD_VARIANT_PATH}}'
+      VARIANT_PATH: '{{.TARGET}}/{{.PROFILE}}'
+      DIST_PATH: './dist/{{.VARIANT_PATH}}'
     requires:
       vars:
         - name: PROFILE
@@ -186,8 +186,8 @@ tasks:
         ref: .SWAPI_PROFILE | default .PROFILE | default "release"
       TARGET:
         ref: .SWAPI_TARGET | default .TARGET | default "local"
-      BUILD_VARIANT_PATH: '{{.TARGET}}/{{.PROFILE}}'
-      DIST_DIR: './dist/{{.BUILD_VARIANT_PATH}}/browser'
+      VARIANT_PATH: '{{.TARGET}}/{{.PROFILE}}'
+      DIST_DIR: './dist/{{.VARIANT_PATH}}/browser'
     requires:
       vars:
         - name: PROFILE

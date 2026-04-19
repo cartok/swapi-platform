@@ -60,12 +60,12 @@ tasks:
         ref: .SWAPI_PROFILE | default .PROFILE | default "release"
       TARGET:
         ref: .SWAPI_TARGET | default .TARGET | default "local"
-      BUILD_VARIANT_PATH: '{{.TARGET}}/{{.PROFILE}}'
-      BUILD_DIST_DIR: './dist/{{.BUILD_VARIANT_PATH}}/build'
-      TARGET_AND_PROFILE_CONDITION: '@swapi/{{.BUILD_VARIANT_PATH}}'
+      VARIANT_PATH: '{{.TARGET}}/{{.PROFILE}}'
+      BUILD_DIST_DIR: './dist/{{.VARIANT_PATH}}/build'
+      TARGET_AND_PROFILE_CONDITION: '@swapi/{{.VARIANT_PATH}}'
       PROFILE_CONDITION: '@swapi/{{.PROFILE}}'
       TSCONFIG: './tsconfig/tsconfig.server{{if eq .PROFILE "release"}}.release{{end}}.json'
-      CLIENT_DIST_ROOT: '../client/dist/{{.BUILD_VARIANT_PATH}}'
+      CLIENT_DIST_ROOT: '../client/dist/{{.VARIANT_PATH}}'
       CLIENT_SSG_DIST_DIR: '{{.CLIENT_DIST_ROOT}}/ssg'
       CLIENT_SSR_ENTRY: '{{.CLIENT_DIST_ROOT}}/ssr/main.server.js'
     requires:
@@ -129,8 +129,8 @@ tasks:
         ref: .SWAPI_PROFILE | default .PROFILE | default "release"
       TARGET:
         ref: .SWAPI_TARGET | default .TARGET | default "local"
-      BUILD_VARIANT_PATH: '{{.TARGET}}/{{.PROFILE}}'
-      BUILD_DIST_DIR: './dist/{{.BUILD_VARIANT_PATH}}/build'
+      VARIANT_PATH: '{{.TARGET}}/{{.PROFILE}}'
+      BUILD_DIST_DIR: './dist/{{.VARIANT_PATH}}/build'
       TSCONFIG: './tsconfig/tsconfig.server{{if eq .PROFILE "release"}}.release{{end}}.json'
     requires:
       vars:
@@ -165,11 +165,11 @@ tasks:
         ref: .SWAPI_PROFILE | default .PROFILE | default "release"
       TARGET:
         ref: .SWAPI_TARGET | default .TARGET | default "local"
-      BUILD_VARIANT_PATH: '{{.TARGET}}/{{.PROFILE}}'
-      DIST_ROOT: './dist/{{.BUILD_VARIANT_PATH}}'
+      VARIANT_PATH: '{{.TARGET}}/{{.PROFILE}}'
+      DIST_ROOT: './dist/{{.VARIANT_PATH}}'
       BUILD_DIST_DIR: '{{.DIST_ROOT}}/build'
       BUNDLE_DIST_DIR: '{{.DIST_ROOT}}/bundle'
-      TARGET_AND_PROFILE_CONDITION: '@swapi/{{.BUILD_VARIANT_PATH}}'
+      TARGET_AND_PROFILE_CONDITION: '@swapi/{{.VARIANT_PATH}}'
       PROFILE_CONDITION: '@swapi/{{.PROFILE}}'
     requires:
       vars:
@@ -208,9 +208,9 @@ tasks:
         ref: .SWAPI_PROFILE | default .PROFILE | default "release"
       TARGET:
         ref: .SWAPI_TARGET | default .TARGET | default "local"
-      BUILD_VARIANT_PATH: '{{.TARGET}}/{{.PROFILE}}'
-      BUILD_DIST_DIR: './dist/{{.BUILD_VARIANT_PATH}}/build'
-      TARGET_AND_PROFILE_CONDITION: '@swapi/{{.BUILD_VARIANT_PATH}}'
+      VARIANT_PATH: '{{.TARGET}}/{{.PROFILE}}'
+      BUILD_DIST_DIR: './dist/{{.VARIANT_PATH}}/build'
+      TARGET_AND_PROFILE_CONDITION: '@swapi/{{.VARIANT_PATH}}'
       PROFILE_CONDITION: '@swapi/{{.PROFILE}}'
     requires:
       vars:
@@ -240,9 +240,9 @@ tasks:
         ref: .SWAPI_PROFILE | default .PROFILE | default "release"
       TARGET:
         ref: .SWAPI_TARGET | default .TARGET | default "local"
-      BUILD_VARIANT_PATH: '{{.TARGET}}/{{.PROFILE}}'
-      BUNDLE_DIST_DIR: './dist/{{.BUILD_VARIANT_PATH}}/bundle'
-      TARGET_AND_PROFILE_CONDITION: '@swapi/{{.BUILD_VARIANT_PATH}}'
+      VARIANT_PATH: '{{.TARGET}}/{{.PROFILE}}'
+      BUNDLE_DIST_DIR: './dist/{{.VARIANT_PATH}}/bundle'
+      TARGET_AND_PROFILE_CONDITION: '@swapi/{{.VARIANT_PATH}}'
       PROFILE_CONDITION: '@swapi/{{.PROFILE}}'
     requires:
       vars:
