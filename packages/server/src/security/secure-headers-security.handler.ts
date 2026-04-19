@@ -2,7 +2,7 @@ import type { MiddlewareHandler } from 'hono'
 import { secureHeaders } from 'hono/secure-headers'
 
 import { env } from '#internal/env'
-import type { Handler, ServerEnv } from '#internal/server.types'
+import type { Handler, ServerEnv } from '#internal/types'
 
 const globalSecureHeaders: MiddlewareHandler<ServerEnv> = secureHeaders({
   strictTransportSecurity: env.SWAPI_TARGET !== 'production' ? false : 'max-age=300',

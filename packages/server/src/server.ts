@@ -11,9 +11,9 @@ import { addRequestContextHandler } from '#internal/request/request-context.hand
 import { honoFetchWithForwardedProtocol } from '#internal/security/forwarded-headers'
 import { addRequestGuardSecurityHandler } from '#internal/security/request-guard-security.handler'
 import { addSecureHeadersSecurityHandler } from '#internal/security/secure-headers-security.handler'
-import type { ServerEnv } from '#internal/server.types'
 import { addSsgHandler } from '#internal/ssg/ssg.handler'
 import { addSsrHandler } from '#internal/ssr/ssr.handler'
+import type { ServerEnv } from '#internal/types'
 
 const hono = new Hono<ServerEnv>({ strict: false })
 

@@ -5,7 +5,7 @@ import { bodyLimit } from 'hono/body-limit'
 import { deleteCookie, getCookie, setCookie } from 'hono/cookie'
 
 import { env } from '#internal/env'
-import type { Handler } from '#internal/server.types'
+import type { Handler } from '#internal/types'
 
 const DEVICE_COOKIE_KEY = 'device'
 const DEVICE_COOKIE_BODY_LIMIT_BYTES = 200

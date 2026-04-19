@@ -5,7 +5,7 @@ import {
   findClosestWidthBreakpoint,
 } from '@swapi/shared/device/context'
 
-import type { Handler } from '#internal/server.types'
+import type { Handler } from '#internal/types'
 
 type HeaderType = string | undefined
 

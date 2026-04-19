@@ -6,7 +6,7 @@ import { ERROR_PATH } from '@swapi/shared/routing/paths'
 import { deleteCookie, getCookie, setCookie } from 'hono/cookie'
 
 import { env } from '#internal/env'
-import type { Handler } from '#internal/server.types'
+import type { Handler } from '#internal/types'
 
 const JUST_REDIRECTED_COOKIE_KEY = 'justRedirected'
 

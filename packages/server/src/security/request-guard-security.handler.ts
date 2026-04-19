@@ -1,5 +1,5 @@
 import { allowedHosts, env } from '#internal/env'
-import type { Handler } from '#internal/server.types'
+import type { Handler } from '#internal/types'
 
 const allowedHostSet: Readonly<Set<string>> = new Set(allowedHosts)
 

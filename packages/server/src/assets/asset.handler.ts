@@ -2,7 +2,7 @@ import { browserDistPath } from '@swapi/client/dist-paths'
 import { serveStatic } from 'hono/bun'
 
 import { env } from '#internal/env'
-import type { Handler } from '#internal/server.types'
+import type { Handler } from '#internal/types'
 
 export const addAssetHandler: Handler = (hono) => {
   const cacheControl =

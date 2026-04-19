@@ -2,8 +2,8 @@ import { CommonEngine } from '@angular/ssr/node'
 import { indexHtmlPath } from '@swapi/client/dist-paths'
 
 import { allowedHosts } from '#internal/env'
-import type { Handler } from '#internal/server.types'
 import { enableAngularServerMode } from '#internal/shared/angular-server-mode'
+import type { Handler } from '#internal/types'
 
 enableAngularServerMode()
 

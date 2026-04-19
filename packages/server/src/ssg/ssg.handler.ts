@@ -3,7 +3,7 @@ import { normalize, resolve, sep } from 'node:path'
 
 import { ssgDistPath } from '@swapi/client/dist-paths'
 
-import type { Handler } from '#internal/server.types'
+import type { Handler } from '#internal/types'
 
 export const addSsgHandler: Handler = (hono) => {
   hono.use('*', async (c, next) => {

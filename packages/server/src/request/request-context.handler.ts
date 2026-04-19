@@ -2,7 +2,7 @@ import { readdirSync } from 'node:fs'
 
 import { browserDistPath } from '@swapi/client/dist-paths'
 
-import type { Handler } from '#internal/server.types'
+import type { Handler } from '#internal/types'
 
 export const addRequestContextHandler: Handler = (hono) => {
   hono.use('*', (c, next) => {

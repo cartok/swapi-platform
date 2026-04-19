@@ -1,4 +1,4 @@
-import type { Handler } from '#internal/server.types'
+import type { Handler } from '#internal/types'
 
 export const addIndexingHandler: Handler = (hono) => {
   hono.use('*', (c, next) => {

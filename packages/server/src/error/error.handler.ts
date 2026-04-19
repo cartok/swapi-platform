@@ -1,6 +1,6 @@
 import { ERROR_PATH } from '@swapi/shared/routing/paths'
 
-import type { Handler } from '#internal/server.types'
+import type { Handler } from '#internal/types'
 
 export const addErrorHandler: Handler = (hono) => {
   hono.onError((error, c) => {
