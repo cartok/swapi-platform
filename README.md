@@ -68,9 +68,23 @@ SWAPI is intentionally integrated defensively because of schema and data inconsi
 
 ### Prerequisites
 
-- Node.js `24.14.1`
-- Bun `1.x`
-- Task runner: either `task` installed globally or via `bunx --no-install task`
+- **Node.js**
+
+  Version: 24.14.1
+
+  It's recommended to have a node version manager compatible with .node-version set up for automatic installation and update of the Node.js version used in the project.
+
+- **Bun**
+
+  Version: 1.x
+
+  Only necessary to install the dependencies. The bun binary that is to be used for in the project will be installed via `package.json` and is used throughout the tasks via `bunx bun` in order to align the bun version for every developer and with the production runtime environment _(a fixed version of oven/bun docker image is used)_.
+
+- **Taskfile**
+
+  It's recommended to install Taskfile on the system plus setting up shell completion.
+
+  Otherwise you could run: `bunx [--no-install] task`
 
 ### Install
 
@@ -78,28 +92,37 @@ SWAPI is intentionally integrated defensively because of schema and data inconsi
 bun i
 ```
 
-### Run locally
+### Run
+
+<!-- TODO: Write about PROFILE x TARGET build independency -->
 
 ```bash
-# Angular dev server (client only)
+# Start `vite` dev server (only CSR, hot reload).
 task client:dev
 
-# Angular preview server after browser build
+# ~ Build and start with `release` profile.
 task client:start
 
-# Full server pipeline (device context + SSG + SSR)
+# Start `bun` + `hono` server with SSG and SSR in dev mode.
+# Notice: It's not yet fully direct code execution, no client hot reload.
 task server:dev
 
-# Full server pipeline in release profile
+# ~ Build and start with `release` profile.
 task server:start
+
+# ~ Add bundling.
+task server:bundle
+
+# ~ Build and run in Docker.
+task docker:start
 ```
 
 Local URLs:
 
-- Client dev server: `http://localhost:4200`
-- Client preview server: `http://localhost:4300`
-- SSR/SSG dev server: `http://localhost:50000`
-- SSR/SSG preview server: `http://localhost:51000`
+- App's vite server in development mode: `http://localhost:4200`
+- App's vite server in production mode: `http://localhost:4300`
+- App's bun + hono Server in development mode: `http://localhost:50000`
+- App's bun + hono Server in production mode: `http://localhost:51000`
 
 ## Build, Bundle, and Quality
 
@@ -124,25 +147,6 @@ Use `PROFILE` and `TARGET` explicitly when needed:
 - `TARGET`:
   - server: `local`, `testing`, `production`
   - client browser build also supports `pages`
-
-Examples:
-
-```bash
-task server:build:with-ssg PROFILE=release TARGET=local
-task server:build:bundle PROFILE=release TARGET=local
-task server:start:bundle PROFILE=release TARGET=local
-```
-
-> By default the all commands use TARGET=local, `dev` commands prefer to use `PROFILE=debug` and `build|start` commands use `PROFILE=release`.
-
-## Docker
-
-```bash
-task docker:build
-task docker:start
-```
-
-The container exposes the server on port `51000` by default.
 
 ## Environment Configuration
 
