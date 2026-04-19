@@ -4,6 +4,6 @@ if (!angularCompiler.VERSION.full) {
   throw new Error('Angular compiler failed to load.')
 }
 
-const { default: server } = await import('./server.js')
+const { default: bunServerOptions } = await import('./server.js')
 
-export default server
+export default bunServerOptions

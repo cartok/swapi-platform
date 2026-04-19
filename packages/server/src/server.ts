@@ -31,10 +31,10 @@ addErrorHandler(hono)
 const fetch =
   env.SWAPI_TARGET === 'local' ? hono.fetch : honoFetchWithForwardedProtocol(hono)
 
-const bunServer = {
+const bunServerOptions = {
   hostname: env.SWAPI_SERVER_HOST_INTERNAL,
   port: env.SWAPI_SERVER_PORT,
   fetch,
 } satisfies Serve.Options<undefined>
 
-export default bunServer
+export default bunServerOptions
