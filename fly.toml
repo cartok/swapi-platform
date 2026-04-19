@@ -1,11 +1,6 @@
 app = 'swapi-platform'
 primary_region = 'fra'
 
-[build]
-  [build.args]
-    PROFILE="release"
-    TARGET="testing"
-
 [http_service]
   internal_port = 51000
   force_https = true

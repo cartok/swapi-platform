@@ -158,3 +158,25 @@ tasks:
             --name swapi-angular \
             swapi-angular:{{.TARGET}}-{{.PROFILE}}
         '
+
+  deploy:
+    vars:
+      PROFILE:
+        ref: .SWAPI_PROFILE | default .PROFILE | default "release"
+      TARGET:
+        ref: .SWAPI_TARGET | default .TARGET | default "testing"
+    requires:
+      vars:
+        - name: PROFILE
+          enum: [debug, release]
+        - name: TARGET
+          enum: [testing, production]
+    dotenv:
+      - ./packages/server/.env/.env.{{.TARGET}}.{{.PROFILE}}.docker
+      - ./packages/server/.env/.env.{{.TARGET}}.{{.PROFILE}}
+    cmds:
+      - >
+        fly deploy
+        --build-arg NODE_ENV=${NODE_ENV}
+        --build-arg PROFILE=${SWAPI_PROFILE}
+        --build-arg TARGET=${SWAPI_TARGET}
