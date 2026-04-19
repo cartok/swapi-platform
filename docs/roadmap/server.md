@@ -11,3 +11,5 @@
 - [ ] Eventually make use of bun's file API, but first try out CF worker for the whole server
 - [x] Deny crawlers for now.
 - [x] Deny indexing for now.
+- [ ] Analyze cause for PU02 errors.
+- [ ] Eventually make more use of hono's MiddlewareHandler and Handler types
