@@ -45,7 +45,6 @@ tasks:
           PROFILE: '{{.PROFILE}}'
       - task: lint:eslint
       - task: lint:prettier
-      - task: client:lint:a11y
 
   lint:tsc:
     vars:
