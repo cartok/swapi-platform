@@ -7,9 +7,6 @@
   "workspaces": [
     "packages/*"
   ],
-  "scripts": {
-    "postinstall": "browser-driver-manager install chrome"
-  },
   "catalog": {
     "@types/node": "^24.x",
     "@types/bun": "~1.3.12",

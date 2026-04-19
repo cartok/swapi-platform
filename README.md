@@ -89,7 +89,7 @@ SWAPI is intentionally integrated defensively because of schema and data inconsi
 ### Install
 
 ```bash
-bun i
+task i
 ```
 
 ### Run

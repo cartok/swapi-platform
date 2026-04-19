@@ -22,6 +22,15 @@ tasks:
       - task: server:clean
       - rm -rf ./.cache || true
 
+  install:
+    aliases:
+      - i
+    preconditions:
+      - sh: command -v bun
+    cmds:
+      - bun install --link-native-bins
+      - bunx browser-driver-manager install chrome
+
   lint:
     vars:
       PROFILE:
