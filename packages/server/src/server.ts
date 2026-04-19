@@ -8,17 +8,19 @@ import { env } from '#internal/env'
 import { addErrorHandler } from '#internal/error/error.handler'
 import { addIndexingHandler } from '#internal/indexing/indexing.handler'
 import { addRequestContextHandler } from '#internal/request/request-context.handler'
-import { honoFetchWithForwardedProtocol } from '#internal/security/forwarded-headers.handler'
-import { addSecurityHandler } from '#internal/security/security.handler'
+import { honoFetchWithForwardedProtocol } from '#internal/security/forwarded-headers'
+import { addRequestGuardSecurityHandler } from '#internal/security/request-guard-security.handler'
+import { addSecureHeadersSecurityHandler } from '#internal/security/secure-headers-security.handler'
 import type { ServerEnv } from '#internal/server.types'
 import { addSsgHandler } from '#internal/ssg/ssg.handler'
 import { addSsrHandler } from '#internal/ssr/ssr.handler'
 
 const hono = new Hono<ServerEnv>({ strict: false })
 
-addSecurityHandler(hono)
-addIndexingHandler(hono)
 addRequestContextHandler(hono)
+addSecureHeadersSecurityHandler(hono)
+addRequestGuardSecurityHandler(hono)
+addIndexingHandler(hono)
 addDeviceContextHandler(hono)
 addDeviceRedirectHandler(hono)
 addAssetHandler(hono)

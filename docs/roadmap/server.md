@@ -13,3 +13,5 @@
 - [x] Deny indexing for now.
 - [ ] Analyze cause for PU02 errors.
 - [ ] Eventually make more use of hono's MiddlewareHandler and Handler types
+- [x] Improve security by adding and configuring Hono's Secure Headers Middleware.
+- [ ] Security: Enable Script CSP via nonces: https://hono.dev/docs/middleware/builtin/secure-headers#nonce-attribute
