@@ -32,7 +32,7 @@ const AppServerEnvSchema = Type.Intersect(
 
 export const env = parseEnv(
   {
-    NODE_ENV: process.env['NODE_ENV'],
+    NODE_ENV: process.env.NODE_ENV,
     SWAPI_ALLOWED_HOSTS: process.env['SWAPI_ALLOWED_HOSTS'],
     SWAPI_BUILD_MINIFY: process.env['SWAPI_BUILD_MINIFY'],
     SWAPI_BUILD_SOURCEMAP: process.env['SWAPI_BUILD_SOURCEMAP'],
