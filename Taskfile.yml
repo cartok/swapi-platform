@@ -180,3 +180,5 @@ tasks:
         --build-arg NODE_ENV=${NODE_ENV}
         --build-arg PROFILE=${SWAPI_PROFILE}
         --build-arg TARGET=${SWAPI_TARGET}
+        --compression zstd
+        --compression-level 7
