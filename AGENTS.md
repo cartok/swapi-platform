@@ -2,6 +2,8 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 
 Talk to me in german, even if I sometimes talk in english or mix both up.
 
+When I ask a question, answer the question! DO NOT straightly go ahead and change some code, when it is not clear that the question implies that you should change / fix things.
+
 ## General Best Practices
 
 - Prefer writing code top-down for readability if the language allows it (make use of hoisting)
