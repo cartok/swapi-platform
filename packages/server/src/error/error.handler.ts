@@ -10,7 +10,7 @@ export const addErrorHandler: Handler = (hono) => {
       return c.text('Server Error', 500)
     }
 
-    return c.redirect(`/${PATHS.SSG.ERROR_PATH}`, 302)
+    return c.redirect(`/${PATHS.SSG.ERROR_PATH}`)
   })
 }
 

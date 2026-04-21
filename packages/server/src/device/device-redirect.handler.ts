@@ -51,7 +51,7 @@ export const addDeviceRedirectHandler: Handler = (hono) => {
       path: '/',
     })
 
-    return c.redirect(relativeDeviceContextUrl, 302)
+    return c.redirect(relativeDeviceContextUrl)
   })
 }
 
