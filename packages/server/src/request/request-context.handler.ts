@@ -23,17 +23,11 @@ const STATIC_DIRECTORY_EXCLUDED_PREFIXES: readonly string[] =
 const DOCUMENT_REQUEST_EXCLUDED_PATHS: ReadonlySet<string> = new Set([
   '/favicon.ico',
   '/robots.txt',
-  '/healthz',
-  '/livez',
-  '/readyz',
 ])
 
 const DOCUMENT_REQUEST_EXCLUDED_PREFIXES: readonly string[] = [
   ...STATIC_DIRECTORY_EXCLUDED_PREFIXES,
   '/.well-known/',
-  '/cdn-cgi/',
-  '/ngsw/',
-  '/api/',
 ]
 
 function isHtmlDocumentRequest({
