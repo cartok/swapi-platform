@@ -149,6 +149,7 @@ tasks:
         --build-arg PROFILE=${SWAPI_PROFILE}
         --build-arg TARGET=${SWAPI_TARGET}
         --tag swapi-angular:${SWAPI_TARGET}-${SWAPI_PROFILE}
+        {{.CLI_ARGS}}
         ./
 
   docker:start:
@@ -208,3 +209,4 @@ tasks:
         --build-arg TARGET=${SWAPI_TARGET}
         --compression zstd
         --compression-level 7
+        {{.CLI_ARGS}}
