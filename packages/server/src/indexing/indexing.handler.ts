@@ -1,7 +1,7 @@
 import type { Handler } from '#internal/types'
 
 export const addIndexingHandler: Handler = (hono) => {
-  hono.use('*', (c, next) => {
+  hono.on(['GET', 'HEAD'], '*', (c, next) => {
     c.header('X-Robots-Tag', 'noindex, nofollow')
     return next()
   })

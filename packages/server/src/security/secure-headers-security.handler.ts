@@ -55,7 +55,7 @@ const htmlDocumentSecureHeaders: MiddlewareHandler<ServerEnv> = secureHeaders({
 
 export const addSecureHeadersSecurityHandler: Handler = (hono) => {
   hono.use('*', globalSecureHeaders)
-  hono.use('*', (c, next) => {
+  hono.get('*', (c, next) => {
     if (!c.get('isHtmlDocumentRequest')) {
       return next()
     }

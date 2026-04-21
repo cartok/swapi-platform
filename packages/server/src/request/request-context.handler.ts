@@ -5,7 +5,7 @@ import { browserDistPath } from '@swapi/client/dist-paths'
 import type { Handler } from '#internal/types'
 
 export const addRequestContextHandler: Handler = (hono) => {
-  hono.use('*', (c, next) => {
+  hono.get('*', (c, next) => {
     const isDocumentRequest = isHtmlDocumentRequest({
       method: c.req.method,
       pathname: c.req.path,

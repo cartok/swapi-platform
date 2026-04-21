@@ -12,7 +12,7 @@ let angularRenderEnginePromise: Promise<CommonEngine> | undefined
 void getAngularRenderEngine()
 
 export const addSsrHandler: Handler = (hono) => {
-  hono.use('*', async (c) => {
+  hono.get('*', async (c, next) => {
     if (!c.get('isHtmlDocumentRequest')) {
       return c.notFound()
     }
