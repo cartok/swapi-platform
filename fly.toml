@@ -1,20 +1,46 @@
 app = 'swapi-platform'
 primary_region = 'fra'
 
-[http_service]
-  internal_port = 51000
-  force_https = true
-  auto_stop_machines = 'stop'
-  auto_start_machines = true
-  min_machines_running = 0
-  processes = ['app']
-  [http_service.concurrency]
-    type = 'requests'
-    soft_limit = 40
-    hard_limit = 80
+kill_signal = 'SIGUSR2'
+kill_timeout = 8
 
 [[vm]]
   size = 'shared-cpu-1x'
   memory = '256MB'
   cpu_kind = 'shared'
   cpus = 1
+
+[deploy]
+  strategy = "rolling"
+
+[checks]
+  [checks.status_live]
+    type = "http"
+    port = 51000
+    interval = "30s"
+    timeout = "2s"
+    grace_period = "15s"
+    method = "HEAD"
+    path = "/status/live"
+    [checks.status_live.headers]
+      X-Forwarded-Proto = "https"
+
+[http_service]
+  internal_port = 51000
+  force_https = true
+  auto_stop_machines = 'suspend'
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ['app']
+  [http_service.concurrency]
+    type = 'requests'
+    soft_limit = 20
+    hard_limit = 40
+  [[http_service.checks]]
+    interval = "15s"
+    timeout = "2s"
+    grace_period = "15s"
+    method = "GET"
+    path = "/status/ready"
+    [http_service.checks.headers]
+      X-Forwarded-Proto = "https"

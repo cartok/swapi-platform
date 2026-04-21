@@ -8,7 +8,7 @@
 
 - [x] Deny crawlers for now.
 - [x] Deny indexing for now.
-- [ ] Implement process signal handling for proper shutdown, inculding healthcheck endpoints
+- [x] Implement process signal handling for proper shutdown, inculding healthcheck endpoints
 - [ ] Once SWAPI certificate got updated, benchmark to find good soft and hard limits
 
 ---

@@ -9,7 +9,9 @@ enableAngularServerMode()
 
 let angularRenderEnginePromise: Promise<CommonEngine> | undefined
 
-void getAngularRenderEngine()
+export async function warmupSsrRenderEngine(): Promise<void> {
+  await getAngularRenderEngine()
+}
 
 export const addSsrHandler: Handler = (hono) => {
   hono.get('*', async (c, next) => {

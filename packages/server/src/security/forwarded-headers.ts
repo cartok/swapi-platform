@@ -2,11 +2,9 @@ import type { Hono } from 'hono'
 import { HTTPException } from 'hono/http-exception'
 
 import { env } from '#internal/env'
-import type { Handler, ServerEnv } from '#internal/types'
+import type { Handler, HonoEnv } from '#internal/types'
 
-export const honoFetchWithForwardedProtocol: Handler<Hono<ServerEnv>['fetch']> = (
-  hono,
-) => {
+export const honoFetchWithForwardedProtocol: Handler<Hono<HonoEnv>['fetch']> = (hono) => {
   return (request, ...rest) => {
     let rewrittenRequest: Request
 

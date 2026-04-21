@@ -1,28 +1,40 @@
 import { Hono } from 'hono'
 
 import { addAssetHandler } from '#internal/assets/asset.handler'
+import { addDebugPaths as addDebugRoutesHandler } from '#internal/debug/debug.handler'
 import { addDeviceContextHandler } from '#internal/device/device-context.handler'
 import { addDeviceRedirectHandler } from '#internal/device/device-redirect.handler'
+import { env } from '#internal/env'
 import { addErrorHandler } from '#internal/error/error.handler'
+import { addHealth as addHealthRoutesHandler } from '#internal/health/health.handler'
 import { addIndexingHandler } from '#internal/indexing/indexing.handler'
 import { addRequestContextHandler } from '#internal/request/request-context.handler'
 import { addRequestGuardSecurityHandler } from '#internal/security/request-guard-security.handler'
 import { addSecureHeadersSecurityHandler } from '#internal/security/secure-headers-security.handler'
 import { addSsgHandler } from '#internal/ssg/ssg.handler'
 import { addSsrHandler } from '#internal/ssr/ssr.handler'
-import type { ServerEnv } from '#internal/types'
+import type { HonoEnv, HonoRunContext } from '#internal/types'
 
-const hono = new Hono<ServerEnv>({ strict: false })
+export function createHono(runContext: HonoRunContext): Hono<HonoEnv> {
+  const hono = new Hono<HonoEnv>({ strict: false })
 
-addRequestContextHandler(hono)
-addSecureHeadersSecurityHandler(hono)
-addRequestGuardSecurityHandler(hono)
-addIndexingHandler(hono)
-addDeviceContextHandler(hono)
-addDeviceRedirectHandler(hono)
-addAssetHandler(hono)
-addSsgHandler(hono)
-addSsrHandler(hono)
-addErrorHandler(hono)
+  addRequestContextHandler(hono, runContext)
+  addSecureHeadersSecurityHandler(hono, runContext)
+  addRequestGuardSecurityHandler(hono, runContext)
+  addIndexingHandler(hono, runContext)
 
-export default hono
+  if (env.SWAPI_TARGET === 'local') {
+    addDebugRoutesHandler(hono, runContext)
+  }
+
+  addHealthRoutesHandler(hono, runContext)
+
+  addDeviceContextHandler(hono, runContext)
+  addDeviceRedirectHandler(hono, runContext)
+  addAssetHandler(hono, runContext)
+  addSsgHandler(hono, runContext)
+  addSsrHandler(hono, runContext)
+  addErrorHandler(hono, runContext)
+
+  return hono
+}
