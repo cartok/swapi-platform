@@ -39,12 +39,39 @@ tasks:
       vars:
         - name: PROFILE
           enum: [debug, release]
+    deps:
+      - task: lint:sequence-collection
+        vars:
+          PROFILE: '{{.PROFILE}}'
+      - task: lint:parallel-collection
+
+  lint:parallel-collection:
+    internal: true
+    deps:
+      - task: lint:fly
+
+  lint:sequence-collection:
+    internal: true
+    vars:
+      PROFILE:
+        ref: .SWAPI_PROFILE | default .PROFILE | default "debug"
+    requires:
+      vars:
+        - name: PROFILE
+          enum: [debug, release]
     cmds:
       - task: lint:tsc
         vars:
           PROFILE: '{{.PROFILE}}'
       - task: lint:eslint
       - task: lint:prettier
+      - task: lint:fly
+
+  lint:fly:
+    sources:
+      - ./fly.toml
+    cmds:
+      - flyctl config validate -c fly.toml
 
   lint:tsc:
     vars:
