@@ -1,7 +1,7 @@
+import { header } from '@swapi/shared/logging/utils'
 import { PATHS } from '@swapi/shared/routing/paths'
 
 import { env } from '#internal/env'
-import { header } from '#internal/log'
 import type { Handler } from '#internal/types'
 
 export const addErrorHandler: Handler = (hono) => {
