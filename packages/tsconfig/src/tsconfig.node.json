@@ -3,7 +3,6 @@
   "compilerOptions": {
     "target": "ES2024",
     "moduleResolution": "nodenext",
-    "module": "nodenext",
-    "types": ["node"]
+    "module": "nodenext"
   }
 }

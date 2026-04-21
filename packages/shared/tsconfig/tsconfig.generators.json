@@ -5,7 +5,8 @@
     "@swapi/tsconfig/tsconfig.node.script"
   ],
   "compilerOptions": {
-    "noEmit": true
+    "noEmit": true,
+    "types": ["node", "bun"]
   },
   "include": ["../generators/**/*.ts", "../generators/**/*.json", "../src/**/*.ts"]
 }

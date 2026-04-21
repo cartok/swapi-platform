@@ -3,7 +3,6 @@
   "compilerOptions": {
     "target": "ES2024",
     "moduleResolution": "bundler",
-    "module": "preserve",
-    "types": ["node"]
+    "module": "preserve"
   }
 }
