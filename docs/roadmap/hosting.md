@@ -16,9 +16,9 @@
 
 ## Phase 3: Cloudflare Worker in front of Fly.io
 
-- Implement edge routing and negotiation for device detection.
-- Evaluate Client Hints.
-- Implement redirect/rewrite/variant decision logic.
+- [ ] Move device detection to CF Worker
+
+  Either keep the device detection also in the bun server for fly, optimize the interplay, or remove it from fly.
 
 ## Phase 4 (optional): Deploy the app to Cloudflare Workers
 
@@ -29,12 +29,8 @@
 
 ## Phase 5: Move to VPS + Docker Compose
 
-- Run multiple services incl. own monitoring, logging, alerting.
+- [ ] Run multiple services incl. own monitoring, logging, alerting, once backend is implemented.
 
 ## Phase 6 (optional): Kubernetes/k3s
 
 - Exploration only.
-
-## Deployment Automation
-
-- Set up GitHub Actions deployments (for example via release tags).

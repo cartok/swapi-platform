@@ -1,20 +1,30 @@
 # Frontend Roadmap
 
 - [x] Fix slider swipe behavior (mobile and Firefox on desktop).
-- Add a global page cursor style and use it while dragging the image slider.
 - [x] Add image placeholders and fallbacks.
 - Improve accessibility.
 - [x] Fix console warnings related to preloaded but unused assets.
 - [x] Optimize for a11y
-  - [ ] Eventuall add global focus blur on esc key
+  - [ ] Eventually add global focus blur on esc key
+- [ ] Add a global page cursor style and use it while dragging the image slider.
 - [ ] Add SVG sprite-sheet generation.
 - [ ] Refactor to Tailwind (4, via vite & lightningcss), as most people prefer tailwind (whyever)
+- [ ] Webmanifest
+- [ ] Integrate a headless CMS
+- [ ] Storybook
+
+---
+
+- [ ] Finish the link-list component as defined in the designs.
+- [ ] Implement search functionallity, once own backend is ready.
+- [ ] Optimize composition and boundaries of UI components.
+
+---
+
+- [ ] Service Worker for better prefetching and offline handling
+- [ ] Try out Angulars dedicated App Shell feature.
 - [ ] Improve the `DeviceService` API.
 - [ ] Add a fallback for device feature detection (Firefox and Safari).
-- [ ] Finish the link-list component as defined in the designs.
-- [ ] Optimize composition and boundaries of UI components.
-- [ ] Try out Angulars dedicated App Shell feature.
-- [ ] Webmanifest
 - [ ] Emphasize which breakpoints to focus on for mobile/tablet opimization in context.ts
 
   ```
