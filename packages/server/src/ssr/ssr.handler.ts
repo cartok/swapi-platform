@@ -14,7 +14,7 @@ void getAngularRenderEngine()
 export const addSsrHandler: Handler = (hono) => {
   hono.get('*', async (c, next) => {
     if (!c.get('isHtmlDocumentRequest')) {
-      return c.notFound()
+      return next()
     }
 
     const angularRenderEngine = await getAngularRenderEngine()
