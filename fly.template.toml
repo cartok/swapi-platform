@@ -24,6 +24,7 @@ kill_timeout = 8
     path = "/status/live"
     [checks.status_live.headers]
       X-Forwarded-Proto = "https"
+      X-Secret-Health-Check-Token = "${SWAPI_SECRET_HEALTH_CHECK_TOKEN}"
 
 [http_service]
   internal_port = 51000
@@ -44,3 +45,4 @@ kill_timeout = 8
     path = "/status/ready"
     [http_service.checks.headers]
       X-Forwarded-Proto = "https"
+      X-Secret-Health-Check-Token = "${SWAPI_SECRET_HEALTH_CHECK_TOKEN}"

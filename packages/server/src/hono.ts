@@ -8,6 +8,7 @@ import { env } from '#internal/env'
 import { addErrorHandler } from '#internal/error/error.handler'
 import { addHealth as addHealthRoutesHandler } from '#internal/health/health.handler'
 import { addIndexingHandler } from '#internal/indexing/indexing.handler'
+import { addInFlightRequestsHandler } from '#internal/request/in-flight-requests.handler'
 import { addRequestContextHandler } from '#internal/request/request-context.handler'
 import { addRequestGuardSecurityHandler } from '#internal/security/request-guard-security.handler'
 import { addSecureHeadersSecurityHandler } from '#internal/security/secure-headers-security.handler'
@@ -18,17 +19,16 @@ import type { HonoEnv, HonoRunContext } from '#internal/types'
 export function createHono(runContext: HonoRunContext): Hono<HonoEnv> {
   const hono = new Hono<HonoEnv>({ strict: false })
 
-  addRequestContextHandler(hono, runContext)
-  addSecureHeadersSecurityHandler(hono, runContext)
-  addRequestGuardSecurityHandler(hono, runContext)
-  addIndexingHandler(hono, runContext)
-
   if (env.SWAPI_TARGET === 'local') {
     addDebugRoutesHandler(hono, runContext)
   }
 
+  addInFlightRequestsHandler(hono, runContext)
   addHealthRoutesHandler(hono, runContext)
-
+  addRequestContextHandler(hono, runContext)
+  addSecureHeadersSecurityHandler(hono, runContext)
+  addRequestGuardSecurityHandler(hono, runContext)
+  addIndexingHandler(hono, runContext)
   addDeviceContextHandler(hono, runContext)
   addDeviceRedirectHandler(hono, runContext)
   addAssetHandler(hono, runContext)

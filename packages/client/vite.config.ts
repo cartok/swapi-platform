@@ -1,6 +1,7 @@
 import { fileURLToPath, URL } from 'node:url'
 
 import angular from '@analogjs/vite-plugin-angular'
+import { logEnv } from '@swapi/shared/environment/env'
 import type { UserConfig } from 'vite'
 import {
   defaultClientConditions,
@@ -12,6 +13,9 @@ import {
 
 import { browserEnv, buildEnv } from './src/env'
 import type { AppBrowserEnv, AppBuildEnv } from './src/env.schema'
+
+logEnv(browserEnv, 'Vite App Environment Variables (Browser)')
+logEnv(buildEnv, 'Vite App Environment Variables (Build)')
 
 const clientResolveConditions: string[] = createResolveConditions(defaultClientConditions)
 const serverResolveConditions: string[] = createResolveConditions(defaultServerConditions)

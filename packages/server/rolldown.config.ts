@@ -2,10 +2,13 @@ import { needsLinking } from '@angular/compiler-cli/linker'
 import angularLinkerBabelPlugin from '@angular/compiler-cli/linker/babel'
 import type { TransformOptions } from '@babel/core'
 import { transformAsync } from '@babel/core'
+import { logEnv } from '@swapi/shared/environment/env'
 import type { OutputOptions } from 'rolldown'
 import { defineConfig } from 'rolldown'
 
 import { env } from './src/env.js'
+
+logEnv(env, 'App Server Environment Variables')
 
 const buildVariantPath = `${env.SWAPI_TARGET}/${env.SWAPI_PROFILE}`
 const isMinifyEnabled = env.SWAPI_BUILD_MINIFY

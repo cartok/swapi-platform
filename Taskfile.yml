@@ -187,26 +187,58 @@ tasks:
         '
 
   deploy:
+    preconditions:
+      - command -v envsubst
+      - command -v shred
+      - command -v openssl
+      - command -v fly
+      - test -s ./fly.template.toml
+      - test -s ./.env.fly
+      - test -n "${SWAPI_SECRET_HEALTH_CHECK_TOKEN}"
+      - printf '%s' "${SWAPI_SECRET_HEALTH_CHECK_TOKEN}" | openssl base64 -d -A >/dev/null 2>&1
     vars:
       PROFILE:
         ref: .SWAPI_PROFILE | default .PROFILE | default "release"
       TARGET:
         ref: .SWAPI_TARGET | default .TARGET | default "testing"
-    requires:
+      CONFIG:
+        sh: mktemp /tmp/fly.XXXXXX.toml
       vars:
         - name: PROFILE
           enum: [debug, release]
         - name: TARGET
           enum: [testing, production]
     dotenv:
+      - ./.env.fly
       - ./packages/server/.env/.env.{{.TARGET}}.{{.PROFILE}}.docker
       - ./packages/server/.env/.env.{{.TARGET}}.{{.PROFILE}}
     cmds:
+      - envsubst < ./fly.template.toml > {{.CONFIG}}
+      - defer: shred -u {{.CONFIG}}
       - >
         fly deploy
+        --config {{.CONFIG}}
         --build-arg NODE_ENV=${NODE_ENV}
         --build-arg PROFILE=${SWAPI_PROFILE}
         --build-arg TARGET=${SWAPI_TARGET}
         --compression zstd
         --compression-level 7
         {{.CLI_ARGS}}
+
+  generate-secret:
+    preconditions:
+      - command -v zsh
+      - command -v openssl
+      - command -v wl-copy
+    silent: true
+    cmd: |
+      zsh -c '
+        secret="$(openssl rand -base64 32)"
+        wl-copy -- "${secret}" >/dev/null 2>&1
+        result=$?
+        if (( ${result} == 0 )); then
+          print -- "A secret was generated and copied to your clipboard."
+        else
+          exit ${result}
+        fi
+      '

@@ -6,12 +6,14 @@ import { dirname, resolve } from 'node:path'
 import { ɵSERVER_CONTEXT } from '@angular/platform-server'
 import { CommonEngine } from '@angular/ssr/node'
 import { indexHtmlPath, ssgDistPath } from '@swapi/client/dist-paths'
+import { logEnv } from '@swapi/shared/environment/env'
 import { PATHS } from '@swapi/shared/routing/paths'
 import { SSG_PATHS } from '@swapi/shared/routing/ssg-paths'
 
 import { allowedHosts, env } from '#internal/env'
 import { enableAngularServerMode } from '#internal/shared/angular-server-mode'
 
+logEnv(env, 'App Server SSG Environment Variables')
 enableAngularServerMode()
 
 const { default: bootstrap } = await import('@swapi/client/main.server')

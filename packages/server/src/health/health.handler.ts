@@ -1,3 +1,4 @@
+import { env, secretEnv } from '#internal/env'
 import type { Handler, RunContext } from '#internal/types'
 
 type HealthHttpStatus = 200 | 503
@@ -13,14 +14,22 @@ interface HealthResponseData {
 }
 
 export const addHealth: Handler = (hono, runContext) => {
-  hono.use('*', async (_c, next) => {
-    runContext.inFlightRequests++
-    try {
-      return await next()
-    } finally {
-      runContext.inFlightRequests--
-    }
-  })
+  if (env.SWAPI_TARGET !== 'local') {
+    hono.on(['GET', 'HEAD'], '/status/*', async (c, next) => {
+      if (!secretEnv.SWAPI_SECRET_HEALTH_CHECK_TOKEN) {
+        return next()
+      }
+
+      if (
+        c.req.header('X-Secret-Health-Check-Token') !==
+        secretEnv.SWAPI_SECRET_HEALTH_CHECK_TOKEN
+      ) {
+        return c.text('Forbidden', 400)
+      }
+
+      return next()
+    })
+  }
 
   hono.get('/status/live', (c) => {
     const status = checkLive(runContext)
