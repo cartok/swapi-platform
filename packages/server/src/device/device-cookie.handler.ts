@@ -20,7 +20,7 @@ export const addDeviceCookieHandler: Handler = (hono) => {
       onError: (c) =>
         c.json(
           {
-            message: `Request body must not exceed ${String(DEVICE_COOKIE_BODY_LIMIT_BYTES)} bytes.`,
+            message: `Body must not exceed ${String(DEVICE_COOKIE_BODY_LIMIT_BYTES)} bytes.`,
           },
           413,
         ),
