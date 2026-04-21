@@ -45,6 +45,7 @@ export default defineConfig(
       'import/no-self-import': 'error',
       'import/no-useless-path-segments': ['error', { noUselessIndex: true }],
       'no-duplicate-imports': 'off',
+      'no-empty': 'warn',
       'simple-import-sort/exports': 'error',
       'simple-import-sort/imports': 'error',
       '@typescript-eslint/consistent-type-imports': [
