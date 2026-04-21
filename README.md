@@ -94,8 +94,6 @@ task i
 
 ### Run
 
-<!-- TODO: Write about PROFILE x TARGET build independency -->
-
 ```bash
 # Start `vite` dev server (only CSR, hot reload).
 task client:dev

@@ -1,22 +1,4 @@
 {
   "version": "2.0.0",
-  "tasks": [
-    {
-      "label": "build:prerender",
-      "type": "shell",
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "command": "bun run build:prerender",
-      "presentation": {
-        "reveal": "never",
-        "focus": false,
-        "panel": "shared",
-        "showReuseMessage": false,
-        "clear": true,
-        "close": true
-      },
-      "problemMatcher": []
-    }
-  ]
+  "tasks": []
 }
