@@ -1,14 +1,19 @@
-# Packages
+# Installed dependencies
 node_modules/
 
-# Compiled output
+# Tool-generated files and caches
+.cache/
+.codex
+.DS_Store/
+.task/
+.Trash-*/
+*.save
 *.tsbuildinfo
+Thumbs.db
+
+# Compiled outputs
 dist/
 generated/
-
-# Cache
-.cache/
-.task/
 
 # Editor settings
 .vscode/*
@@ -17,12 +22,4 @@ generated/
 !.vscode/settings.json
 !.vscode/tasks.json
 
-# Application files
-.codex
-.DS_Store/
-.Trash-*/
-*.save
-Thumbs.db
-
-# Symlink to keep project clean
-TODO.md
+# Everything else
