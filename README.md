@@ -86,6 +86,10 @@ SWAPI is intentionally integrated defensively because of schema and data inconsi
 
   Otherwise you could run: `bunx [--no-install] task`
 
+- **Fly.io CLI**
+
+  For deployment.
+
 ### Install
 
 ```bash
