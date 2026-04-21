@@ -1,4 +1,4 @@
-import { ERROR_PATH } from '@swapi/shared/routing/paths'
+import { PATHS } from '@swapi/shared/routing/paths'
 
 import type { Handler } from '#internal/types'
 
@@ -10,10 +10,10 @@ export const addErrorHandler: Handler = (hono) => {
       return c.text('Server Error', 500)
     }
 
-    return c.redirect('/error', 302)
+    return c.redirect(`/${PATHS.SSG.ERROR_PATH}`, 302)
   })
 }
 
 function isErrorPageUrl(url: string) {
-  return new URL(url).pathname === `/${ERROR_PATH}`
+  return new URL(url).pathname === `/${PATHS.SSG.ERROR_PATH}`
 }

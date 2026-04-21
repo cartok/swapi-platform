@@ -6,7 +6,7 @@
 ---
 
 - [ ] No unified sourcemap values, just define one env var per bundling tool (vite, rolldown, babel)
-- [ ] Cleanup app paths code a bit further & Check `/<path>` references and eventually use the constants + Two formats per path: one with and one without slash.
+- [x] Cleanup app paths code a bit further & Check `/<path>` references and eventually use the constants + Two formats per path: one with and one without slash. (last part not done on purpose)
 - [ ] Logging wrapper
 
 ---

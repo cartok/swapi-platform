@@ -2,7 +2,7 @@ import {
   deviceContextToPathSegment,
   isDeviceContextPathSegment,
 } from '@swapi/shared/device/context'
-import { ERROR_PATH } from '@swapi/shared/routing/paths'
+import { PATHS } from '@swapi/shared/routing/paths'
 import { deleteCookie, getCookie, setCookie } from 'hono/cookie'
 
 import { env } from '#internal/env'
@@ -23,7 +23,7 @@ export const addDeviceRedirectHandler: Handler = (hono) => {
       return next()
     }
 
-    if (c.req.path.startsWith(`/${ERROR_PATH}`)) {
+    if (c.req.path.startsWith(`/${PATHS.SSG.ERROR_PATH}`)) {
       return next()
     }
 

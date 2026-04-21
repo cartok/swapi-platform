@@ -12,38 +12,38 @@ import {
   LenientDeviceContextSchema,
   parseDeviceContext,
 } from '@swapi/shared/device/context'
-import { ERROR_PATH, HOME_PATH } from '@swapi/shared/routing/paths'
+import { PATHS } from '@swapi/shared/routing/paths'
 
 const actualRoutes: Routes = [
   {
-    path: HOME_PATH,
+    path: PATHS.SSG.HOME_PATH,
     loadComponent: () => import('@/pages/home/home').then(({ Home }) => Home),
     pathMatch: 'full',
   },
   {
-    path: 'movies',
+    path: PATHS.SSR.MOVIES,
     loadComponent: () => import('@/pages/movies/movies').then(({ Movies }) => Movies),
   },
   {
-    path: 'movie/:id',
+    path: PATHS.SSR.MOVIE,
     loadComponent: () => import('@/pages/movie/movie').then(({ Movie }) => Movie),
   },
   {
-    path: 'characters',
+    path: PATHS.SSR.CHARACTERS,
     loadComponent: () =>
       import('@/pages/characters/characters').then(({ Characters }) => Characters),
   },
   {
-    path: 'character/:id',
+    path: PATHS.SSR.CHARACTER,
     loadComponent: () =>
       import('@/pages/character/character').then((component) => component.Character),
   },
   {
-    path: 'planets',
+    path: PATHS.SSR.PLANETS,
     loadComponent: () => import('@/pages/planets/planets').then(({ Planets }) => Planets),
   },
   {
-    path: 'planet/:id',
+    path: PATHS.SSR.PLANET,
     loadComponent: () => import('@/pages/planet/planet').then(({ Planet }) => Planet),
   },
 ]
@@ -136,11 +136,11 @@ export const routes: Routes = [
   },
   ...actualRoutes,
   {
-    path: ERROR_PATH,
+    path: PATHS.SSG.ERROR_PATH,
     loadComponent: () => import('@/pages/error/error').then(({ ErrorPage }) => ErrorPage),
   },
   {
     path: '**',
-    redirectTo: `/${ERROR_PATH}`,
+    redirectTo: `/${PATHS.SSG.ERROR_PATH}`,
   },
 ]

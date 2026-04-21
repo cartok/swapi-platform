@@ -6,7 +6,7 @@ import { dirname, resolve } from 'node:path'
 import { ɵSERVER_CONTEXT } from '@angular/platform-server'
 import { CommonEngine } from '@angular/ssr/node'
 import { indexHtmlPath, ssgDistPath } from '@swapi/client/dist-paths'
-import { HOME_PATH } from '@swapi/shared/routing/paths'
+import { PATHS } from '@swapi/shared/routing/paths'
 import { SSG_PATHS } from '@swapi/shared/routing/ssg-paths'
 
 import { allowedHosts, env } from '#internal/env'
@@ -31,7 +31,7 @@ for (const path of SSG_PATHS) {
     url: new URL(`/${path}`, origin).toString(),
     documentFilePath: indexHtmlPath,
   })
-  const indexPath = path === HOME_PATH ? './index.html' : `./${path}/index.html`
+  const indexPath = path === PATHS.SSG.HOME_PATH ? './index.html' : `./${path}/index.html`
   const outputFilePath = resolve(ssgDistPath, indexPath)
   console.log('SSG: Rendered', indexPath.replace(/^\./, ''))
   await mkdir(dirname(outputFilePath), { recursive: true })

@@ -3,19 +3,26 @@ import {
   DEVICE_FORMATS,
   deviceContextToPathSegment,
 } from '#internal/device/context'
-import { ERROR_PATH, HOME_PATH } from '#internal/routing/paths'
+import { PATHS } from '#internal/routing/paths'
 
 export const DEVICE_CONTEXT_PATH_SEGMENTS: readonly string[] =
   createDeviceContextPathSegments()
-export const SSG_NON_VARIANT_PATHS: readonly string[] = Object.freeze([ERROR_PATH])
-export const SSG_VARIANT_PATHS: readonly string[] = Object.freeze([HOME_PATH])
+
+export const SSG_NON_VARIANT_PATHS: readonly string[] = Object.freeze([
+  PATHS.SSG.ERROR_PATH,
+] as const)
+
+export const SSG_VARIANT_PATHS: readonly string[] = Object.freeze([
+  PATHS.SSG.HOME_PATH,
+] as const)
+
 export const SSG_PATHS: readonly string[] = Object.freeze([
   ...SSG_NON_VARIANT_PATHS,
   ...SSG_VARIANT_PATHS.flatMap((path) => [
     path,
     ...DEVICE_CONTEXT_PATH_SEGMENTS.map((deviceContextPath) => {
       switch (path) {
-        case HOME_PATH:
+        case PATHS.SSG.HOME_PATH:
           return deviceContextPath
         default:
           return `${deviceContextPath}/${path}`
