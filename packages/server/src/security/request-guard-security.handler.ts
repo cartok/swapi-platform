@@ -3,7 +3,7 @@ import type { Handler } from '#internal/types'
 
 const allowedHostSet: Readonly<Set<string>> = new Set(allowedHosts)
 
-export const addRequestGuardSecurityHandler: Handler = (hono) => {
+export const addRequestGuardHandler: Handler = (hono) => {
   hono.use('*', async (c, next) => {
     const requestUrl = new URL(c.req.url)
     const protocol = requestUrl.protocol.slice(0, -1)

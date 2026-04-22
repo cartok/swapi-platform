@@ -13,7 +13,7 @@ interface HealthResponseData {
   status: HealthHttpStatus
 }
 
-export const addHealth: Handler = (hono, runContext) => {
+export const addHealthChecksHandler: Handler = (hono, runContext) => {
   if (env.SWAPI_TARGET !== 'local') {
     hono.on(['GET', 'HEAD'], '/status/*', async (c, next) => {
       if (

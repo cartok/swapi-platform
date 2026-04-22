@@ -53,7 +53,7 @@ const htmlDocumentSecureHeaders: MiddlewareHandler<HonoEnv> = secureHeaders({
   },
 })
 
-export const addSecureHeadersSecurityHandler: Handler = (hono) => {
+export const addSecureHeadersHandler: Handler = (hono) => {
   hono.use('*', globalSecureHeaders)
   hono.get('*', (c, next) => {
     if (!c.get('isHtmlDocumentRequest')) {
