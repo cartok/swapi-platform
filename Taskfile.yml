@@ -203,11 +203,13 @@ tasks:
         ref: .SWAPI_TARGET | default .TARGET | default "testing"
       CONFIG:
         sh: mktemp /tmp/fly.XXXXXX.yaml
+    requires:
       vars:
         - name: PROFILE
           enum: [debug, release]
         - name: TARGET
           enum: [testing, production]
+        - CONFIG
     dotenv:
       - ./.env.fly
       - ./packages/server/.env/.env.{{.TARGET}}.{{.PROFILE}}.docker
