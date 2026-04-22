@@ -16,13 +16,10 @@ interface HealthResponseData {
 export const addHealth: Handler = (hono, runContext) => {
   if (env.SWAPI_TARGET !== 'local') {
     hono.on(['GET', 'HEAD'], '/status/*', async (c, next) => {
-      if (!secretEnv.SWAPI_SECRET_HEALTH_CHECK_TOKEN) {
-        return next()
-      }
-
       if (
-        c.req.header('X-Secret-Health-Check-Token') !==
-        secretEnv.SWAPI_SECRET_HEALTH_CHECK_TOKEN
+        !secretEnv.SWAPI_SECRET_HEALTH_CHECK_TOKEN ||
+        secretEnv.SWAPI_SECRET_HEALTH_CHECK_TOKEN !==
+          c.req.header('X-Secret-Health-Check-Token')
       ) {
         return c.text('Forbidden', 400)
       }
