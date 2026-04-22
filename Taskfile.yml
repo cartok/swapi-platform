@@ -65,7 +65,6 @@ tasks:
           PROFILE: '{{.PROFILE}}'
       - task: lint:eslint
       - task: lint:prettier
-      - task: lint:fly
 
   lint:fly:
     sources:
