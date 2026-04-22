@@ -8,6 +8,9 @@ This repository started as a successful job application challenge implementation
 
 - [Test domain (Fly.io behind Cloudflare)](https://swapi-platform.cartok.dev/)
 - [Fly.io test domain](https://swapi-platform.fly.dev/)
+
+  The first request on the fly.io domain can take longer, as the machine will automatically suspend if there was no traffic for a while.
+
 - [GitHub Pages demo (CSR only)](https://cartok.github.io/swapi-platform/)
 
 ## What This Project Demonstrates
