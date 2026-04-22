@@ -11,13 +11,6 @@
 
 ---
 
-- [ ] Add end-to-end tests incl. axe a11y
-- [ ] Fix unit tests.
-- [ ] Add build matrix tests.
-  - [ ] Make `server:dev` run directly from source by adding a Vite dev-server middleware (if feasible).
-- [ ] Automate linting and test execution.
-  - [ ] Git Hooks
-  - [ ] Github Actions
-- [ ] Github Action for deployment
+- [ ] Git Hooks for linting, testing
 - [ ] Fix at least in the server project: Files that were build and then deleted (the sources) are not discovered as deleted, cause TS resolves to the built .js files.
 - [ ] Taskfile: re-check `sources`, `generates`, `preconditions`
