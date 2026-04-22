@@ -186,6 +186,8 @@ tasks:
         ref: .SWAPI_TARGET | default .TARGET | default "testing"
       CONFIG:
         sh: mktemp /tmp/fly.XXXXXX.yaml
+      FAST:
+        ref: .FAST | default "false"
     requires:
       vars:
         - name: PROFILE
@@ -206,9 +208,11 @@ tasks:
       - test -s ./.env.fly
       - test -n "${SWAPI_SECRET_HEALTH_CHECK_TOKEN}"
       - printf '%s' "${SWAPI_SECRET_HEALTH_CHECK_TOKEN}" | openssl base64 -d -A >/dev/null 2>&1
-    deps:
-      - task: docker:build
     cmds:
+      - task: docker:build
+        if: '{{eq .FAST "false"}}'
+      - task: lint
+        if: '{{eq .FAST "true"}}'
       - envsubst < ./fly.template.yaml > {{.CONFIG}}
       - defer: shred -u {{.CONFIG}}
       - >
