@@ -41,11 +41,11 @@ process.on('SIGCONT', () => {
 })
 
 process.on('SIGUSR2', (signal) => {
-  void shutdown(String(signal), 0)
+  void shutdown(String(signal), 1)
 })
 
 process.on('SIGINT', (signal) => {
-  void shutdown(signal, 0)
+  void shutdown(signal, 1)
 })
 
 process.on('SIGTERM', (signal) => {
