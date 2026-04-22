@@ -2,8 +2,6 @@ import type { Static, TSchema } from '@sinclair/typebox'
 import { Type } from '@sinclair/typebox'
 import { AssertError, Value } from '@sinclair/typebox/value'
 
-import { objectToString } from '#internal/logging/utils'
-
 const LogLevelSchema = Type.Union([
   Type.Literal('debug'),
   Type.Literal('info'),
@@ -70,5 +68,5 @@ export function logEnv(env: Record<string, unknown>, title?: string): void {
     console.info(title)
   }
 
-  console.info(objectToString(env))
+  console.info(env)
 }
