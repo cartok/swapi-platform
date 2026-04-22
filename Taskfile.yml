@@ -142,6 +142,7 @@ tasks:
       - ./packages/server/.env/.env.{{.TARGET}}.{{.PROFILE}}.docker
       - ./packages/server/.env/.env.{{.TARGET}}.{{.PROFILE}}
     cmds:
+      - task: lint
       - >
         docker buildx build --load
         --build-arg NODE_ENV=${NODE_ENV}
@@ -212,6 +213,7 @@ tasks:
       - ./packages/server/.env/.env.{{.TARGET}}.{{.PROFILE}}.docker
       - ./packages/server/.env/.env.{{.TARGET}}.{{.PROFILE}}
     cmds:
+      - task: lint
       - envsubst < ./fly.template.yaml > {{.CONFIG}}
       - defer: shred -u {{.CONFIG}}
       - >
