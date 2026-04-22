@@ -19,7 +19,7 @@ checks:
     type: http
     interval: 30s
     timeout: 2s
-    grace_period: 5s
+    grace_period: 3s
     method: HEAD
     path: /status/live
 
@@ -45,7 +45,7 @@ http_service:
   checks:
     - interval: 30s
       timeout: 2s
-      grace_period: 3s
+      grace_period: 5s
       method: GET
       path: /status/ready
 
