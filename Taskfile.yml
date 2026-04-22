@@ -3,6 +3,9 @@ run: once
 set: [pipefail]
 output: prefixed
 
+vars:
+  DOCKER_IMAGE_NAME: swapi-angular
+
 includes:
   client:
     taskfile: ./packages/client
@@ -128,19 +131,21 @@ tasks:
 
   docker:build:
     vars:
-      PROFILE:
+      PROFILE: &var-docker-profile
         ref: .SWAPI_PROFILE | default .PROFILE | default "release"
-      TARGET:
+      TARGET: &var-docker-target
         ref: .SWAPI_TARGET | default .TARGET | default "local"
     requires:
       vars:
-        - name: PROFILE
+        - &requires-docker-profile
+          name: PROFILE
           enum: [debug, release]
-        - name: TARGET
+        - &requires-docker-target
+          name: TARGET
           enum: [local, testing, production]
     dotenv:
-      - ./packages/server/.env/.env.{{.TARGET}}.{{.PROFILE}}.docker
-      - ./packages/server/.env/.env.{{.TARGET}}.{{.PROFILE}}
+      - &dotenv-docker-1 ./packages/server/.env/.env.{{.TARGET}}.{{.PROFILE}}.docker
+      - &dotenv-docker-2 ./packages/server/.env/.env.{{.TARGET}}.{{.PROFILE}}
     cmds:
       - task: lint
       - >
@@ -148,54 +153,41 @@ tasks:
         --build-arg NODE_ENV=${NODE_ENV}
         --build-arg PROFILE=${SWAPI_PROFILE}
         --build-arg TARGET=${SWAPI_TARGET}
-        --tag swapi-angular:${SWAPI_TARGET}-${SWAPI_PROFILE}
+        --tag {{.DOCKER_IMAGE_NAME}}:${SWAPI_TARGET}-${SWAPI_PROFILE}
         {{.CLI_ARGS}}
         ./
 
   docker:start:
     vars:
-      PROFILE:
-        ref: .SWAPI_PROFILE | default .PROFILE | default "release"
-      TARGET:
-        ref: .SWAPI_TARGET | default .TARGET | default "local"
+      PROFILE: *var-docker-profile
+      TARGET: *var-docker-target
     requires:
       vars:
-        - name: PROFILE
-          enum: [debug, release]
-        - name: TARGET
-          enum: [local, testing, production]
+        - *requires-docker-profile
+        - *requires-docker-target
+    dotenv:
+      - *dotenv-docker-1
+      - *dotenv-docker-2
     deps:
       - task: docker:build
         vars:
           PROFILE: '{{.PROFILE}}'
           TARGET: '{{.TARGET}}'
-    dotenv:
-      - ./packages/server/.env/.env.{{.TARGET}}.{{.PROFILE}}.docker
-      - ./packages/server/.env/.env.{{.TARGET}}.{{.PROFILE}}
     cmds:
       - |
         zsh -c '
           cleanup() {
-            docker rm --force swapi-angular >/dev/null 2>&1 || true
+            docker rm --force {{.DOCKER_IMAGE_NAME}} >/dev/null 2>&1 || true
           }
           trap cleanup EXIT INT TERM
           cleanup
           docker run --rm \
             --publish 127.0.0.1:${SWAPI_SERVER_PORT}:${SWAPI_SERVER_PORT} \
-            --name swapi-angular \
-            swapi-angular:{{.TARGET}}-{{.PROFILE}}
+            --name {{.DOCKER_IMAGE_NAME}} \
+            {{.DOCKER_IMAGE_NAME}}:{{.TARGET}}-{{.PROFILE}}
         '
 
   deploy:
-    preconditions:
-      - command -v envsubst
-      - command -v shred
-      - command -v openssl
-      - command -v fly
-      - test -s ./fly.template.yaml
-      - test -s ./.env.fly
-      - test -n "${SWAPI_SECRET_HEALTH_CHECK_TOKEN}"
-      - printf '%s' "${SWAPI_SECRET_HEALTH_CHECK_TOKEN}" | openssl base64 -d -A >/dev/null 2>&1
     vars:
       PROFILE:
         ref: .SWAPI_PROFILE | default .PROFILE | default "release"
@@ -212,8 +204,17 @@ tasks:
         - CONFIG
     dotenv:
       - ./.env.fly
-      - ./packages/server/.env/.env.{{.TARGET}}.{{.PROFILE}}.docker
-      - ./packages/server/.env/.env.{{.TARGET}}.{{.PROFILE}}
+      - *dotenv-docker-1
+      - *dotenv-docker-2
+    preconditions:
+      - command -v envsubst
+      - command -v shred
+      - command -v openssl
+      - command -v fly
+      - test -s ./fly.template.yaml
+      - test -s ./.env.fly
+      - test -n "${SWAPI_SECRET_HEALTH_CHECK_TOKEN}"
+      - printf '%s' "${SWAPI_SECRET_HEALTH_CHECK_TOKEN}" | openssl base64 -d -A >/dev/null 2>&1
     cmds:
       - task: lint
       - envsubst < ./fly.template.yaml > {{.CONFIG}}
@@ -229,11 +230,11 @@ tasks:
         {{.CLI_ARGS}}
 
   generate-secret:
+    silent: true
     preconditions:
       - command -v zsh
       - command -v openssl
       - command -v wl-copy
-    silent: true
     cmd: |
       zsh -c '
         secret="$(openssl rand -base64 32)"
