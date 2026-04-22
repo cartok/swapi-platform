@@ -129,25 +129,29 @@ tasks:
     cmds:
       - bunx --no-install prettier --write --list-different ./
 
-  docker:build:
+  DOCKER: &docker
+    internal: true
     vars:
-      PROFILE: &var-docker-profile
+      PROFILE:
         ref: .SWAPI_PROFILE | default .PROFILE | default "release"
-      TARGET: &var-docker-target
+      TARGET:
         ref: .SWAPI_TARGET | default .TARGET | default "local"
     requires:
       vars:
-        - &requires-docker-profile
-          name: PROFILE
-          enum: [debug, release]
-        - &requires-docker-target
-          name: TARGET
+        - name: PROFILE
+          enum: [release]
+        - name: TARGET
           enum: [local, testing, production]
     dotenv:
-      - &dotenv-docker-1 ./packages/server/.env/.env.{{.TARGET}}.{{.PROFILE}}.docker
-      - &dotenv-docker-2 ./packages/server/.env/.env.{{.TARGET}}.{{.PROFILE}}
-    cmds:
+      - ./packages/server/.env/.env.{{.TARGET}}.{{.PROFILE}}.docker
+      - ./packages/server/.env/.env.{{.TARGET}}.{{.PROFILE}}
+
+  docker:build:
+    <<: *docker
+    internal: false
+    deps:
       - task: lint
+    cmds:
       - >
         docker buildx build --load
         --build-arg NODE_ENV=${NODE_ENV}
@@ -158,34 +162,21 @@ tasks:
         ./
 
   docker:start:
-    vars:
-      PROFILE: *var-docker-profile
-      TARGET: *var-docker-target
-    requires:
-      vars:
-        - *requires-docker-profile
-        - *requires-docker-target
-    dotenv:
-      - *dotenv-docker-1
-      - *dotenv-docker-2
+    <<: *docker
+    internal: false
     deps:
       - task: docker:build
         vars:
           PROFILE: '{{.PROFILE}}'
           TARGET: '{{.TARGET}}'
     cmds:
-      - |
-        zsh -c '
-          cleanup() {
-            docker rm --force {{.DOCKER_IMAGE_NAME}} >/dev/null 2>&1 || true
-          }
-          trap cleanup EXIT INT TERM
-          cleanup
-          docker run --rm \
-            --publish 127.0.0.1:${SWAPI_SERVER_PORT}:${SWAPI_SERVER_PORT} \
-            --name {{.DOCKER_IMAGE_NAME}} \
-            {{.DOCKER_IMAGE_NAME}}:{{.TARGET}}-{{.PROFILE}}
-        '
+      - docker rm --force {{.DOCKER_IMAGE_NAME}} >/dev/null 2>&1 || true
+      - defer: docker rm --force {{.DOCKER_IMAGE_NAME}} >/dev/null 2>&1 || true
+      - >
+        docker run --rm
+        --publish 127.0.0.1:${SWAPI_SERVER_PORT}:${SWAPI_SERVER_PORT}
+        --name {{.DOCKER_IMAGE_NAME}}
+        {{.DOCKER_IMAGE_NAME}}:{{.TARGET}}-{{.PROFILE}}
 
   deploy:
     vars:
@@ -198,14 +189,14 @@ tasks:
     requires:
       vars:
         - name: PROFILE
-          enum: [debug, release]
+          enum: [release]
         - name: TARGET
           enum: [testing, production]
         - CONFIG
     dotenv:
       - ./.env.fly
-      - *dotenv-docker-1
-      - *dotenv-docker-2
+      - ./packages/server/.env/.env.{{.TARGET}}.{{.PROFILE}}.docker
+      - ./packages/server/.env/.env.{{.TARGET}}.{{.PROFILE}}
     preconditions:
       - command -v envsubst
       - command -v shred
@@ -215,8 +206,9 @@ tasks:
       - test -s ./.env.fly
       - test -n "${SWAPI_SECRET_HEALTH_CHECK_TOKEN}"
       - printf '%s' "${SWAPI_SECRET_HEALTH_CHECK_TOKEN}" | openssl base64 -d -A >/dev/null 2>&1
+    deps:
+      - task: docker:build
     cmds:
-      - task: lint
       - envsubst < ./fly.template.yaml > {{.CONFIG}}
       - defer: shred -u {{.CONFIG}}
       - >
