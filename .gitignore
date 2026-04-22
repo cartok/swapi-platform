@@ -24,3 +24,7 @@ generated/
 
 # Everything else
 .env.fly
+fly.*.toml
+fly.*.yml
+fly.toml
+fly.yml

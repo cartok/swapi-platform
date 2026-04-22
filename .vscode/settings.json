@@ -127,7 +127,11 @@
   "yaml.schemaStore.enable": true,
   "yaml.schemas": {
     "https://taskfile.dev/schema.json": ["**/Taskfile.yml", "**/Taskfile.*.yml"],
-    "https://json-schema.org/draft/2020-12/schema": ["**/*.schema.yml", "**/schema.*.yml"]
+    "https://json-schema.org/draft/2020-12/schema": [
+      "**/*.schema.yml",
+      "**/schema.*.yml"
+    ],
+    "https://www.schemastore.org/fly.json": ["**/fly.yaml", "**/fly.*.yaml"]
   },
   // EXTENSION: tamasfe.even-better-toml
   "evenBetterToml.schema.associations": {
