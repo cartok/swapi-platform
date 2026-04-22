@@ -31,8 +31,4 @@ Disallow: /
 
 User-agent: *
 Disallow: /healthz
-Disallow: /livez
-Disallow: /readyz
-Disallow: /cdn-cgi/
-Disallow: /ngsw/
-Disallow: /api/
+Disallow: /status/

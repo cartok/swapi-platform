@@ -5,6 +5,7 @@ import {
   findClosestWidthBreakpoint,
 } from '@swapi/shared/device/context'
 
+import { skipDeviceDetection } from '#internal/device/skip-device-detection'
 import type { Handler } from '#internal/types'
 
 type HeaderType = string | undefined
@@ -13,6 +14,10 @@ export const addDeviceContextHandler: Handler = (hono) => {
   hono.get('*', (c, next) => {
     const isDocumentRequest = c.get('isHtmlDocumentRequest')
     if (!isDocumentRequest) {
+      return next()
+    }
+
+    if (skipDeviceDetection(c)) {
       return next()
     }
 

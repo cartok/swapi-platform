@@ -4,8 +4,10 @@ import { PATHS } from '@swapi/shared/routing/paths'
 import { env } from '#internal/env'
 import type { Handler } from '#internal/types'
 
-export const addErrorHandler: Handler = (hono) => {
+export const addErrorHandler: Handler = (hono, runContext) => {
   hono.onError((error, c) => {
+    runContext.hono.caughtExceptions++
+
     console.error(header('Hono error handler'))
     console.error(error)
     if (env.SWAPI_TARGET !== 'production') {

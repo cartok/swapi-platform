@@ -3,8 +3,6 @@ import process, { resourceUsage } from 'node:process'
 
 import { header, objectToString } from '@swapi/shared/logging/utils'
 
-// TODO: Disabled SSR smoke test until health checks work.
-// import { PATHS } from '@swapi/shared/routing/paths'
 import { env } from '#internal/env'
 import { createHono } from '#internal/hono'
 import { honoFetchWithForwardedProtocol } from '#internal/security/forwarded-headers'
@@ -13,19 +11,22 @@ import type { ServerRunContext } from '#internal/types'
 
 console.log(`Process id is: ${process.pid}`)
 
-// Fly kills in 8 seconds, see `kill_timeout` in fly.toml.
+// Timeout should be below the timeout configured in fly.toml.
 const FORCE_EXIT_TIMEOUT = 7_500
 const INFLIGHT_REQUESTS_TIMEOUT = 6_000
 const INFLIGHT_REQUESTS_POLL = 100
-// TODO: Disabled SSR smoke test until health checks work.
-// const SSR_SMOKE_TEST_PATH = PATHS.SSR.MOVIES
 
 const runContext: ServerRunContext = {
-  ready: false,
-  ssrReady: false,
-  shutdownStarted: false,
-  unhandledRejectionCount: 0,
-  inFlightRequests: 0,
+  server: {
+    ready: false,
+    ssrReady: false,
+    shutdownStarted: false,
+    unhandledRejections: 0,
+  },
+  hono: {
+    inFlightRequests: 0,
+    caughtExceptions: 0,
+  },
 }
 
 process.once('beforeExit', () => {
@@ -53,7 +54,7 @@ process.on('SIGTERM', (signal) => {
 })
 
 process.on('unhandledRejection', (reason) => {
-  runContext.unhandledRejectionCount++
+  runContext.server.unhandledRejections++
   console.error(runContext)
   console.error(reason)
 })
@@ -102,12 +103,8 @@ async function startServer(): Promise<Bun.Server<undefined>> {
 
   try {
     await warmupSsrRenderEngine()
-    // TODO: Disabled SSR smoke test until health checks work.
-    // await runSsrSmokeTest()
-
-    runContext.ssrReady = true
-    runContext.ready = true
-
+    runContext.server.ssrReady = true
+    runContext.server.ready = true
     return server
   } catch (error) {
     console.error('Startup failed.', error)
@@ -115,51 +112,11 @@ async function startServer(): Promise<Bun.Server<undefined>> {
     process.exit(1)
   }
 }
-
-// TODO: Disabled SSR smoke test until health checks work.
-// async function runSsrSmokeTest(): Promise<void> {
-//   console.log('Running SSR Smoke Test.')
-//   const smokeTestUrl = new URL(
-//     SSR_SMOKE_TEST_PATH,
-//     `http://127.0.0.1:${String(env.SWAPI_SERVER_PORT)}`,
-//   )
-//   const smokeTestHeaders: Record<string, string> = {
-//     accept: 'text/html',
-//     host: env.SWAPI_SERVER_HOST,
-//   }
-
-//   if (env.SWAPI_TARGET !== 'local') {
-//     smokeTestHeaders['x-forwarded-proto'] = 'https'
-//   }
-
-//   const response = await fetch(smokeTestUrl, {
-//     method: 'GET',
-//     headers: smokeTestHeaders,
-//   })
-
-//   if (!response.ok) {
-//     throw new Error(
-//       `SSR smoke test failed for ${smokeTestUrl.pathname} with status ${response.status}.`,
-//     )
-//   }
-
-//   const contentType = response.headers.get('content-type')?.toLowerCase()
-//   if (!contentType?.includes('text/html')) {
-//     throw new Error(
-//       `SSR smoke test failed for ${smokeTestUrl.pathname}: ` +
-//         `expected text/html but got ${contentType ?? 'empty content-type'}.`,
-//     )
-//   }
-
-//   await response.arrayBuffer()
-//   console.log('SSR Smoke Test was sucessfull.')
-// }
-
 async function shutdown(reason: string, code = 0) {
-  if (runContext.shutdownStarted) return
-  runContext.shutdownStarted = true
-  runContext.ready = false
-  runContext.ssrReady = false
+  if (runContext.server.shutdownStarted) return
+  runContext.server.shutdownStarted = true
+  runContext.server.ready = false
+  runContext.server.ssrReady = false
 
   console.error(`Shutdown started by: ${reason}`)
 
@@ -172,16 +129,18 @@ async function shutdown(reason: string, code = 0) {
   try {
     await server.stop()
 
-    if (runContext.inFlightRequests > 0) {
+    if (runContext.hono.inFlightRequests > 0) {
       const deadline = Date.now() + INFLIGHT_REQUESTS_TIMEOUT
 
       do {
-        console.log(`Waiting for ${runContext.inFlightRequests} in-flight request(s).`)
+        console.log(
+          `Waiting for ${runContext.hono.inFlightRequests} in-flight request(s).`,
+        )
         await new Promise((resolve) => setTimeout(resolve, INFLIGHT_REQUESTS_POLL))
-      } while (runContext.inFlightRequests > 0 && Date.now() < deadline)
+      } while (runContext.hono.inFlightRequests > 0 && Date.now() < deadline)
 
       console.warn(
-        `Exiting with ${runContext.inFlightRequests} in-flight request(s) still open.`,
+        `Exiting with ${runContext.hono.inFlightRequests} in-flight request(s) still open.`,
       )
     }
 

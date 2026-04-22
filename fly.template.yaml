@@ -14,14 +14,40 @@ vm:
     cpus: 1
 
 checks:
-  status_live:
+  alife:
     port: 51000
     type: http
     interval: 30s
     timeout: 2s
     grace_period: 3s
     method: HEAD
-    path: /status/live
+    path: /status/alife
+
+    headers:
+      X-Forwarded-Proto: https
+      X-Secret-Health-Check-Token: ${SWAPI_SECRET_HEALTH_CHECK_TOKEN}
+
+  errors:
+    port: 51000
+    type: http
+    interval: 2m
+    timeout: 2s
+    grace_period: 4s
+    method: GET
+    path: /status/errors
+
+    headers:
+      X-Forwarded-Proto: https
+      X-Secret-Health-Check-Token: ${SWAPI_SECRET_HEALTH_CHECK_TOKEN}
+
+  ssr:
+    port: 51000
+    type: http
+    interval: 3m
+    timeout: 3s
+    grace_period: 5s
+    method: GET
+    path: /status/ssr
 
     headers:
       X-Forwarded-Proto: https
@@ -45,11 +71,10 @@ http_service:
   checks:
     - interval: 30s
       timeout: 2s
-      grace_period: 5s
+      grace_period: 6s
       method: GET
       path: /status/ready
 
       headers:
         X-Forwarded-Proto: https
         X-Secret-Health-Check-Token: ${SWAPI_SECRET_HEALTH_CHECK_TOKEN}
-

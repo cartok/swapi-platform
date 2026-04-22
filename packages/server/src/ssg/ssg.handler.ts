@@ -11,6 +11,10 @@ export const addSsgHandler: Handler = (hono) => {
       return next()
     }
 
+    if (c.req.header('X-Skip-SSG') === 'true') {
+      return next()
+    }
+
     const ssgFilePath = resolveSsgFilePath(c.req.path)
     if (!isInsideSsgDirectory(ssgFilePath, ssgDistPath)) {
       return next()

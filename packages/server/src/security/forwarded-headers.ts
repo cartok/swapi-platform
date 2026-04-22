@@ -25,7 +25,7 @@ export const honoFetchWithForwardedProtocol: Handler<Hono<HonoEnv>['fetch']> = (
 }
 
 export function rewriteRequestWithForwardedProtocol(request: Request): Request {
-  const forwardedProtocol = request.headers.get('x-forwarded-proto')
+  const forwardedProtocol = request.headers.get('X-Forwarded-Proto')
   if (!forwardedProtocol) {
     return request
   }

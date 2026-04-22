@@ -1,10 +1,13 @@
 # Deployment Roadmap
 
-- [ ] Make SSR smoke test skip device detection. Then create a top-level health check for SSR health check instead of having it in the process startup pipeline.
-- [ ] Add a top-level health check that reports:
-  - [ ] Exceptions catched in Hono and add that information to the health status
-  - [ ] Unhandled promise rejectsion catched in the main process
-  - [ ] Remove the /status/ready check
+- [x] Add a top level SSR smoke test
+  - [x] Make SSR smoke test skip device detection
+- [x] Add a top-level health check that reports:
+  - [x] Exceptions catched in Hono and add that information to the health status
+  - [x] Unhandled promise rejectsion catched in the main process
+- [x] Simplify the /status/ready check
+- [ ] Add a service level health check for the SWAPI API
+- [ ] Add a service level health check for the images
 
 ---
 
@@ -16,6 +19,7 @@
     - Check if there is any machine running (started)
       - If not, run `fly machine start --app <machine-id>`, `flyctl checks list --app <name>`
       - Else only run `flyctl checks list --app <name>`
+- [ ] When deploying with --local-only, the image size is x3 bigger.
 
 ---
 

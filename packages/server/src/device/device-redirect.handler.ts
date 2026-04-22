@@ -5,6 +5,7 @@ import {
 import { PATHS } from '@swapi/shared/routing/paths'
 import { deleteCookie, getCookie, setCookie } from 'hono/cookie'
 
+import { skipDeviceDetection } from '#internal/device/skip-device-detection'
 import { env } from '#internal/env'
 import type { Handler } from '#internal/types'
 
@@ -13,6 +14,10 @@ const JUST_REDIRECTED_COOKIE_KEY = 'justRedirected'
 export const addDeviceRedirectHandler: Handler = (hono) => {
   hono.get('*', (c, next) => {
     if (!c.get('isHtmlDocumentRequest')) {
+      return next()
+    }
+
+    if (skipDeviceDetection(c)) {
       return next()
     }
 

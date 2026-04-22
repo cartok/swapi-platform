@@ -1,17 +1,8 @@
 import { env, secretEnv } from '#internal/env'
-import type { Handler, RunContext } from '#internal/types'
+import type { Handler } from '#internal/types'
 
-type HealthHttpStatus = 200 | 503
-
-type HealthResponseBody = RunContext & {
-  ok: boolean
-  message?: string
-}
-
-interface HealthResponseData {
-  body: HealthResponseBody
-  status: HealthHttpStatus
-}
+// Timeout should be below the timeout configured in fly.toml.
+const SSR_SMOKE_TEST_TIMEOUT_MS = 2000
 
 export const addHealthChecksHandler: Handler = (hono, runContext) => {
   if (env.SWAPI_TARGET !== 'local') {
@@ -28,36 +19,82 @@ export const addHealthChecksHandler: Handler = (hono, runContext) => {
     })
   }
 
-  hono.get('/status/live', (c) => {
-    const status = checkLive(runContext)
-    return c.body(null, status)
+  hono.get('/status/alife', (c) => {
+    return c.body(null, runContext.server.shutdownStarted ? 503 : 200)
   })
 
   hono.get('/status/ready', (c) => {
-    const responseData = checkReady(runContext)
-    return c.json(responseData.body, responseData.status)
+    return c.body(
+      null,
+      !runContext.server.ready ||
+        !runContext.server.ssrReady ||
+        runContext.server.shutdownStarted
+        ? 503
+        : 200,
+    )
+  })
+
+  hono.get('/status/ssr', async (c) => {
+    try {
+      await runSsrSmokeTest()
+      return c.body(null, 200)
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error('Unexpected error during SSR Smoke Test.')
+      } else {
+        console.error(error)
+      }
+      return c.body(null, 503)
+    }
+  })
+
+  hono.get('/status/errors', (c) => {
+    if (!runContext.server.unhandledRejections && !runContext.hono.caughtExceptions) {
+      return c.body(null, 200)
+    } else {
+      const text = [
+        `Unhandled Promise Rejections: ${runContext.server.unhandledRejections}`,
+        `Unhandled Exceptions: ${runContext.hono.caughtExceptions}`,
+      ].join(', ')
+      return c.text(text, 503)
+    }
   })
 }
 
-function checkLive(runContext: RunContext): HealthHttpStatus {
-  return runContext.shutdownStarted ? 503 : 200
-}
-
-function checkReady(runContext: RunContext): HealthResponseData {
-  if (!runContext.ready || !runContext.ssrReady || runContext.shutdownStarted) {
-    return { body: { ok: false, ...runContext }, status: 503 }
+async function runSsrSmokeTest(): Promise<void> {
+  console.log('Running SSR Smoke Test.')
+  const smokeTestUrl = new URL(`http://127.0.0.1:${env.SWAPI_SERVER_PORT}`)
+  const smokeTestHeaders: HeadersInit = {
+    Accept: 'text/html',
+    Host: env.SWAPI_SERVER_HOST,
+    'X-Skip-Device-Detection': 'true',
+    'X-Skip-SSG': 'true',
   }
 
-  if (runContext.unhandledRejectionCount > 0) {
-    return {
-      body: {
-        ok: false,
-        ...runContext,
-        message: `ready but ${runContext.unhandledRejectionCount} unhandled rejections so far`,
-      },
-      status: 200,
-    }
+  if (env.SWAPI_TARGET !== 'local') {
+    smokeTestHeaders['X-Forwarded-Proto'] = 'https'
   }
 
-  return { body: { ok: true, ...runContext }, status: 200 }
+  const response = await fetch(smokeTestUrl, {
+    method: 'GET',
+    headers: smokeTestHeaders,
+    signal: AbortSignal.timeout(SSR_SMOKE_TEST_TIMEOUT_MS),
+  })
+
+  if (!response.ok) {
+    throw new Error(
+      `SSR smoke test failed for ${smokeTestUrl.pathname} with status ${response.status}.`,
+    )
+  }
+
+  const contentType = response.headers.get('content-type')?.toLowerCase()
+  if (!contentType?.includes('text/html')) {
+    throw new Error(
+      `SSR smoke test failed for ${smokeTestUrl.pathname}: ` +
+        `expected text/html but got ${contentType ?? 'empty content-type'}.`,
+    )
+  }
+
+  await response.arrayBuffer()
+  console.log('SSR Smoke Test was sucessfull.')
 }

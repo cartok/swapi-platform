@@ -9,7 +9,6 @@
 - [x] Deny crawlers for now.
 - [x] Deny indexing for now.
 - [x] Implement process signal handling for proper shutdown, inculding healthcheck endpoints
-- [ ] Once SWAPI certificate got updated, benchmark to find good soft and hard limits
 
 ---
 
@@ -27,6 +26,14 @@
 
 ---
 
+## Stability / Performance
+
+- [ ] PRIO-3: Eventually check and optimize asset caching via `Cache-Control: immutable` just in case users do not use the Cloudflare URL
+- [ ] Analyze cause for PU02 errors.
+- [ ] Try out worker thrads SSR rendering for >= 4 Cores or so
 - [ ] Test if in-flight requests telemetry behaves correct
-- [ ] Smoke test retrys + ggf nextTick
-- [ ] Make requests cancelable, so that the server stops at least SSR if client stoped requesting
+
+---
+
+- [ ] PRIO-1: Make requests cancelable, so that the server stops at least SSR if client stoped requesting
+- [ ] PRIO-2: Semaphore + FIFO-Queue for SSR rendering

@@ -12,21 +12,25 @@ export interface HonoEnv {
 
 export type Handler<T = void> = (server: Hono<HonoEnv>, runContext: HonoRunContext) => T
 
-interface ServerPrivateRunContext {
-  ready: boolean
-  ssrReady: boolean
-  shutdownStarted: boolean
-  unhandledRejectionCount: number
+export interface RunContext {
+  server: {
+    ready: boolean
+    ssrReady: boolean
+    shutdownStarted: boolean
+    unhandledRejections: number
+  }
+  hono: {
+    inFlightRequests: number
+    caughtExceptions: number
+  }
 }
 
-interface HonoPrivateRunContext {
-  inFlightRequests: number
+export interface ServerRunContext {
+  server: RunContext['server']
+  hono: Readonly<RunContext['hono']>
 }
 
-export interface ServerRunContext
-  extends ServerPrivateRunContext, Readonly<HonoPrivateRunContext> {}
-
-export interface HonoRunContext
-  extends HonoPrivateRunContext, Readonly<ServerPrivateRunContext> {}
-
-export interface RunContext extends ServerPrivateRunContext, HonoPrivateRunContext {}
+export interface HonoRunContext {
+  server: Readonly<RunContext['server']>
+  hono: RunContext['hono']
+}
