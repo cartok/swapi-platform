@@ -6,8 +6,9 @@
   - [x] Exceptions catched in Hono and add that information to the health status
   - [x] Unhandled promise rejectsion catched in the main process
 - [x] Simplify the /status/ready check
-- [ ] Add a service level health check for the SWAPI API
+- [x] Add a service level health check for the SWAPI API
 - [ ] Add a service level health check for the images
+- [ ] Versioning of docker images
 
 ---
 

@@ -12,7 +12,7 @@ import type { ServerRunContext } from '#internal/types'
 
 console.log(`Process id is: ${process.pid}`)
 
-// Timeout should be below the timeout configured in fly.toml.
+// The timeout should be lower than the one defined in fly config for that health check.
 const FORCE_EXIT_TIMEOUT = 7_500
 const INFLIGHT_REQUESTS_TIMEOUT = 6_000
 const INFLIGHT_REQUESTS_POLL = 100

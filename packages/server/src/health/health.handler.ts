@@ -1,8 +1,8 @@
 import { env, secretEnv } from '#internal/env'
+import { runSwapiApiHealthCheck } from '#internal/health/external/swapi/swapi-api.smoke-test'
+import { runSsrSmokeTest } from '#internal/health/ssr/ssr.smoke-test'
+import { extractErrorMessage } from '#internal/shared/error'
 import type { Handler } from '#internal/types'
-
-// Timeout should be below the timeout configured in fly.toml.
-const SSR_SMOKE_TEST_TIMEOUT_MS = 2000
 
 export const addHealthChecksHandler: Handler = (hono, runContext) => {
   if (env.SWAPI_TARGET !== 'local') {
@@ -14,7 +14,6 @@ export const addHealthChecksHandler: Handler = (hono, runContext) => {
       ) {
         return c.text('Forbidden', 400)
       }
-
       return next()
     })
   }
@@ -24,28 +23,11 @@ export const addHealthChecksHandler: Handler = (hono, runContext) => {
   })
 
   hono.get('/status/ready', (c) => {
-    return c.body(
-      null,
+    const isReady =
       !runContext.server.ready ||
-        !runContext.server.ssrReady ||
-        runContext.server.shutdownStarted
-        ? 503
-        : 200,
-    )
-  })
-
-  hono.get('/status/ssr', async (c) => {
-    try {
-      await runSsrSmokeTest()
-      return c.body(null, 200)
-    } catch (error) {
-      if (error instanceof Error) {
-        console.error('Unexpected error during SSR Smoke Test.')
-      } else {
-        console.error(error)
-      }
-      return c.body(null, 503)
-    }
+      !runContext.server.ssrReady ||
+      runContext.server.shutdownStarted
+    return c.body(null, isReady ? 503 : 200)
   })
 
   hono.get('/status/errors', (c) => {
@@ -59,42 +41,24 @@ export const addHealthChecksHandler: Handler = (hono, runContext) => {
       return c.text(text, 503)
     }
   })
-}
 
-async function runSsrSmokeTest(): Promise<void> {
-  console.log('Running SSR Smoke Test.')
-  const smokeTestUrl = new URL(`http://127.0.0.1:${env.SWAPI_SERVER_PORT}`)
-  const smokeTestHeaders: HeadersInit = {
-    Accept: 'text/html',
-    Host: env.SWAPI_SERVER_HOST,
-    'X-Skip-Device-Detection': 'true',
-    'X-Skip-SSG': 'true',
-  }
-
-  if (env.SWAPI_TARGET !== 'local') {
-    smokeTestHeaders['X-Forwarded-Proto'] = 'https'
-  }
-
-  const response = await fetch(smokeTestUrl, {
-    method: 'GET',
-    headers: smokeTestHeaders,
-    signal: AbortSignal.timeout(SSR_SMOKE_TEST_TIMEOUT_MS),
+  hono.get('/status/ssr', async (c) => {
+    try {
+      await runSsrSmokeTest()
+      return c.body(null, 200)
+    } catch (error) {
+      console.error(error)
+      return c.body(extractErrorMessage(error), 503)
+    }
   })
 
-  if (!response.ok) {
-    throw new Error(
-      `SSR smoke test failed for ${smokeTestUrl.pathname} with status ${response.status}.`,
-    )
-  }
-
-  const contentType = response.headers.get('content-type')?.toLowerCase()
-  if (!contentType?.includes('text/html')) {
-    throw new Error(
-      `SSR smoke test failed for ${smokeTestUrl.pathname}: ` +
-        `expected text/html but got ${contentType ?? 'empty content-type'}.`,
-    )
-  }
-
-  await response.arrayBuffer()
-  console.log('SSR Smoke Test was sucessfull.')
+  hono.get('/status/swapi', async (c) => {
+    try {
+      await runSwapiApiHealthCheck()
+      return c.body(null, 200)
+    } catch (error) {
+      console.error(error)
+      return c.text(extractErrorMessage(error), 503)
+    }
+  })
 }

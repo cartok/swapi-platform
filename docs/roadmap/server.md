@@ -26,6 +26,10 @@
 
 ---
 
+## Quality
+
+- [ ] Unify smoke test code, less repetition & timeouts should be configurable in one place.
+
 ## Stability / Performance
 
 - [ ] PRIO-3: Eventually check and optimize asset caching via `Cache-Control: immutable` just in case users do not use the Cloudflare URL
