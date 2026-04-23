@@ -21,7 +21,7 @@ tasks:
       - task: lint:generators
         vars:
           PROFILE: '{{.PROFILE}}'
-      - task: lint:shared
+      - task: lint:src
         vars:
           PROFILE: '{{.PROFILE}}'
 
@@ -40,11 +40,11 @@ tasks:
     cmds:
       - bunx --no-install tsc --noEmit --project '{{.TSCONFIG}}'
 
-  lint:shared:
+  lint:src:
     vars:
       PROFILE:
         ref: .SWAPI_PROFILE | default .PROFILE | default "debug"
-      TSCONFIG: './tsconfig/tsconfig.shared{{if eq .PROFILE "release"}}.release{{end}}.json'
+      TSCONFIG: './tsconfig/tsconfig.src{{if eq .PROFILE "release"}}.release{{end}}.json'
     requires:
       vars:
         - name: PROFILE
@@ -61,7 +61,7 @@ tasks:
       PROFILE:
         ref: .SWAPI_PROFILE | default .PROFILE | default "debug"
       DIST_DIR: './dist/{{.PROFILE}}'
-      TSCONFIG: './tsconfig/tsconfig.shared{{if eq .PROFILE "release"}}.release{{end}}.json'
+      TSCONFIG: './tsconfig/tsconfig.src{{if eq .PROFILE "release"}}.release{{end}}.json'
     requires:
       vars:
         - name: PROFILE
