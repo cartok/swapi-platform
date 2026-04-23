@@ -1,4 +1,4 @@
-ARG BUN_VERSION=1.3.12
+ARG BUN_VERSION=1.3.13
 ARG NODE_ENV
 ARG PROFILE
 ARG TARGET
@@ -11,10 +11,11 @@ ARG NODE_ENV
 ENV NODE_ENV=${NODE_ENV}
 WORKDIR /app
 
-COPY ./.node-version ./
 COPY ./.npmrc ./
-COPY ./bun.lock ./
+COPY ./.node-version ./
+COPY ./.bun-version ./
 COPY ./package.json ./
+COPY ./bun.lock ./
 COPY ./packages/tsconfig/package.json ./packages/tsconfig/
 COPY ./packages/shared/package.json ./packages/shared/
 COPY ./packages/server/package.json ./packages/server/

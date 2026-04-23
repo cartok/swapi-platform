@@ -2,8 +2,10 @@
   "files": [],
   "compileOnSave": false,
   "compilerOptions": {
-    "skipLibCheck": true,
     "importHelpers": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "skipLibCheck": true,
+    "types": []
   }
 }
