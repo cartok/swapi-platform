@@ -1,7 +1,6 @@
 import { fileURLToPath, URL } from 'node:url'
 
 import angular from '@analogjs/vite-plugin-angular'
-import { logEnv } from '@swapi/shared/environment/env'
 import type { UserConfig } from 'vite'
 import {
   defaultClientConditions,
@@ -11,6 +10,7 @@ import {
   transformWithOxc,
 } from 'vite'
 
+import { logEnv } from '../shared/src/environment/env'
 import { browserEnv, buildEnv } from './src/env'
 import type { AppBrowserEnv, AppBuildEnv } from './src/env.schema'
 
