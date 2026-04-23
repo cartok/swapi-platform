@@ -96,6 +96,7 @@ tasks:
 
   lint:eslint:
     sources:
+      - ./bun.lock
       - ./eslint.config.mjs
       - ./package.json
       - ./packages/**/*.{ts,json}
@@ -105,6 +106,7 @@ tasks:
   lint:prettier:
     sources:
       - ./.prettierignore
+      - ./bun.lock
       - ./package.json
       - ./prettier.config.mjs
       - ./packages/**/*.{ts,json}
@@ -113,6 +115,7 @@ tasks:
 
   fix:
     sources:
+      - ./bun.lock
       - ./eslint.config.mjs
       - ./package.json
       - ./packages/**/*.{ts,json}
@@ -123,6 +126,7 @@ tasks:
   format:
     sources:
       - ./.prettierignore
+      - ./bun.lock
       - ./package.json
       - ./prettier.config.mjs
       - ./packages/**/*.{ts,json}

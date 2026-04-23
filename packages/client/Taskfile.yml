@@ -21,6 +21,7 @@ tasks:
       - ./vite.config.ts
       - ./tsconfig/**/*.json
       - ./src/**/*.{ts,json}
+      - ../../bun.lock
       - ../../../packages/shared/src/**/*.ts
     cmds:
       - bunx --no-install tsc --noEmit --project '{{.TSCONFIG}}'
@@ -32,6 +33,7 @@ tasks:
       - ./vite.config.ts
       - ./tsconfig/**/*.json
       - ./src/**/*.{ts,json,html,css}
+      - ../../bun.lock
       - ../../../packages/shared/src/**/*.ts
     cmds:
       - bunx axe http://localhost:4200 --tags wcag2a,wcag2aa,wcag21a,wcag21aa --exit
@@ -104,6 +106,7 @@ tasks:
       - ./tsconfig/tsconfig.app.base.json
       - '{{.TSCONFIG}}'
       - ./{src,public}/**/*
+      - ../../bun.lock
     generates:
       - '{{.DIST_DIR}}/**/*'
     cmds:
@@ -147,6 +150,7 @@ tasks:
       - ./tsconfig/tsconfig.app.base.json
       - '{{.TSCONFIG}}'
       - ./{src,public}/**/*
+      - ../../bun.lock
     generates:
       - '{{.DIST_DIR}}/**/*'
     cmds:
@@ -172,6 +176,7 @@ tasks:
     sources:
       - ./tsconfig/tsconfig.dist-paths.json
       - ./src/dist-paths.ts
+      - ../../bun.lock
     generates:
       - '{{.DIST_PATH}}/dist-paths.js'
     cmds:

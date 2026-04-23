@@ -23,6 +23,7 @@ tasks:
       - '{{.TSCONFIG}}'
       - ./src/**/*
       - ./docker/**/*
+      - ../../bun.lock
     cmds:
       - bunx --no-install tsc --noEmit --project '{{.TSCONFIG}}'
 
@@ -89,6 +90,7 @@ tasks:
       - '{{.CLIENT_DIST_ROOT}}/browser/**/*'
       - '{{.CLIENT_DIST_ROOT}}/dist-paths.*'
       - '{{.CLIENT_DIST_ROOT}}/ssr/**/*'
+      - ../../bun.lock
     generates:
       - '{{.CLIENT_SSG_DIST_DIR}}/index.html'
       - '{{.CLIENT_SSG_DIST_DIR}}/**/*/index.html'
@@ -149,6 +151,7 @@ tasks:
       - ./package.json
       - ./.env/.env.{{.TARGET}}.{{.PROFILE}}
       - ./src/**/*
+      - ../../bun.lock
     generates:
       - '{{.BUILD_DIST_DIR}}/**/*'
     cmds:
@@ -189,6 +192,7 @@ tasks:
       - ./rolldown.config.ts
       - ./docker/**/*.ts
       - '{{.BUILD_DIST_DIR}}/**/*'
+      - ../../bun.lock
     generates:
       - '{{.BUNDLE_DIST_DIR}}/**/*'
     cmds:
