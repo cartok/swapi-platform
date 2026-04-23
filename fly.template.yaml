@@ -40,18 +40,18 @@ checks:
       X-Forwarded-Proto: https
       X-Secret-Health-Check-Token: ${SWAPI_SECRET_HEALTH_CHECK_TOKEN}
 
-  swapi:
-    port: 51000
-    type: http
-    interval: 5m
-    timeout: 2s
-    grace_period: 6s
-    method: GET
-    path: /status/api/swapi
+  # swapi:
+  #   port: 51000
+  #   type: http
+  #   interval: 5m
+  #   timeout: 2s
+  #   grace_period: 6s
+  #   method: GET
+  #   path: /status/api/swapi
 
-    headers:
-      X-Forwarded-Proto: https
-      X-Secret-Health-Check-Token: ${SWAPI_SECRET_HEALTH_CHECK_TOKEN}
+  #   headers:
+  #     X-Forwarded-Proto: https
+  #     X-Secret-Health-Check-Token: ${SWAPI_SECRET_HEALTH_CHECK_TOKEN}
 
   ssr:
     port: 51000
