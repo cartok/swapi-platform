@@ -171,7 +171,6 @@ tasks:
           TARGET: '{{.TARGET}}'
     cmds:
       - docker rm --force {{.DOCKER_IMAGE_NAME}} >/dev/null 2>&1 || true
-      - defer: docker rm --force {{.DOCKER_IMAGE_NAME}} >/dev/null 2>&1 || true
       - >
         docker run --rm
         --publish 127.0.0.1:${SWAPI_SERVER_PORT}:${SWAPI_SERVER_PORT}
