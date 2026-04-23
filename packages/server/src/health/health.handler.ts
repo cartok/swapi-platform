@@ -52,7 +52,7 @@ export const addHealthChecksHandler: Handler = (hono, runContext) => {
     }
   })
 
-  hono.get('/status/swapi', async (c) => {
+  hono.get('/status/api/swapi', async (c) => {
     try {
       await runSwapiApiHealthCheck()
       return c.body(null, 200)

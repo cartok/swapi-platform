@@ -19,7 +19,7 @@ checks:
     type: http
     interval: 30s
     timeout: 2s
-    grace_period: 3s
+    grace_period: 2s
     method: HEAD
     path: /status/alife
 
@@ -44,10 +44,10 @@ checks:
     port: 51000
     type: http
     interval: 5m
-    timeout: 5s
-    grace_period: 5s
+    timeout: 2s
+    grace_period: 6s
     method: GET
-    path: /status/swapi
+    path: /status/api/swapi
 
     headers:
       X-Forwarded-Proto: https
@@ -57,8 +57,8 @@ checks:
     port: 51000
     type: http
     interval: 3m
-    timeout: 3s
-    grace_period: 6s
+    timeout: 2s
+    grace_period: 8s
     method: GET
     path: /status/ssr
 
@@ -83,8 +83,8 @@ http_service:
 
   checks:
     - interval: 30s
-      timeout: 2s
-      grace_period: 6s
+      timeout: 5s
+      grace_period: 10s
       method: GET
       path: /status/ready
 
