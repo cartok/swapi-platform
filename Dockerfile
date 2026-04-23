@@ -36,9 +36,9 @@ COPY ./packages/tsconfig/ ./packages/tsconfig
 
 COPY ./packages/client/public/ ./packages/client/public
 
-COPY ./packages/client/.env/${VARIANT_ENV_FILE} / ./packages/client/.env/
-COPY ./packages/server/.env/${VARIANT_ENV_FILE} / ./packages/server/.env/
-COPY ./packages/server/.env/${VARIANT_ENV_FILE_DOCKER} / ./packages/server/.env/
+COPY ./packages/client/.env/${VARIANT_ENV_FILE} ./packages/client/.env/
+COPY ./packages/server/.env/${VARIANT_ENV_FILE} ./packages/server/.env/
+COPY ./packages/server/.env/${VARIANT_ENV_FILE_DOCKER} ./packages/server/.env/
 
 COPY ./packages/client/index.html ./packages/client/
 
