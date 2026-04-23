@@ -1,4 +1,5 @@
 import fs from 'node:fs'
+import { constants } from 'node:os'
 import process, { resourceUsage } from 'node:process'
 
 import { header, objectToString } from '@swapi/shared/logging/utils'
@@ -42,15 +43,15 @@ process.on('SIGCONT', () => {
 })
 
 process.on('SIGUSR2', (signal) => {
-  void shutdown(String(signal), 1)
+  void shutdown(String(signal), signalExitCode(signal))
 })
 
 process.on('SIGINT', (signal) => {
-  void shutdown(signal, 1)
+  void shutdown(signal, signalExitCode(signal))
 })
 
 process.on('SIGTERM', (signal) => {
-  void shutdown(signal, 1)
+  void shutdown(signal, signalExitCode(signal))
 })
 
 process.on('unhandledRejection', (reason) => {
@@ -90,65 +91,65 @@ process.on('uncaughtException', (error) => {
 const server = await startServer()
 
 async function startServer(): Promise<Bun.Server<undefined>> {
-  const hono = createHono(runContext)
-  const server = Bun.serve({
-    hostname: env.SWAPI_SERVER_HOST_INTERNAL,
-    port: env.SWAPI_SERVER_PORT,
-    fetch:
-      env.SWAPI_TARGET === 'local'
-        ? hono.fetch
-        : honoFetchWithForwardedProtocol(hono, runContext),
-  })
-  console.log(`Server running at: ${server.url}`)
-
   try {
+    const hono = createHono(runContext)
+    const server = Bun.serve({
+      hostname: env.SWAPI_SERVER_HOST_INTERNAL,
+      port: env.SWAPI_SERVER_PORT,
+      fetch:
+        env.SWAPI_TARGET === 'local'
+          ? hono.fetch
+          : honoFetchWithForwardedProtocol(hono, runContext),
+    })
+    console.log(`Server running at: ${server.url}`)
+
     await warmupSsrRenderEngine()
     runContext.server.ssrReady = true
     runContext.server.ready = true
+
     return server
   } catch (error) {
     console.error('Startup failed.', error)
-    await server.stop(true)
     process.exit(1)
   }
 }
-async function shutdown(reason: string, code = 0) {
+async function shutdown(reason: string, code = 1) {
   if (runContext.server.shutdownStarted) return
+  console.error(`Shutdown started by: ${reason}`)
+
   runContext.server.shutdownStarted = true
   runContext.server.ready = false
   runContext.server.ssrReady = false
 
-  console.error(`Shutdown started by: ${reason}`)
-
-  const forceExitTimer = setTimeout(() => {
+  const forceExit = setTimeout(() => {
     console.error(`Forced shutdown after ${FORCE_EXIT_TIMEOUT}ms timeout.`)
-    void server.stop(true)
     process.exit(1)
   }, FORCE_EXIT_TIMEOUT)
 
   try {
     await server.stop()
-
     if (runContext.hono.inFlightRequests > 0) {
       const deadline = Date.now() + INFLIGHT_REQUESTS_TIMEOUT
-
       do {
         console.log(
           `Waiting for ${runContext.hono.inFlightRequests} in-flight request(s).`,
         )
         await new Promise((resolve) => setTimeout(resolve, INFLIGHT_REQUESTS_POLL))
       } while (runContext.hono.inFlightRequests > 0 && Date.now() < deadline)
-
       console.warn(
         `Exiting with ${runContext.hono.inFlightRequests} in-flight request(s) still open.`,
       )
     }
 
-    clearTimeout(forceExitTimer)
+    clearTimeout(forceExit)
     console.log('Shutdown complete.')
     process.exit(code)
   } catch (error) {
     console.error('Error during shutdown.', error)
     process.exit(1)
   }
+}
+
+function signalExitCode(signal: NodeJS.Signals) {
+  return 128 + constants.signals[signal]
 }
