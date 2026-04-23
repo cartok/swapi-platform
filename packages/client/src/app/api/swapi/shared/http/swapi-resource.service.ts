@@ -27,7 +27,7 @@ export class SwapiResourceService<
 > {
   private static readonly swapiApiBaseUrl = 'https://swapi.dev/api'
 
-  private readonly defaultItemCacheTtlMs = 5 * 60 * 1000
+  private readonly defaultItemCacheTtlMs = 1000 * 60 * 60
   private readonly itemCache = new Map<string, SwapiResourceItemCacheEntry<TModel>>()
 
   constructor(private readonly config: SwapiResourceServiceConfig<TDto, TModel>) {}
