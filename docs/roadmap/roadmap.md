@@ -1,6 +1,6 @@
 # Roadmap and Final Architecture Direction
 
-This project is intended to become a strong full-stack portfolio example. 
+This project is intended to become a strong full-stack portfolio example.
 
 My goal is not to build the most complex system possible for its own sake. The goal is to build a technically strong, modern, performance-conscious, cost-aware system that demonstrates good architectural judgment across frontend, edge, backend, infrastructure, and operations.
 
@@ -40,6 +40,7 @@ That means I do **not** want to split everything into many microservices too ear
 # Final target stack
 
 ## Frontend
+
 - **Angular**
 - SSR + SSG hybrid rendering
 - focus on modern Angular patterns
@@ -49,6 +50,7 @@ That means I do **not** want to split everything into many microservices too ear
 The frontend remains the visible core of the project and the main entry point for demonstrating UI engineering, SSR/SSG, rendering strategy, and performance thinking.
 
 ## Edge and delivery layer
+
 - **Cloudflare**
   - DNS
   - CDN
@@ -63,6 +65,7 @@ The frontend remains the visible core of the project and the main entry point fo
 This layer is important because it shows that I do not treat the frontend as just a client bundle. I want to demonstrate that I understand delivery architecture, caching strategy, and request steering at the edge.
 
 ## SSR / web application server
+
 - **Hono**
 - initially still usable in a container setup
 - long-term direction: run SSR-related logic as close to the edge as possible where it is practical
@@ -70,6 +73,7 @@ This layer is important because it shows that I do not treat the frontend as jus
 This part acts as the web application layer that connects Angular rendering concerns with edge and backend concerns.
 
 ## Core backend
+
 - **Quarkus**
 - one main backend service
 - REST API
@@ -88,6 +92,7 @@ I currently see Quarkus as the best backend direction for this project because i
 Rust is still interesting to me, especially for edge and performance-heavy areas, but for the main portfolio backend I currently consider Quarkus the more market-relevant choice.
 
 ## Database
+
 - **PostgreSQL**
 - likely via a cost-efficient hosted option first
 - structured relational data model
@@ -95,6 +100,7 @@ Rust is still interesting to me, especially for edge and performance-heavy areas
 - room for migrations, indexing, query optimization, and performance tuning
 
 ## Storage / assets / backups
+
 - **Cloudflare R2**
 - media / assets
 - exports
@@ -102,6 +108,7 @@ Rust is still interesting to me, especially for edge and performance-heavy areas
 - object storage use cases
 
 ## Async processing
+
 - optional later stage:
   - queue-based background processing
   - AI-related or import/export related tasks
@@ -110,9 +117,11 @@ Rust is still interesting to me, especially for edge and performance-heavy areas
 This should only be introduced when there is a real use case.
 
 ## Auth
+
 Authentication and authorization are important, but I do not want to introduce unnecessary infrastructure burden too early.
 
 Current direction:
+
 - start with a pragmatic auth approach
 - keep room for stronger identity integration later
 - evaluate Keycloak-related architecture only when it creates real value for the portfolio
@@ -120,6 +129,7 @@ Current direction:
 I do find a Quarkus + Keycloak-related direction interesting, but I do **not** want to force a heavy self-hosted auth stack too early if it mostly increases complexity and cost.
 
 ## Observability
+
 - **Sentry first**
   - exceptions
   - alerts
@@ -129,19 +139,23 @@ I do find a Quarkus + Keycloak-related direction interesting, but I do **not** w
   - broader metrics / logs / traces / dashboards as needed
 
 My current plan is to start pragmatic:
+
 - keep platform/server basics visible through existing hosting metrics
 - add Sentry for application-level observability
 - expand only when needed
 
 ## Infrastructure and operations
+
 - **Terraform**
 - **Docker Compose**
 - **Kubernetes later only if justified**
 
 ### Terraform
+
 Terraform is the long-term infrastructure-as-code layer.
 
 I want to use it for:
+
 - Cloudflare configuration
 - routing-related edge configuration
 - DNS
@@ -150,18 +164,22 @@ I want to use it for:
 - generally keeping important platform configuration versioned in code
 
 ### Docker Compose
+
 Docker Compose is the practical local and early deployment tool.
 
 I want to use it for:
+
 - local development
 - local integration testing
 - simple multi-service environments
 - potentially early VPS deployment stages
 
 ### Kubernetes
+
 Kubernetes is not an early priority.
 
 I am interested in it, but I do not want to introduce it just for keyword value. I only want to adopt it later if:
+
 - the architecture actually benefits from it
 - I want to explicitly demonstrate cluster-oriented operations
 - the extra complexity is justified
@@ -171,7 +189,9 @@ I am interested in it, but I do not want to introduce it just for keyword value.
 # Component responsibilities
 
 ## 1. Angular frontend
+
 Responsible for:
+
 - UI
 - routing
 - rendering experience
@@ -180,7 +200,9 @@ Responsible for:
 - SSR/SSG-compatible application structure
 
 ## 2. Device detection + redirect worker
+
 Responsible for:
+
 - request inspection
 - device-related logic
 - redirect or canonicalization strategy
@@ -189,20 +211,26 @@ Responsible for:
 This is a very interesting architectural showcase piece because it demonstrates performance-minded delivery and edge-based request handling.
 
 ## 3. Asset / SSG worker
+
 Responsible for:
+
 - static asset delivery
 - SSG response serving
 - cache-aware content delivery
 - offloading work from the application server
 
 ## 4. Hono SSR / web layer
+
 Responsible for:
+
 - SSR-related application logic
 - integration between Angular rendering and backend/edge strategy
 - request handling where static/edge delivery alone is not sufficient
 
 ## 5. Quarkus backend
+
 Responsible for:
+
 - business logic
 - API design
 - persistence
@@ -232,7 +260,9 @@ I want this project to show that I know how to make strong tradeoffs.
 # Planned evolution path
 
 ## Phase 1 — strong frontend + delivery foundation
+
 Focus:
+
 - Angular app quality
 - SSR + SSG architecture
 - Cloudflare integration
@@ -242,12 +272,15 @@ Focus:
 - basic Sentry integration
 
 Outcome:
+
 - technically strong frontend platform
 - visible performance and delivery thinking
 - deployable and demonstrable system
 
 ## Phase 2 — real backend foundation
+
 Focus:
+
 - Quarkus backend
 - Postgres integration
 - domain model
@@ -257,12 +290,15 @@ Focus:
 - persistence and backend structure
 
 Outcome:
+
 - clear demonstration of modern backend capability
 - stronger full-stack credibility
 - move beyond frontend-centric portfolio work
 
 ## Phase 3 — operational maturity
+
 Focus:
+
 - better alerts
 - tracing / APM improvements
 - infrastructure-as-code expansion with Terraform
@@ -271,10 +307,13 @@ Focus:
 - selective async jobs if useful
 
 Outcome:
+
 - the project starts to look like a serious production-oriented system, not just a demo app
 
 ## Phase 4 — advanced differentiation
+
 Optional later additions:
+
 - Grafana
 - more detailed metrics and dashboards
 - selected edge optimizations
@@ -282,6 +321,7 @@ Optional later additions:
 - possibly Kubernetes as an advanced operational branch or showcase extension
 
 Outcome:
+
 - additional engineering depth without forcing complexity too early
 
 ---
@@ -316,6 +356,7 @@ My hosting and architecture choices should aim for:
 - only adding infrastructure when it creates real portfolio value
 
 That means:
+
 - leverage Cloudflare heavily for delivery and edge concerns
 - avoid too many always-on backend services
 - avoid premature microservice sprawl
@@ -341,6 +382,7 @@ This project is meant to communicate that I can think across the full stack:
 - cost/performance tradeoffs
 
 If executed well, it should serve as a strong technical showcase for:
+
 - freelance opportunities
 - full-stack roles
 - frontend roles with backend credibility
@@ -365,6 +407,7 @@ My current preferred long-term direction is:
 - **Kubernetes only later if there is a real reason**
 
 This is the stack I currently consider the best balance of:
+
 - portfolio strength
 - market relevance
 - technical depth
