@@ -1,5 +1,5 @@
 import { env, secretEnv } from '#internal/env'
-import { runSwapiApiHealthCheck } from '#internal/health/external/swapi/swapi-api.smoke-test'
+import { runSwapiApiSmokeTest } from '#internal/health/external/swapi/swapi-api.smoke-test'
 import { runSsrSmokeTest } from '#internal/health/ssr/ssr.smoke-test'
 import { extractErrorMessage } from '#internal/shared/error'
 import type { Handler } from '#internal/types'
@@ -54,7 +54,7 @@ export const addHealthChecksHandler: Handler = (hono, runContext) => {
 
   hono.get('/status/api/swapi', async (c) => {
     try {
-      await runSwapiApiHealthCheck()
+      await runSwapiApiSmokeTest()
       return c.body(null, 200)
     } catch (error) {
       console.error(error)

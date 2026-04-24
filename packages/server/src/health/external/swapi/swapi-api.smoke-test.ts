@@ -4,7 +4,7 @@ import { runTlsCertificateHealthCheck } from '#internal/health/tls-certificate.h
 const SWAPI_API_HEALTH_CHECK_TIMEOUT_MS = 2000
 const SWAPI_API_HEALTH_CHECK_URL = new URL('https://swapi.dev/api')
 
-export async function runSwapiApiHealthCheck(): Promise<void> {
+export async function runSwapiApiSmokeTest(): Promise<void> {
   console.log('Running SWAPI API Smoke Test.')
   await runTlsCertificateHealthCheck({
     host: SWAPI_API_HEALTH_CHECK_URL.hostname,

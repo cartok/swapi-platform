@@ -29,6 +29,7 @@
 ## Quality
 
 - [ ] Unify smoke test code, less repetition & timeouts should be configurable in one place.
+- [ ] Environment variables for things like timeouts that are referred to in the code.
 
 ## Stability / Performance
 
