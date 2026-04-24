@@ -3,6 +3,7 @@ import { normalize, resolve, sep } from 'node:path'
 
 import { ssgDistPath } from '@swapi/client/dist-paths'
 
+import { CACHE_TAGS, DOCUMENT_CACHE_HEADERS } from '#internal/cache/cache'
 import type { Handler } from '#internal/types'
 
 export const addSsgHandler: Handler = (hono) => {
@@ -24,7 +25,10 @@ export const addSsgHandler: Handler = (hono) => {
       await access(ssgFilePath, constants.F_OK)
       console.log('SSG: Serve', ssgFilePath)
       const html = await readFile(ssgFilePath, 'utf8')
-      return c.html(html, 200)
+      return c.html(html, 200, {
+        ...DOCUMENT_CACHE_HEADERS,
+        'Cache-Tag': [CACHE_TAGS.HTML, CACHE_TAGS.SSG],
+      })
     } catch (error) {
       if (isErrorCode(error, 'ENOENT')) {
         return next()

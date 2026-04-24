@@ -1,6 +1,7 @@
 import { CommonEngine } from '@angular/ssr/node'
 import { indexHtmlPath } from '@swapi/client/dist-paths'
 
+import { CACHE_TAGS, DOCUMENT_CACHE_HEADERS } from '#internal/cache/cache'
 import { allowedHosts } from '#internal/env'
 import { enableAngularServerMode } from '#internal/shared/angular-server-mode'
 import type { Handler } from '#internal/types'
@@ -27,7 +28,10 @@ export const addSsrHandler: Handler = (hono) => {
     })
     console.log(`SSR: Rendered ${url}`)
 
-    return c.html(html, 200)
+    return c.html(html, 200, {
+      ...DOCUMENT_CACHE_HEADERS,
+      'Cache-Tag': [CACHE_TAGS.HTML, CACHE_TAGS.SSR],
+    })
   })
 }
 

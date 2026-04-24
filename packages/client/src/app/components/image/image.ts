@@ -32,7 +32,7 @@ export class Image {
     transform: booleanAttribute,
   })
   readonly placeholder = input(
-    '/assets/svg-sprite-sheet/build/sprite-sheet.1.svg#image-placeholder',
+    '/assets/svg-sprite-sheet/sprite-sheet.svg#image-placeholder',
   )
 
   readonly loaded = signal(false)
