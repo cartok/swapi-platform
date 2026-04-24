@@ -28,8 +28,9 @@ const DOCUMENT_REQUEST_EXCLUDED_PATHS: ReadonlySet<string> = new Set([
 const DOCUMENT_REQUEST_EXCLUDED_PREFIXES: readonly string[] = [
   ...STATIC_DIRECTORY_EXCLUDED_PREFIXES,
   '/.well-known/',
-  '/status/',
+  '/cdn-cgi/',
   '/debug/',
+  '/status/',
 ]
 
 function isHtmlDocumentRequest({
