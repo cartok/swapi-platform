@@ -32,11 +32,6 @@ export const addAssetHandler: Handler = (hono) => {
     serveStatic({
       root: browserDistPath,
       onFound: (path, c) => {
-        if (env.SWAPI_TARGET === 'local') {
-          c.header('Cache-Control', 'no-store')
-          return
-        }
-
         const cacheHeaders = resolveAssetCacheHeaders(path)
         for (const [headerName, headerValue] of Object.entries(cacheHeaders)) {
           c.header(headerName, headerValue)
