@@ -7,7 +7,6 @@ import type { Handler } from '#internal/types'
 export const addRequestContextHandler: Handler = (hono) => {
   hono.get('*', (c, next) => {
     const isDocumentRequest = isHtmlDocumentRequest({
-      method: c.req.method,
       pathname: c.req.path,
       acceptHeader: c.req.header('accept'),
     })
@@ -34,18 +33,12 @@ const DOCUMENT_REQUEST_EXCLUDED_PREFIXES: readonly string[] = [
 ]
 
 function isHtmlDocumentRequest({
-  method,
   pathname,
   acceptHeader,
 }: {
-  method: string
   pathname: string
   acceptHeader: string | undefined
 }): boolean {
-  if (method !== 'GET') {
-    return false
-  }
-
   if (isExcludedDocumentPath(pathname)) {
     return false
   }
