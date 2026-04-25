@@ -12,8 +12,9 @@ import {
 
 // Those vite runner related imports had to be relative.
 import { logEnv } from '../shared/src/environment/env'
+import { envToOxcDefine } from '../shared/src/environment/globals'
 import { browserEnv, buildEnv } from './src/env'
-import type { AppBrowserEnv, AppBuildEnv } from './src/env.schema'
+import type { AppBuildEnv } from './src/env.schema'
 
 logEnv(browserEnv, 'Vite App Environment Variables (Browser)')
 logEnv(buildEnv, 'Vite App Environment Variables (Build)')
@@ -26,17 +27,6 @@ const buildSourcemap: boolean | 'inline' | 'hidden' = toViteSourcemap(
 )
 
 export default defineConfig(({ isSsrBuild }) => {
-  const definedBrowserEnv = Object.fromEntries(
-    (
-      Object.entries(browserEnv) as [
-        keyof AppBrowserEnv,
-        AppBrowserEnv[keyof AppBrowserEnv],
-      ][]
-    ).map(([key, value]) => {
-      return [key, typeof value === 'string' ? `"${value}"` : value]
-    }),
-  ) satisfies Record<string, string | boolean | number>
-
   const config: UserConfig = {
     base: buildEnv.SWAPI_CLIENT_PUBLIC_BASE_PATH,
     clearScreen: false,
@@ -48,7 +38,7 @@ export default defineConfig(({ isSsrBuild }) => {
       sourcemap: buildSourcemap,
     },
     define: {
-      ...definedBrowserEnv,
+      ...envToOxcDefine(browserEnv),
       VITE_MODE: JSON.stringify(viteMode),
       ngServerMode: isSsrBuild,
     },

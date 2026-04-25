@@ -1,7 +1,7 @@
 import { header } from '@swapi/shared/logging/utils'
 import { PATHS } from '@swapi/shared/routing/paths'
 
-import { env } from '#internal/env'
+import { GLOBAL_SWAPI_TARGET } from '#internal/env'
 import type { Handler } from '#internal/types'
 
 export const addErrorHandler: Handler = (hono, runContext) => {
@@ -10,7 +10,7 @@ export const addErrorHandler: Handler = (hono, runContext) => {
 
     console.error(header('Hono error handler'))
     console.error(error)
-    if (env.SWAPI_TARGET !== 'production') {
+    if (GLOBAL_SWAPI_TARGET !== 'production') {
       console.error('Variables:', c.var)
       console.error('Environment:', c.env)
     }

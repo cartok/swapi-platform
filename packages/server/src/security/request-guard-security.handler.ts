@@ -1,4 +1,4 @@
-import { allowedHosts, env } from '#internal/env'
+import { allowedHosts, GLOBAL_SWAPI_TARGET } from '#internal/env'
 import type { Handler } from '#internal/types'
 
 const allowedHostSet: Readonly<Set<string>> = new Set(allowedHosts)
@@ -8,7 +8,7 @@ export const addRequestGuardHandler: Handler = (hono) => {
     const requestUrl = new URL(c.req.url)
     const protocol = requestUrl.protocol.slice(0, -1)
 
-    if (env.SWAPI_TARGET !== 'local' && protocol !== 'https') {
+    if (GLOBAL_SWAPI_TARGET !== 'local' && protocol !== 'https') {
       throw new Error(`Invalid protocol ${protocol}.`)
     }
 

@@ -1,11 +1,11 @@
-import { env, secretEnv } from '#internal/env'
+import { GLOBAL_SWAPI_TARGET, secretEnv } from '#internal/env'
 import { runSwapiApiSmokeTest } from '#internal/health/external/swapi/swapi-api.smoke-test'
 import { runSsrSmokeTest } from '#internal/health/ssr/ssr.smoke-test'
 import { extractErrorMessage } from '#internal/shared/error'
 import type { Handler } from '#internal/types'
 
 export const addHealthChecksHandler: Handler = (hono, runContext) => {
-  if (env.SWAPI_TARGET !== 'local') {
+  if (GLOBAL_SWAPI_TARGET !== 'local') {
     hono.on(['GET', 'HEAD'], '/status/*', async (c, next) => {
       if (
         !secretEnv.SWAPI_SECRET_HEALTH_CHECK_TOKEN ||

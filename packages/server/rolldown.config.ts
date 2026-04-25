@@ -3,6 +3,7 @@ import angularLinkerBabelPlugin from '@angular/compiler-cli/linker/babel'
 import type { TransformOptions } from '@babel/core'
 import { transformAsync } from '@babel/core'
 import { logEnv } from '@swapi/shared/environment/env'
+import { envToOxcDefine } from '@swapi/shared/environment/globals'
 import type { OutputOptions } from 'rolldown'
 import { defineConfig } from 'rolldown'
 
@@ -32,6 +33,9 @@ const serverBundleConfig = defineConfig({
     ],
   },
   external: (id) => externalDependencies.has(id),
+  transform: {
+    define: envToOxcDefine(env),
+  },
   output: {
     dir: `./dist/${buildVariantPath}/bundle`,
     cleanDir: true,

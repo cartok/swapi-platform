@@ -4,7 +4,7 @@ import type { Context } from 'hono'
 import { bodyLimit } from 'hono/body-limit'
 import { deleteCookie, getCookie, setCookie } from 'hono/cookie'
 
-import { env } from '#internal/env'
+import { GLOBAL_SWAPI_TARGET } from '#internal/env'
 import type { Handler } from '#internal/types'
 
 const DEVICE_COOKIE_KEY = 'device'
@@ -60,10 +60,10 @@ export const addDeviceCookieHandler: Handler = (hono) => {
       // Set new cookie from request body.
       setCookie(c, DEVICE_COOKIE_KEY, JSON.stringify(requestBody), {
         sameSite: 'lax',
-        secure: env.SWAPI_TARGET !== 'local',
+        secure: GLOBAL_SWAPI_TARGET !== 'local',
         path: '/',
         maxAge:
-          env.SWAPI_TARGET !== 'local'
+          GLOBAL_SWAPI_TARGET !== 'local'
             ? PRODUCTION_DEVICE_COOKIE_MAX_AGE_SECONDS
             : LOCAL_DEVICE_COOKIE_MAX_AGE_SECONDS,
       })

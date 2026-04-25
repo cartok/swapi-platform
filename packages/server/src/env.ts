@@ -1,3 +1,4 @@
+import type { Static } from '@sinclair/typebox'
 import { Type } from '@sinclair/typebox'
 import {
   BuildSourcemapSchema,
@@ -55,6 +56,16 @@ export const env = parseEnv(AppServerEnvSchema, {
   SWAPI_SERVER_PORT: process.env['SWAPI_SERVER_PORT'],
   SWAPI_TARGET: process.env['SWAPI_TARGET'],
 })
+
+export type AppServerEnv = Static<typeof AppServerEnvSchema>
+
+export const GLOBAL_NODE_ENV = typeof NODE_ENV === 'undefined' ? env.NODE_ENV : NODE_ENV
+export const GLOBAL_SWAPI_PROFILE =
+  typeof SWAPI_PROFILE === 'undefined' ? env.SWAPI_PROFILE : SWAPI_PROFILE
+export const GLOBAL_SWAPI_RUN_MODE =
+  typeof SWAPI_RUN_MODE === 'undefined' ? env.SWAPI_RUN_MODE : SWAPI_RUN_MODE
+export const GLOBAL_SWAPI_TARGET =
+  typeof SWAPI_TARGET === 'undefined' ? env.SWAPI_TARGET : SWAPI_TARGET
 
 const parsedAllowedHosts = env.SWAPI_ALLOWED_HOSTS.split(',')
   .map((x) => x.trim().toLowerCase())

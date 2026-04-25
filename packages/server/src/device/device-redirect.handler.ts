@@ -6,7 +6,7 @@ import { PATHS } from '@swapi/shared/routing/paths'
 import { deleteCookie, getCookie, setCookie } from 'hono/cookie'
 
 import { skipDeviceDetection } from '#internal/device/skip-device-detection'
-import { env } from '#internal/env'
+import { GLOBAL_SWAPI_TARGET } from '#internal/env'
 import type { Handler } from '#internal/types'
 
 const JUST_REDIRECTED_COOKIE_KEY = 'justRedirected'
@@ -52,7 +52,7 @@ export const addDeviceRedirectHandler: Handler = (hono) => {
     setCookie(c, JUST_REDIRECTED_COOKIE_KEY, 'true', {
       sameSite: 'lax',
       httpOnly: true,
-      secure: env.SWAPI_TARGET !== 'local',
+      secure: GLOBAL_SWAPI_TARGET !== 'local',
       path: '/',
     })
 

@@ -4,7 +4,7 @@ import { addAssetHandler } from '#internal/assets/asset.handler'
 import { addDebugPaths as addDebugRoutesHandler } from '#internal/debug/debug.handler'
 import { addDeviceContextHandler } from '#internal/device/device-context.handler'
 import { addDeviceRedirectHandler } from '#internal/device/device-redirect.handler'
-import { env } from '#internal/env'
+import { GLOBAL_SWAPI_TARGET } from '#internal/env'
 import { addErrorHandler } from '#internal/error/error.handler'
 import { addHealthChecksHandler } from '#internal/health/health.handler'
 import { addIndexingHandler } from '#internal/indexing/indexing.handler'
@@ -19,7 +19,7 @@ import type { HonoEnv, HonoRunContext } from '#internal/types'
 export function createHono(runContext: HonoRunContext): Hono<HonoEnv> {
   const hono = new Hono<HonoEnv>({ strict: false })
 
-  if (env.SWAPI_TARGET === 'local') {
+  if (GLOBAL_SWAPI_TARGET === 'local') {
     addDebugRoutesHandler(hono, runContext)
   }
 

@@ -1,7 +1,7 @@
 import type { Hono } from 'hono'
 import { HTTPException } from 'hono/http-exception'
 
-import { env } from '#internal/env'
+import { GLOBAL_SWAPI_TARGET } from '#internal/env'
 import type { Handler, HonoEnv } from '#internal/types'
 
 export const honoFetchWithForwardedProtocol: Handler<Hono<HonoEnv>['fetch']> = (hono) => {
@@ -29,7 +29,7 @@ export function rewriteRequestWithForwardedProtocol(request: Request): Request {
   if (!forwardedProtocol) {
     return request
   }
-  if (env.SWAPI_TARGET !== 'local' && forwardedProtocol === 'http') {
+  if (GLOBAL_SWAPI_TARGET !== 'local' && forwardedProtocol === 'http') {
     throw new HTTPException(400, { message: 'Forwarding HTTP is forbidden.' })
   }
   if (forwardedProtocol !== 'https') {

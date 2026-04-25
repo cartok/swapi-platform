@@ -4,7 +4,7 @@ import process, { resourceUsage } from 'node:process'
 
 import { header, objectToString } from '@swapi/shared/logging/utils'
 
-import { env } from '#internal/env'
+import { env, GLOBAL_SWAPI_TARGET } from '#internal/env'
 import { createHono } from '#internal/hono'
 import { honoFetchWithForwardedProtocol } from '#internal/security/forwarded-headers'
 import { warmupSsrRenderEngine } from '#internal/ssr/ssr.handler'
@@ -69,7 +69,7 @@ process.on('uncaughtException', (error) => {
     fs.writeSync(process.stderr.fd, header('run context'))
     fs.writeSync(process.stderr.fd, objectToString(runContext))
 
-    if (env.SWAPI_TARGET !== 'production') {
+    if (GLOBAL_SWAPI_TARGET !== 'production') {
       fs.writeSync(process.stderr.fd, header('env'))
       fs.writeSync(process.stderr.fd, objectToString(env))
 
@@ -97,7 +97,7 @@ async function startServer(): Promise<Bun.Server<undefined>> {
       hostname: env.SWAPI_SERVER_HOST_INTERNAL,
       port: env.SWAPI_SERVER_PORT,
       fetch:
-        env.SWAPI_TARGET === 'local'
+        GLOBAL_SWAPI_TARGET === 'local'
           ? hono.fetch
           : honoFetchWithForwardedProtocol(hono, runContext),
     })

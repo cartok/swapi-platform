@@ -1,11 +1,11 @@
 import type { MiddlewareHandler } from 'hono'
 import { secureHeaders } from 'hono/secure-headers'
 
-import { env } from '#internal/env'
+import { GLOBAL_SWAPI_TARGET } from '#internal/env'
 import type { Handler, HonoEnv } from '#internal/types'
 
 const globalSecureHeaders: MiddlewareHandler<HonoEnv> = secureHeaders({
-  strictTransportSecurity: env.SWAPI_TARGET !== 'production' ? false : 'max-age=300',
+  strictTransportSecurity: GLOBAL_SWAPI_TARGET !== 'production' ? false : 'max-age=300',
 })
 
 const htmlDocumentSecureHeaders: MiddlewareHandler<HonoEnv> = secureHeaders({
