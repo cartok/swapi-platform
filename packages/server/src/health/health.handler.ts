@@ -6,7 +6,7 @@ import type { Handler } from '#internal/types'
 
 export const addHealthChecksHandler: Handler = (hono, runContext) => {
   if (GLOBAL_SWAPI_TARGET !== 'local') {
-    hono.on(['GET', 'HEAD'], '/status/*', async (c, next) => {
+    hono.get('/status/*', async (c, next) => {
       if (
         !secretEnv.SWAPI_SECRET_HEALTH_CHECK_TOKEN ||
         secretEnv.SWAPI_SECRET_HEALTH_CHECK_TOKEN !==

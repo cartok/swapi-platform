@@ -25,7 +25,7 @@ const MEDIA_ASSET_EXTENSIONS = new Set([
 ]) as ReadonlySet<string>
 
 export const addAssetHandler: Handler = (hono) => {
-  hono.on(['GET', 'HEAD'], '*', (c, next) => {
+  hono.get('*', (c, next) => {
     if (c.get('isHtmlDocumentRequest')) {
       return next()
     }
