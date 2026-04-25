@@ -1,6 +1,7 @@
 import type { Static } from '@sinclair/typebox'
 import { Type } from '@sinclair/typebox'
 
+// Those vite runner related imports had to be relative.
 import {
   BuildSourcemapSchema,
   CommonEnvSchema,

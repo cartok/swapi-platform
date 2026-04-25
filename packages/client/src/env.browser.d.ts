@@ -1,3 +1,4 @@
+// Those vite runner related imports had to be relative.
 import type { AppBrowserEnv } from './env.schema'
 
 declare global {

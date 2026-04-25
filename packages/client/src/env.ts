@@ -1,3 +1,4 @@
+// Those vite runner related imports had to be relative.
 import { parseEnv } from '../../shared/src/environment/env'
 import { AppBrowserEnvSchema, AppBuildEnvSchema } from './env.schema'
 

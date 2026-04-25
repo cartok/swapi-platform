@@ -10,6 +10,7 @@ import {
   transformWithOxc,
 } from 'vite'
 
+// Those vite runner related imports had to be relative.
 import { logEnv } from '../shared/src/environment/env'
 import { browserEnv, buildEnv } from './src/env'
 import type { AppBrowserEnv, AppBuildEnv } from './src/env.schema'
