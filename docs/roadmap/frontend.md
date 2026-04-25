@@ -8,10 +8,9 @@
   - [ ] Eventually add global focus blur on esc key
 - [ ] Add a global page cursor style and use it while dragging the image slider.
 - [ ] Add SVG sprite-sheet generation.
-- [ ] Refactor to Tailwind (4, via vite & lightningcss), as most people prefer tailwind (whyever)
+- [ ] Eventually refactor to Tailwind (4, via vite & lightningcss), as most people prefer tailwind (whyever)
 - [ ] Webmanifest
-- [ ] Integrate a headless CMS
-- [ ] Storybook
+- [ ] Inject error Information into error page
 
 ---
 
