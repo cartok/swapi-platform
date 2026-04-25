@@ -46,6 +46,7 @@ tasks:
       SWAPI_RUN_MODE: source
     interactive: true
     cmds:
+      - 'echo "Hint: This task does not do SSG automatically and will fallback to SSR."'
       - >
         bunx --no-install bun
         --conditions @swapi/shared/source
