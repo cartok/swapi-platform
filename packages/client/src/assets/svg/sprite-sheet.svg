@@ -10,7 +10,4 @@
   <symbol id="circle" viewBox="0 0 20 20">
     <circle cx="10" cy="10" r="10" fill="currentColor" />
   </symbol>
-  <symbol id="image-placeholder" viewBox="0 0 100 100">
-    <rect width="100" height="100" fill="currentColor" />
-  </symbol>
 </svg>

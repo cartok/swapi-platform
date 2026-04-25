@@ -10,11 +10,12 @@ import {
 } from '@angular/core'
 
 import { Image } from '@/components/image/image'
+import { Spritesheet } from '@/components/spritesheet/spritesheet'
 import { SwipeDirective } from '@/shared/directives/swipe/swipe'
 
 @Component({
   selector: 'app-image-slider',
-  imports: [SwipeDirective, Image, Tabs, TabList, Tab, TabPanel],
+  imports: [SwipeDirective, Image, Tabs, TabList, Tab, TabPanel, Spritesheet],
   templateUrl: './image-slider.html',
   styleUrl: './image-slider.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -31,9 +31,6 @@ export class Image {
   readonly draggable = input<HTMLImageElement['draggable'], unknown>(false, {
     transform: booleanAttribute,
   })
-  readonly placeholder = input(
-    '/assets/svg-sprite-sheet/sprite-sheet.svg#image-placeholder',
-  )
 
   readonly loaded = signal(false)
   readonly loadError = signal(false)

@@ -33,6 +33,7 @@ export default defineConfig(({ isSsrBuild }) => {
     envDir: false,
     mode: viteMode,
     build: {
+      ssrManifest: isSsrBuild,
       emptyOutDir: true,
       minify: buildEnv.SWAPI_BUILD_MINIFY,
       sourcemap: buildSourcemap,
@@ -46,6 +47,10 @@ export default defineConfig(({ isSsrBuild }) => {
       conditions: clientResolveConditions,
       mainFields: ['module'],
       alias: [
+        {
+          find: /^@\/assets\//,
+          replacement: fileURLToPath(new URL('./src/assets/', import.meta.url)),
+        },
         {
           find: /^@\/css\//,
           replacement: fileURLToPath(new URL('./src/css/', import.meta.url)),

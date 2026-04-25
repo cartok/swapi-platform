@@ -48,9 +48,7 @@
         [value]="toTabValue($index)"
         (click)="setActiveIndex($index)"
       >
-        <svg width="11" height="11" aria-hidden="true" focusable="false">
-          <use href="/assets/svg-sprite-sheet/sprite-sheet.svg#circle" />
-        </svg>
+        <app-spritesheet symbol="circle" [width]="11" [height]="11" />
       </button>
     }
   </div>
