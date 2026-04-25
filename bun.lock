@@ -69,6 +69,7 @@
         "bun": "catalog:",
         "rolldown": "catalog:tooling",
         "typescript": "catalog:",
+        "vite": "catalog:tooling",
       },
     },
     "packages/shared": {

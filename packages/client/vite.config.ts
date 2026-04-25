@@ -33,6 +33,7 @@ export default defineConfig(({ isSsrBuild }) => {
     envDir: false,
     mode: viteMode,
     build: {
+      manifest: isSsrBuild,
       ssrManifest: isSsrBuild,
       emptyOutDir: true,
       minify: buildEnv.SWAPI_BUILD_MINIFY,

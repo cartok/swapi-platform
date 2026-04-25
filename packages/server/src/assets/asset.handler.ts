@@ -1,28 +1,26 @@
-import { extname } from 'node:path'
+import console from 'node:console'
+import { readFileSync } from 'node:fs'
+import { extname, normalize, resolve } from 'node:path'
 
-import { browserDistPath } from '@swapi/client/dist-paths'
+import { browserDistPath, ssrDistPath } from '@swapi/client/dist-paths'
 import { serveStatic } from 'hono/bun'
+import type { Manifest } from 'vite'
 
 import {
+  ASSET_FILE_EXTENSION_SET,
+  HASHED_FILE_CACHE_HEADERS,
+  isRegisteredFileExtension,
+  NO_STORE_CACHE_HEADERS,
+  SCRIPT_FILE_EXTENSION_SET,
+  STYLE_FILE_EXTENSION_SET,
   UNHASHED_MEDIA_CACHE_HEADERS,
-  UNHASHED_SCRIPT_STYLE_CACHE_HEADERS,
+  UNHASHED_SCRIPT_STYLE_CACHE_HEADERS as UNHASHED_SCRIPT_AND_STYLE_CACHE_HEADERS,
+  withCacheTagHeader,
 } from '#internal/cache/cache'
 import type { Handler } from '#internal/types'
 
-const NO_STORE_CACHE_HEADERS = {
-  'Cache-Control': 'no-store',
-  'CDN-Cache-Control': 'no-store',
-} as const
-
-const SCRIPT_STYLE_ASSET_EXTENSIONS = new Set(['css', 'js', 'mjs']) as ReadonlySet<string>
-
-const MEDIA_ASSET_EXTENSIONS = new Set([
-  'ico',
-  'jpg',
-  'png',
-  'svg',
-  'woff2',
-]) as ReadonlySet<string>
+const BROWSER_MANIFEST_PATH = resolve(ssrDistPath, '.vite/manifest.json')
+const ASSET_PATHS: ReadonlySet<string> = readAssetPaths()
 
 export const addAssetHandler: Handler = (hono) => {
   hono.get('*', (c, next) => {
@@ -41,26 +39,77 @@ export const addAssetHandler: Handler = (hono) => {
   })
 }
 
-function resolveAssetCacheHeaders(path: string): Record<string, string> {
-  const fileExtension = toFileExtension(path)
-
-  if (fileExtension === null || fileExtension === 'map') {
+function resolveAssetCacheHeaders(filePath: string): Record<string, string> {
+  const fileExtension = readFileExtension(filePath)
+  if (fileExtension === 'map') {
+    return NO_STORE_CACHE_HEADERS
+  }
+  if (fileExtension === null) {
+    console.warn(`Will serve file that has no file extension: ${filePath}`)
     return NO_STORE_CACHE_HEADERS
   }
 
-  if (SCRIPT_STYLE_ASSET_EXTENSIONS.has(fileExtension)) {
-    return UNHASHED_SCRIPT_STYLE_CACHE_HEADERS
+  if (isRegisteredFileExtension(fileExtension)) {
+    if (ASSET_PATHS.has(normalize(filePath))) {
+      return withCacheTagHeader({
+        cacheControlHeaders: HASHED_FILE_CACHE_HEADERS,
+        fileExtension,
+      })
+    }
+
+    if (
+      SCRIPT_FILE_EXTENSION_SET.has(fileExtension) ||
+      STYLE_FILE_EXTENSION_SET.has(fileExtension)
+    ) {
+      return withCacheTagHeader({
+        cacheControlHeaders: UNHASHED_SCRIPT_AND_STYLE_CACHE_HEADERS,
+        fileExtension,
+      })
+    }
+
+    if (ASSET_FILE_EXTENSION_SET.has(fileExtension)) {
+      return withCacheTagHeader({
+        cacheControlHeaders: UNHASHED_MEDIA_CACHE_HEADERS,
+        fileExtension,
+      })
+    }
   }
 
-  if (MEDIA_ASSET_EXTENSIONS.has(fileExtension)) {
-    return UNHASHED_MEDIA_CACHE_HEADERS
-  }
-
+  console.warn(`Will serve '.${fileExtension}' file without cache tags: ${filePath}`)
   return NO_STORE_CACHE_HEADERS
 }
 
-function toFileExtension(path: string): string | null {
-  const fileExtension = extname(path).toLowerCase()
+function readAssetPaths(): ReadonlySet<string> {
+  try {
+    const manifest = JSON.parse(readFileSync(BROWSER_MANIFEST_PATH, 'utf8')) as Manifest
+    const hashedPaths = new Set<string>()
+
+    for (const chunk of Object.values(manifest)) {
+      hashedPaths.add(normalize(resolve(browserDistPath, chunk.file)))
+      for (const cssPath of chunk.css ?? []) {
+        hashedPaths.add(normalize(resolve(browserDistPath, cssPath)))
+      }
+      for (const assetPath of chunk.assets ?? []) {
+        hashedPaths.add(normalize(resolve(browserDistPath, assetPath)))
+      }
+    }
+
+    return hashedPaths
+  } catch (error) {
+    console.warn(
+      [
+        `Asset cache manifest could not be read at ${BROWSER_MANIFEST_PATH}.`,
+        `Falling back to extension-based cache headers only.`,
+      ].join(' '),
+      error,
+    )
+
+    return new Set()
+  }
+}
+
+function readFileExtension(filePath: string): string | null {
+  const fileExtension = extname(filePath).toLowerCase()
   if (fileExtension === '') {
     return null
   }

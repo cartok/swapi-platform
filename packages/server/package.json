@@ -31,6 +31,7 @@
     "@types/node": "catalog:",
     "bun": "catalog:",
     "rolldown": "catalog:tooling",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vite": "catalog:tooling"
   }
 }
