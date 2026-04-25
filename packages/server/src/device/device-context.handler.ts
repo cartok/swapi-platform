@@ -12,8 +12,7 @@ type HeaderType = string | undefined
 
 export const addDeviceContextHandler: Handler = (hono) => {
   hono.get('*', (c, next) => {
-    const isDocumentRequest = c.get('isHtmlDocumentRequest')
-    if (!isDocumentRequest) {
+    if (!c.get('isHtmlDocumentRequest')) {
       return next()
     }
 
