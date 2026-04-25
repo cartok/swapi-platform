@@ -6,5 +6,3 @@ declare global {
   const SWAPI_TARGET: AppBrowserEnv['SWAPI_TARGET']
   const VITE_MODE: 'development' | 'production'
 }
-
-export {}
