@@ -7,7 +7,6 @@ import {
   UNHASHED_MEDIA_CACHE_HEADERS,
   UNHASHED_SCRIPT_STYLE_CACHE_HEADERS,
 } from '#internal/cache/cache'
-import { env } from '#internal/env'
 import type { Handler } from '#internal/types'
 
 const NO_STORE_CACHE_HEADERS = {
@@ -26,10 +25,11 @@ const MEDIA_ASSET_EXTENSIONS = new Set([
 ]) as ReadonlySet<string>
 
 export const addAssetHandler: Handler = (hono) => {
-  hono.on(
-    ['GET', 'HEAD'],
-    '*',
-    serveStatic({
+  hono.on(['GET', 'HEAD'], '*', (c, next) => {
+    if (c.get('isHtmlDocumentRequest')) {
+      return next()
+    }
+    return serveStatic({
       root: browserDistPath,
       onFound: (path, c) => {
         const cacheHeaders = resolveAssetCacheHeaders(path)
@@ -37,8 +37,8 @@ export const addAssetHandler: Handler = (hono) => {
           c.header(headerName, headerValue)
         }
       },
-    }),
-  )
+    })(c, next)
+  })
 }
 
 function resolveAssetCacheHeaders(path: string): Record<string, string> {
