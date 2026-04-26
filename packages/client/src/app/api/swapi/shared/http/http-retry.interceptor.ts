@@ -52,8 +52,8 @@ export const httpRetryInterceptor: HttpInterceptorFn = (
   return next(request).pipe(
     retry({
       count: retryPolicy.retryCount,
-      delay: (error: unknown, retryAttempt: number) => {
-        console.error(error)
+      delay: (error: unknown, retryAttempt) => {
+        logHttpRequestError(error)
         if (!isRetryableError(error)) {
           throw error
         }
@@ -71,7 +71,7 @@ export const httpRetryInterceptor: HttpInterceptorFn = (
     }),
     tap({
       error: (error) => {
-        console.error(error)
+        logHttpRequestError(error)
         if (lastRetryAttempt === retryPolicy.retryCount) {
           console.error(`Retries exhausted for ${request.urlWithParams}`)
         }
@@ -80,29 +80,50 @@ export const httpRetryInterceptor: HttpInterceptorFn = (
   )
 }
 
+function logHttpRequestError(error: unknown) {
+  if (isHttpErrorResponse(error)) {
+    logHttpErrorResponse(error)
+  } else {
+    console.log(error)
+  }
+}
+
+function logHttpErrorResponse(response: HttpErrorResponse) {
+  const { status, url, ok, type, redirected, responseType, message } = response
+  console.error(
+    'Error:',
+    JSON.stringify({ url, message, ok, status, type, redirected, responseType }),
+  )
+  console.error(response.error)
+}
+
+function isHttpErrorResponse(error: unknown): error is HttpErrorResponse {
+  return error instanceof HttpErrorResponse
+}
+
 function isRetryableError(error: unknown): boolean {
-  if (!(error instanceof HttpErrorResponse)) {
+  if (!isHttpErrorResponse(error)) {
     return false
   }
 
-  if (isAbortLike(error.error) || isAbortLike(error)) {
+  if (isAbortLikeError(error.error) || isAbortLikeError(error)) {
     return false
   }
 
   return isRetryableStatusCode(error.status)
 }
 
-function isAbortLike(value: unknown): boolean {
-  if (typeof DOMException !== 'undefined' && value instanceof DOMException) {
-    return value.name === 'AbortError'
+function isAbortLikeError(error: unknown): boolean {
+  if (typeof DOMException !== 'undefined' && error instanceof DOMException) {
+    return error.name === 'AbortError'
   }
 
-  if (value instanceof ProgressEvent) {
-    return value.type === 'abort'
+  if (typeof ProgressEvent !== 'undefined' && error instanceof ProgressEvent) {
+    return error.type === 'abort'
   }
 
-  if (value !== null && typeof value === 'object') {
-    const maybe = value as { name?: unknown; code?: unknown }
+  if (error !== null && typeof error === 'object') {
+    const maybe = error as { name?: unknown; code?: unknown }
     return maybe.name === 'AbortError' || maybe.code === 'ERR_ABORTED'
   }
 
