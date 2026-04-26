@@ -2,8 +2,8 @@ import { httpResource } from '@angular/common/http'
 import type { ResourceStatus, Signal } from '@angular/core'
 import { computed, runInInjectionContext, untracked } from '@angular/core'
 
+import type { RetryableHttpResourceMethodOptions } from '@/api/swapi/shared/http/http-retry.interceptor'
 import {
-  MINIMAL_HTTP_RETRY_POLICY,
   retryableHttpResourceRequest,
 } from '@/api/swapi/shared/http/http-retry.interceptor'
 import type {
@@ -16,7 +16,6 @@ import type {
 } from '@/api/swapi/shared/types/model'
 import type {
   SwapiResourceServiceConfig,
-  SwapiResourceServiceMethodOptions,
   SwapiServiceResult,
 } from '@/api/swapi/shared/types/service'
 import { extractSwapiIdOptional } from '@/api/swapi/shared/utils/mapping'
@@ -34,7 +33,7 @@ export class SwapiResourceService<
 
   getCollection(
     page: Signal<string>,
-    options?: SwapiResourceServiceMethodOptions,
+    options?: RetryableHttpResourceMethodOptions,
   ): SwapiServiceResult<SwapiResourceCollection<TModel>> {
     const resource = runInInjectionContext(this.config.injector, () =>
       httpResource<SwapiResourceCollectionDto<TDto>>(
@@ -89,7 +88,7 @@ export class SwapiResourceService<
 
   getItem(
     id: Signal<string>,
-    options?: SwapiResourceServiceMethodOptions,
+    options?: RetryableHttpResourceMethodOptions,
   ): SwapiServiceResult<TModel | undefined> {
     const resource = runInInjectionContext(this.config.injector, () =>
       httpResource<TModel>(
@@ -131,7 +130,7 @@ export class SwapiResourceService<
 
   getItems(
     ids: Signal<string[]>,
-    options?: SwapiResourceServiceMethodOptions,
+    options?: RetryableHttpResourceMethodOptions,
   ): SwapiServiceResult<TModel[]> {
     const getOrCreateResource = (id: string): SwapiServiceResult<TModel | undefined> => {
       const currentTime = Date.now()
@@ -148,19 +147,7 @@ export class SwapiResourceService<
       }
 
       const newResource = untracked(() =>
-        this.getItem(
-          computed(() => id),
-          {
-            ...options,
-            retryPolicy:
-              options?.includeMinimalRetryForItems === false
-                ? options.retryPolicy
-                : {
-                    ...MINIMAL_HTTP_RETRY_POLICY,
-                    ...options?.retryPolicy,
-                  },
-          },
-        ),
+        this.getItem(computed(() => id), options),
       )
       this.setCacheEntry(id, { resource: newResource })
 
