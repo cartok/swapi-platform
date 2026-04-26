@@ -9,7 +9,7 @@ tasks:
   lint:
     vars:
       PROFILE:
-        ref: .SWAPI_PROFILE | default .PROFILE | default "debug"
+        ref: .PROFILE | default "debug"
       TSCONFIG: './tsconfig/tsconfig.vite{{if eq .PROFILE "release"}}.release{{end}}.json'
     requires:
       vars:
@@ -51,9 +51,9 @@ tasks:
   build:
     vars:
       PROFILE:
-        ref: .SWAPI_PROFILE | default .PROFILE | default "release"
+        ref: .PROFILE | default "release"
       TARGET:
-        ref: .SWAPI_TARGET | default .TARGET | default "local"
+        ref: .TARGET | default "local"
     requires:
       vars:
         - name: PROFILE
@@ -73,9 +73,9 @@ tasks:
   build:browser:
     vars:
       PROFILE:
-        ref: .SWAPI_PROFILE | default .PROFILE | default "release"
+        ref: .PROFILE | default "release"
       TARGET:
-        ref: .SWAPI_TARGET | default .TARGET | default "local"
+        ref: .TARGET | default "local"
       VARIANT_PATH: '{{.TARGET}}/{{.PROFILE}}'
       DIST_DIR: './dist/{{.VARIANT_PATH}}/browser'
       TSCONFIG: './tsconfig/tsconfig.vite{{if eq .PROFILE "release"}}.release{{end}}.json'
@@ -117,9 +117,9 @@ tasks:
   build:ssr:
     vars:
       PROFILE:
-        ref: .SWAPI_PROFILE | default .PROFILE | default "release"
+        ref: .PROFILE | default "release"
       TARGET:
-        ref: .SWAPI_TARGET | default .TARGET | default "local"
+        ref: .TARGET | default "local"
       VARIANT_PATH: '{{.TARGET}}/{{.PROFILE}}'
       DIST_DIR: './dist/{{.VARIANT_PATH}}/ssr'
       TSCONFIG: './tsconfig/tsconfig.vite{{if eq .PROFILE "release"}}.release{{end}}.json'
@@ -162,9 +162,9 @@ tasks:
   build:dist-paths:
     vars:
       PROFILE:
-        ref: .SWAPI_PROFILE | default .PROFILE | default "release"
+        ref: .PROFILE | default "release"
       TARGET:
-        ref: .SWAPI_TARGET | default .TARGET | default "local"
+        ref: .TARGET | default "local"
       VARIANT_PATH: '{{.TARGET}}/{{.PROFILE}}'
       DIST_PATH: './dist/{{.VARIANT_PATH}}'
     requires:
@@ -188,9 +188,9 @@ tasks:
   start:
     vars:
       PROFILE:
-        ref: .SWAPI_PROFILE | default .PROFILE | default "release"
+        ref: .PROFILE | default "release"
       TARGET:
-        ref: .SWAPI_TARGET | default .TARGET | default "local"
+        ref: .TARGET | default "local"
       VARIANT_PATH: '{{.TARGET}}/{{.PROFILE}}'
       DIST_DIR: './dist/{{.VARIANT_PATH}}/browser'
     requires:

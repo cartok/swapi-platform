@@ -37,7 +37,7 @@ tasks:
   lint:
     vars:
       PROFILE:
-        ref: .SWAPI_PROFILE | default .PROFILE | default "debug"
+        ref: .PROFILE | default "debug"
     requires:
       vars:
         - name: PROFILE
@@ -56,7 +56,7 @@ tasks:
     internal: true
     vars:
       PROFILE:
-        ref: .SWAPI_PROFILE | default .PROFILE | default "debug"
+        ref: .PROFILE | default "debug"
     requires:
       vars:
         - name: PROFILE
@@ -71,7 +71,7 @@ tasks:
   lint:tsc:
     vars:
       PROFILE:
-        ref: .SWAPI_PROFILE | default .PROFILE | default "debug"
+        ref: .PROFILE | default "debug"
     requires:
       vars:
         - name: PROFILE
@@ -130,9 +130,9 @@ tasks:
     internal: true
     vars:
       PROFILE:
-        ref: .SWAPI_PROFILE | default .PROFILE | default "release"
+        ref: .PROFILE | default "release"
       TARGET:
-        ref: .SWAPI_TARGET | default .TARGET | default "local"
+        ref: .TARGET | default "local"
     requires:
       vars:
         - name: PROFILE
@@ -177,9 +177,9 @@ tasks:
   fly:build-config:
     vars:
       PROFILE:
-        ref: .SWAPI_PROFILE | default .PROFILE | default "release"
+        ref: .PROFILE | default "release"
       TARGET:
-        ref: .SWAPI_TARGET | default .TARGET | default "testing"
+        ref: .TARGET | default "testing"
       CONFIG_TEMPLATE: ./fly.template.yaml
       CONFIG_VARIABLES: ./fly.variables.yaml
       CONFIG_TEMPLATE_COPY:
@@ -227,9 +227,9 @@ tasks:
   fly:deploy:
     vars:
       PROFILE:
-        ref: .SWAPI_PROFILE | default .PROFILE | default "release"
+        ref: .PROFILE | default "release"
       TARGET:
-        ref: .SWAPI_TARGET | default .TARGET | default "testing"
+        ref: .TARGET | default "testing"
       FAST:
         ref: .FAST | default "false"
       CONFIG:

@@ -12,7 +12,7 @@ tasks:
   lint:
     vars:
       PROFILE:
-        ref: .SWAPI_PROFILE | default .PROFILE | default "debug"
+        ref: .PROFILE | default "debug"
     requires:
       vars:
         - name: PROFILE
@@ -28,7 +28,7 @@ tasks:
   lint:generators:
     vars:
       PROFILE:
-        ref: .SWAPI_PROFILE | default .PROFILE | default "debug"
+        ref: .PROFILE | default "debug"
       TSCONFIG: './tsconfig/tsconfig.generators{{if eq .PROFILE "release"}}.release{{end}}.json'
     requires:
       vars:
@@ -44,7 +44,7 @@ tasks:
   lint:src:
     vars:
       PROFILE:
-        ref: .SWAPI_PROFILE | default .PROFILE | default "debug"
+        ref: .PROFILE | default "debug"
       TSCONFIG: './tsconfig/tsconfig.src{{if eq .PROFILE "release"}}.release{{end}}.json'
     requires:
       vars:
@@ -61,7 +61,7 @@ tasks:
   build:
     vars:
       PROFILE:
-        ref: .SWAPI_PROFILE | default .PROFILE | default "debug"
+        ref: .PROFILE | default "debug"
       DIST_DIR: './dist/{{.PROFILE}}'
       TSCONFIG: './tsconfig/tsconfig.src{{if eq .PROFILE "release"}}.release{{end}}.json'
     requires:
