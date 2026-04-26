@@ -79,10 +79,11 @@ ARG VARIANT_PATH
 WORKDIR /app
 
 # Copy dependant files:
-# The client's dist-dirs.js has to stay in it's dist dir, must not be bundled and
+# - The client's dist-dirs.js has to stay in it's dist dir, must not be bundled and
 # the root and client package.json's have to exist aswell to have it resolvable.
 # To resolve unbundled monorepo files we also need to copy the symlinks in node_modules.
-# The client's browser build and the SSG files also need to be available for the server runtime.
+# - The client's browser build and the SSG files also need to be available for the server runtime.
+# - The vite manifests for SSR.
 COPY --from=deps /app/package.json ./
 COPY --from=deps /app/packages/client/package.json ./packages/client/package.json
 COPY --from=deps /app/node_modules/@swapi/ ./node_modules/@swapi
@@ -92,6 +93,8 @@ COPY --from=build-bundle /app/packages/client/dist/${VARIANT_PATH}/browser/ \
   ./packages/client/dist/${VARIANT_PATH}/browser
 COPY --from=build-bundle /app/packages/client/dist/${VARIANT_PATH}/ssg/ \
   ./packages/client/dist/${VARIANT_PATH}/ssg
+COPY --from=build-bundle /app/packages/client/dist/${VARIANT_PATH}/ssr/.vite/ \
+  ./packages/client/dist/${VARIANT_PATH}/ssr/.vite
 
 # Copy server files:
 # To start the server we additionally need the server's environment files and the server bundle.

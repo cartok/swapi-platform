@@ -80,32 +80,20 @@ function resolveAssetCacheHeaders(filePath: string): Record<string, string> {
 }
 
 function readAssetPaths(): ReadonlySet<string> {
-  try {
-    const manifest = JSON.parse(readFileSync(VITE_MANIFEST_PATH, 'utf8')) as Manifest
-    const hashedPaths = new Set<string>()
+  const manifest = JSON.parse(readFileSync(VITE_MANIFEST_PATH, 'utf8')) as Manifest
+  const hashedPaths = new Set<string>()
 
-    for (const chunk of Object.values(manifest)) {
-      hashedPaths.add(normalize(resolve(browserDistPath, chunk.file)))
-      for (const cssPath of chunk.css ?? []) {
-        hashedPaths.add(normalize(resolve(browserDistPath, cssPath)))
-      }
-      for (const assetPath of chunk.assets ?? []) {
-        hashedPaths.add(normalize(resolve(browserDistPath, assetPath)))
-      }
+  for (const chunk of Object.values(manifest)) {
+    hashedPaths.add(normalize(resolve(browserDistPath, chunk.file)))
+    for (const cssPath of chunk.css ?? []) {
+      hashedPaths.add(normalize(resolve(browserDistPath, cssPath)))
     }
-
-    return hashedPaths
-  } catch (error) {
-    console.warn(
-      [
-        `Asset cache manifest could not be read at ${VITE_MANIFEST_PATH}.`,
-        `Falling back to extension-based cache headers only.`,
-      ].join(' '),
-      error,
-    )
-
-    return new Set()
+    for (const assetPath of chunk.assets ?? []) {
+      hashedPaths.add(normalize(resolve(browserDistPath, assetPath)))
+    }
   }
+
+  return hashedPaths
 }
 
 function readFileExtension(filePath: string): string | null {
