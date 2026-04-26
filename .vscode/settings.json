@@ -131,7 +131,11 @@
       "**/*.schema.yml",
       "**/schema.*.yml"
     ],
-    "https://www.schemastore.org/fly.json": ["**/fly.yaml", "**/fly.*.yaml"]
+    "https://www.schemastore.org/fly.json": [
+      "**/fly.yaml",
+      "**/fly.*.yaml",
+      "!**/fly.variables.yaml"
+    ]
   },
   // EXTENSION: tamasfe.even-better-toml
   "evenBetterToml.schema.associations": {
