@@ -12,6 +12,7 @@ import { DefaultPageLayout } from '@/layouts/default-page-layout/default-page-la
   imports: [Heading, ImageGrid, ImageGridItem, DefaultPageLayout],
   templateUrl: './characters.html',
   styleUrl: './characters.css',
+  providers: [PeopleService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Characters {

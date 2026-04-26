@@ -13,6 +13,7 @@ import { DeviceService } from '@/services/DeviceService'
   imports: [Heading, ImageGrid, ImageGridItem, DefaultPageLayout],
   templateUrl: './planets.html',
   styleUrl: './planets.css',
+  providers: [PlanetsService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Planets {

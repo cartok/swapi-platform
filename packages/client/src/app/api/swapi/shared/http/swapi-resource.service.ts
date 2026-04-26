@@ -1,11 +1,11 @@
 import { httpResource } from '@angular/common/http'
-import type { ResourceStatus, Signal } from '@angular/core'
+import type { Injector, ResourceStatus, Signal } from '@angular/core'
 import { computed, runInInjectionContext, untracked } from '@angular/core'
+import { SWAPI_BASE_URL_STRING } from '@swapi/shared/apis/external/urls'
 
 import type { RetryableHttpResourceMethodOptions } from '@/api/swapi/shared/http/http-retry.interceptor'
-import {
-  retryableHttpResourceRequest,
-} from '@/api/swapi/shared/http/http-retry.interceptor'
+import { retryableHttpResourceRequest } from '@/api/swapi/shared/http/http-retry.interceptor'
+import type { SwapiItemCacheStore } from '@/api/swapi/shared/http/swapi-item-cache.store'
 import type {
   SwapiResourceCollectionDto,
   SwapiResourceDto,
@@ -14,22 +14,57 @@ import type {
   SwapiResource,
   SwapiResourceCollection,
 } from '@/api/swapi/shared/types/model'
-import type {
-  SwapiResourceServiceConfig,
-  SwapiServiceResult,
-} from '@/api/swapi/shared/types/service'
 import { extractSwapiIdOptional } from '@/api/swapi/shared/utils/mapping'
+
+const DEFAULT_CACHE_TTL_MS = 1000 * 60 * 60
+
+interface SwapiResourceServiceConfigInput<TDto, TModel extends SwapiResource> {
+  readonly injector: Injector
+  readonly resourcePath: string
+  readonly mapDtoToModel: (dto: TDto) => TModel
+  readonly cacheTtl?: number
+}
+
+interface SwapiResourceServiceConfig<
+  TDto,
+  TModel extends SwapiResource,
+> extends SwapiResourceServiceConfigInput<TDto, TModel> {
+  readonly cacheTtl: number
+}
+
+interface SwapiResourceItemResourceCacheEntry<TModel extends SwapiResource> {
+  readonly resource: SwapiServiceResult<TModel | undefined>
+  readonly expiresAt: number
+}
+
+export interface SwapiServiceResult<T> {
+  status: Signal<ResourceStatus>
+  data: Signal<T>
+  errors: Signal<Error[] | undefined>
+  reload: () => boolean
+}
 
 export class SwapiResourceService<
   TDto extends SwapiResourceDto,
   TModel extends SwapiResource,
 > {
-  private static readonly swapiApiBaseUrl = 'https://swapi.dev/api'
+  private readonly itemResourceCache = new Map<
+    string,
+    SwapiResourceItemResourceCacheEntry<TModel>
+  >()
 
-  private readonly defaultItemCacheTtlMs = 1000 * 60 * 60
-  private readonly itemCache = new Map<string, SwapiResourceItemCacheEntry<TModel>>()
+  private readonly config: SwapiResourceServiceConfig<TDto, TModel>
 
-  constructor(private readonly config: SwapiResourceServiceConfig<TDto, TModel>) {}
+  constructor(
+    config: SwapiResourceServiceConfigInput<TDto, TModel>,
+    private readonly itemCacheStore: SwapiItemCacheStore,
+  ) {
+    this.config = {
+      ...config,
+      cacheTtl:
+        typeof config.cacheTtl === 'number' ? config.cacheTtl : DEFAULT_CACHE_TTL_MS,
+    }
+  }
 
   getCollection(
     page: Signal<string>,
@@ -57,7 +92,7 @@ export class SwapiResourceService<
         try {
           const item = this.config.mapDtoToModel(dto)
           items.push(item)
-          this.setCacheEntry(item.id, { item })
+          this.setCachedItem(item)
         } catch {
           // Skip invalid items in collection responses.
         }
@@ -105,7 +140,7 @@ export class SwapiResourceService<
     const data = computed<TModel | undefined>(() => {
       const item = resource.value()
       if (item !== undefined) {
-        this.setCacheEntry(item.id, { item })
+        this.setCachedItem(item)
 
         return item
       }
@@ -134,22 +169,23 @@ export class SwapiResourceService<
   ): SwapiServiceResult<TModel[]> {
     const getOrCreateResource = (id: string): SwapiServiceResult<TModel | undefined> => {
       const currentTime = Date.now()
-      const cachedEntry = this.itemCache.get(id)
-      if (cachedEntry?.resource !== undefined) {
-        if (cachedEntry.expiresAt > currentTime) {
-          return cachedEntry.resource
+      const cachedResourceEntry = this.itemResourceCache.get(id)
+      if (cachedResourceEntry !== undefined) {
+        if (cachedResourceEntry.expiresAt <= currentTime) {
+          cachedResourceEntry.resource.reload()
+          this.setResourceCacheEntry(id, cachedResourceEntry.resource)
         }
 
-        cachedEntry.resource.reload()
-        this.setCacheEntry(id, { resource: cachedEntry.resource })
-
-        return cachedEntry.resource
+        return cachedResourceEntry.resource
       }
 
       const newResource = untracked(() =>
-        this.getItem(computed(() => id), options),
+        this.getItem(
+          computed(() => id),
+          options,
+        ),
       )
-      this.setCacheEntry(id, { resource: newResource })
+      this.setResourceCacheEntry(id, newResource)
 
       return newResource
     }
@@ -249,33 +285,22 @@ export class SwapiResourceService<
     }
   }
 
-  private setCacheEntry(
+  private setResourceCacheEntry(
     id: string,
-    entry: Omit<SwapiResourceItemCacheEntry<TModel>, 'expiresAt'>,
+    resource: SwapiServiceResult<TModel | undefined>,
   ): void {
-    const currentEntry = this.itemCache.get(id)
-    this.itemCache.set(id, {
-      ...currentEntry,
-      ...entry,
-      expiresAt: Date.now() + (this.config.itemCacheTtlMs ?? this.defaultItemCacheTtlMs),
+    this.itemResourceCache.set(id, {
+      resource,
+      expiresAt: Date.now() + this.config.cacheTtl,
     })
   }
 
   private getCachedItem(id: string): TModel | undefined {
-    const currentEntry = this.itemCache.get(id)
-    if (currentEntry?.item === undefined) {
-      return undefined
-    }
+    return this.itemCacheStore.getItem<TModel>(this.config.resourcePath, id)
+  }
 
-    if (currentEntry.expiresAt <= Date.now()) {
-      if (currentEntry.resource === undefined) {
-        this.itemCache.delete(id)
-      }
-
-      return undefined
-    }
-
-    return currentEntry.item
+  private setCachedItem(item: TModel): void {
+    this.itemCacheStore.setItem(this.config.resourcePath, item, this.config.cacheTtl)
   }
 
   private static swapiUrl(
@@ -286,27 +311,21 @@ export class SwapiResourceService<
       .map((pathSegment) => this.normalizePathSegment(pathSegment))
       .join('/')
 
-    const baseUrlAndPath = `${this.swapiApiBaseUrl}/${path}`
+    const urlString = `${SWAPI_BASE_URL_STRING}/${path}`
 
     if (query !== undefined) {
       const parameterString = new URLSearchParams(query).toString()
-      if (parameterString.length === 0) {
-        return new URL(baseUrlAndPath).toString()
+      if (!parameterString.length) {
+        return new URL(urlString).toString()
       }
 
-      return new URL(`${baseUrlAndPath}?${parameterString}`).toString()
+      return new URL(`${urlString}?${parameterString}`).toString()
     }
 
-    return new URL(baseUrlAndPath).toString()
+    return new URL(urlString).toString()
   }
 
   private static normalizePathSegment(value: string): string {
     return value.replace(/^\/+|\/+$/g, '')
   }
-}
-
-interface SwapiResourceItemCacheEntry<TModel extends SwapiResource> {
-  readonly resource?: SwapiServiceResult<TModel | undefined>
-  readonly item?: TModel
-  readonly expiresAt: number
 }

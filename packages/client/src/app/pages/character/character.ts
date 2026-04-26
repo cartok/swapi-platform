@@ -34,6 +34,7 @@ import type { InputValue } from '@/shared/types/component.types'
   ],
   templateUrl: './character.html',
   styleUrl: './character.css',
+  providers: [FilmsService, PeopleService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Character {

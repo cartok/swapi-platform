@@ -14,6 +14,7 @@ import { DeviceService } from '@/services/DeviceService'
   imports: [DatePipe, Heading, ImageGrid, ImageGridItem, DefaultPageLayout],
   templateUrl: './movies.html',
   styleUrl: './movies.css',
+  providers: [FilmsService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Movies {

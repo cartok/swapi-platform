@@ -5,6 +5,9 @@ import { TestBed } from '@angular/core/testing'
 import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router'
 import { of } from 'rxjs'
 
+import { FilmsService } from '@/api/swapi/resources/films/films.service'
+import { PeopleService } from '@/api/swapi/resources/people/people.service'
+import { PlanetsService } from '@/api/swapi/resources/planets/planets.service'
 import { Planet } from '@/pages/planet/planet'
 
 describe('Planet', () => {
@@ -18,6 +21,9 @@ describe('Planet', () => {
         provideHttpClient(),
         provideHttpClientTesting(),
         provideRouter([]),
+        FilmsService,
+        PeopleService,
+        PlanetsService,
         {
           provide: ActivatedRoute,
           useValue: {

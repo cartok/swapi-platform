@@ -5,20 +5,23 @@ import type { PersonDto } from '@/api/swapi/resources/people/people.dto'
 import { mapPersonDtoToModel } from '@/api/swapi/resources/people/people.mapper'
 import type { Person } from '@/api/swapi/resources/people/people.model'
 import type { RetryableHttpResourceMethodOptions } from '@/api/swapi/shared/http/http-retry.interceptor'
+import { SwapiItemCacheStore } from '@/api/swapi/shared/http/swapi-item-cache.store'
+import type { SwapiServiceResult } from '@/api/swapi/shared/http/swapi-resource.service'
 import { SwapiResourceService } from '@/api/swapi/shared/http/swapi-resource.service'
 import type { SwapiResourceCollection } from '@/api/swapi/shared/types/model'
-import type { SwapiServiceResult } from '@/api/swapi/shared/types/service'
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable()
 export class PeopleService {
   private readonly injector = inject(Injector)
-  private readonly service = new SwapiResourceService<PersonDto, Person>({
-    injector: this.injector,
-    resourcePath: 'people',
-    mapDtoToModel: mapPersonDtoToModel,
-  })
+  private readonly itemCacheStore = inject(SwapiItemCacheStore)
+  private readonly service = new SwapiResourceService<PersonDto, Person>(
+    {
+      injector: this.injector,
+      resourcePath: 'people',
+      mapDtoToModel: mapPersonDtoToModel,
+    },
+    this.itemCacheStore,
+  )
 
   getCollection(
     page: Signal<string>,

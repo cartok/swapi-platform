@@ -5,20 +5,23 @@ import type { FilmDto } from '@/api/swapi/resources/films/films.dto'
 import { mapFilmDtoToModel } from '@/api/swapi/resources/films/films.mapper'
 import type { Film } from '@/api/swapi/resources/films/films.model'
 import type { RetryableHttpResourceMethodOptions } from '@/api/swapi/shared/http/http-retry.interceptor'
+import { SwapiItemCacheStore } from '@/api/swapi/shared/http/swapi-item-cache.store'
+import type { SwapiServiceResult } from '@/api/swapi/shared/http/swapi-resource.service'
 import { SwapiResourceService } from '@/api/swapi/shared/http/swapi-resource.service'
 import type { SwapiResourceCollection } from '@/api/swapi/shared/types/model'
-import type { SwapiServiceResult } from '@/api/swapi/shared/types/service'
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable()
 export class FilmsService {
   private readonly injector = inject(Injector)
-  private readonly service = new SwapiResourceService<FilmDto, Film>({
-    injector: this.injector,
-    resourcePath: 'films',
-    mapDtoToModel: mapFilmDtoToModel,
-  })
+  private readonly itemCacheStore = inject(SwapiItemCacheStore)
+  private readonly service = new SwapiResourceService<FilmDto, Film>(
+    {
+      injector: this.injector,
+      resourcePath: 'films',
+      mapDtoToModel: mapFilmDtoToModel,
+    },
+    this.itemCacheStore,
+  )
 
   getCollection(
     page: Signal<string>,

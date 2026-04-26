@@ -1,8 +1,10 @@
+import { SWAPI_BASE_URL_STRING } from '@swapi/shared/apis/external/urls'
+
 import { runTlsCertificateHealthCheck } from '#internal/health/tls-certificate.health-check'
 
 // The timeout should be lower than the one defined in fly config for that health check.
 const SWAPI_API_HEALTH_CHECK_TIMEOUT_MS = 2000
-const SWAPI_API_HEALTH_CHECK_URL = new URL('https://swapi.dev/api')
+const SWAPI_API_HEALTH_CHECK_URL = new URL(SWAPI_BASE_URL_STRING)
 
 export async function runSwapiApiSmokeTest(): Promise<void> {
   console.log('Running SWAPI API Smoke Test.')

@@ -94,6 +94,7 @@ export default defineConfig(
           style: 'kebab-case',
         },
       ],
+      '@angular-eslint/use-injectable-provided-in': ['off'],
     },
   },
   {

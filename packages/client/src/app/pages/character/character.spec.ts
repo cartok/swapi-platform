@@ -5,6 +5,8 @@ import { TestBed } from '@angular/core/testing'
 import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router'
 import { of } from 'rxjs'
 
+import { FilmsService } from '@/api/swapi/resources/films/films.service'
+import { PeopleService } from '@/api/swapi/resources/people/people.service'
 import { Character } from '@/pages/character/character'
 
 describe('Character', () => {
@@ -18,6 +20,8 @@ describe('Character', () => {
         provideHttpClient(),
         provideHttpClientTesting(),
         provideRouter([]),
+        FilmsService,
+        PeopleService,
         {
           provide: ActivatedRoute,
           useValue: {
