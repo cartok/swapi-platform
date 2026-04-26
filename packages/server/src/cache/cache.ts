@@ -111,16 +111,7 @@ export const HASHED_FILE_CACHE_HEADERS: CacheHeaders = Object.freeze({
   'CDN-Cache-Control': toCacheControlValue(['public', 's-maxage=31536000', 'immutable']),
 })
 
-export const PUBLIC_STABLE_CACHE_HEADERS: CacheHeaders = Object.freeze({
-  'Cache-Control': toCacheControlValue(['public', 'max-age=0', 'must-revalidate']),
-  'CDN-Cache-Control': toCacheControlValue([
-    'public',
-    's-maxage=3600',
-    'stale-while-revalidate=600',
-  ]),
-})
-
-export const UNHASHED_SCRIPT_STYLE_CACHE_HEADERS: CacheHeaders = {
+export const UNHASHED_SCRIPT_AND_STYLE_CACHE_HEADERS: CacheHeaders = {
   'Cache-Control': toCacheControlValue(['public', 'max-age=0', 'must-revalidate']),
   'CDN-Cache-Control': toCacheControlValue([
     'public',

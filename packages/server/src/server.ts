@@ -113,6 +113,7 @@ async function startServer(): Promise<Bun.Server<undefined>> {
     process.exit(1)
   }
 }
+
 async function shutdown(reason: string, code = 1) {
   if (runContext.server.shutdownStarted) return
   console.error(`Shutdown started by: ${reason}`)

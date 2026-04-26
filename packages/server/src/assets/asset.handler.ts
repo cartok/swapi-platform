@@ -14,12 +14,12 @@ import {
   SCRIPT_FILE_EXTENSION_SET,
   STYLE_FILE_EXTENSION_SET,
   UNHASHED_MEDIA_CACHE_HEADERS,
-  UNHASHED_SCRIPT_STYLE_CACHE_HEADERS as UNHASHED_SCRIPT_AND_STYLE_CACHE_HEADERS,
+  UNHASHED_SCRIPT_AND_STYLE_CACHE_HEADERS,
   withCacheTagHeader,
 } from '#internal/cache/cache'
 import type { Handler } from '#internal/types'
 
-const BROWSER_MANIFEST_PATH = resolve(ssrDistPath, '.vite/manifest.json')
+const VITE_MANIFEST_PATH = resolve(ssrDistPath, '.vite/manifest.json')
 const ASSET_PATHS: ReadonlySet<string> = readAssetPaths()
 
 export const addAssetHandler: Handler = (hono) => {
@@ -81,7 +81,7 @@ function resolveAssetCacheHeaders(filePath: string): Record<string, string> {
 
 function readAssetPaths(): ReadonlySet<string> {
   try {
-    const manifest = JSON.parse(readFileSync(BROWSER_MANIFEST_PATH, 'utf8')) as Manifest
+    const manifest = JSON.parse(readFileSync(VITE_MANIFEST_PATH, 'utf8')) as Manifest
     const hashedPaths = new Set<string>()
 
     for (const chunk of Object.values(manifest)) {
@@ -98,7 +98,7 @@ function readAssetPaths(): ReadonlySet<string> {
   } catch (error) {
     console.warn(
       [
-        `Asset cache manifest could not be read at ${BROWSER_MANIFEST_PATH}.`,
+        `Asset cache manifest could not be read at ${VITE_MANIFEST_PATH}.`,
         `Falling back to extension-based cache headers only.`,
       ].join(' '),
       error,
