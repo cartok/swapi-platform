@@ -15,13 +15,13 @@
 ## Quality
 
 - [ ] Unify smoke test code, less repetition & timeouts should be configurable in one place.
-- [ ] Environment variables for things like timeouts that are referred to in the code.
+- [x] Environment variables for things like timeouts that are referred to in the code.
+  - [ ] Make use of them.
 - [ ] Eventually refactor file cache code in a cohesive class structure.
 
 ## Stability
 
-- [ ] At least log out a warning if in-flight request count is reaching configured fly.io soft limit
-- [ ] Make requests cancelable, so that the server stops at least SSR if client stoped requesting
+- [x] At least log out a warning if in-flight request count is reaching configured fly.io soft limit
 - [ ] Test if in-flight requests telemetry behaves correct
 - [ ] Semaphore + FIFO-Queue and logging for SSR rendering
 
