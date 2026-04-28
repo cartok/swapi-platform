@@ -6,7 +6,6 @@ import {
   inject,
   LOCALE_ID,
   provideEnvironmentInitializer,
-  provideZonelessChangeDetection,
 } from '@angular/core'
 import {
   provideClientHydration,
@@ -24,7 +23,6 @@ if (VITE_MODE === 'production') {
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideZonelessChangeDetection(),
     provideClientHydration(withIncrementalHydration()),
     { provide: LOCALE_ID, useValue: 'en-US' },
     { provide: LocationStrategy, useClass: NoTrailingSlashPathLocationStrategy },
