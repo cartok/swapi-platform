@@ -18,6 +18,7 @@
 - [x] Environment variables for things like timeouts that are referred to in the code.
   - [ ] Make use of them.
 - [ ] Eventually refactor file cache code in a cohesive class structure.
+- [ ] Is it possible to have the node server use sourcemaps to keep SWAPI_BUILD_MINIFY in server env active so that runtime code is minified but still get good error logs?
 
 ## Stability
 
