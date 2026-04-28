@@ -1,32 +1,14 @@
-import { LocationStrategy, NoTrailingSlashPathLocationStrategy } from '@angular/common'
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http'
 import type { ApplicationConfig } from '@angular/core'
-import {
-  enableProdMode,
-  inject,
-  LOCALE_ID,
-  provideEnvironmentInitializer,
-} from '@angular/core'
-import {
-  provideClientHydration,
-  withIncrementalHydration,
-} from '@angular/platform-browser'
+import { mergeApplicationConfig } from '@angular/core'
 import { provideRouter, withInMemoryScrolling, withRouterConfig } from '@angular/router'
 
 import { httpRetryInterceptor } from '@/api/swapi/shared/http/http-retry.interceptor'
+import { appConfigBase } from '@/app.config.base'
 import { routes } from '@/app.routes'
-import { DeviceService } from '@/services/DeviceService'
 
-if (VITE_MODE === 'production') {
-  enableProdMode()
-}
-
-export const appConfig: ApplicationConfig = {
+const config: ApplicationConfig = {
   providers: [
-    provideClientHydration(withIncrementalHydration()),
-    { provide: LOCALE_ID, useValue: 'en-US' },
-    { provide: LocationStrategy, useClass: NoTrailingSlashPathLocationStrategy },
-    provideEnvironmentInitializer(() => inject(DeviceService)),
     provideRouter(
       routes,
       withInMemoryScrolling({
@@ -39,3 +21,5 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withFetch(), withInterceptors([httpRetryInterceptor])),
   ],
 }
+
+export const appConfigClient = mergeApplicationConfig(appConfigBase, config)
