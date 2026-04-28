@@ -173,6 +173,7 @@ tasks:
       BUNDLE_DIST_DIR: '{{.DIST_ROOT}}/bundle'
       TARGET_AND_PROFILE_CONDITION: '@swapi/{{.VARIANT_PATH}}'
       PROFILE_CONDITION: '@swapi/{{.PROFILE}}'
+      CLIENT_DIST_ROOT: '../client/dist/{{.VARIANT_PATH}}'
     requires:
       vars:
         - name: PROFILE
@@ -193,6 +194,7 @@ tasks:
       - ./rolldown.config.ts
       - ./docker/**/*.ts
       - '{{.BUILD_DIST_DIR}}/**/*'
+      - '{{.CLIENT_DIST_ROOT}}/**/*'
       - ../../bun.lock
     generates:
       - '{{.BUNDLE_DIST_DIR}}/**/*'
