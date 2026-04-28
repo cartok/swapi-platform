@@ -41,3 +41,4 @@
 ## Response Caching
 
 - [x] Cache control headers and cache tags
+- [ ] Cache avoid mechanism via secret
