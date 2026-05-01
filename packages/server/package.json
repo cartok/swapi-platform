@@ -11,8 +11,7 @@
       "@swapi/testing/debug": "./dist/testing/debug/build/*.js",
       "@swapi/testing/release": "./dist/testing/release/build/*.js",
       "@swapi/production/debug": "./dist/production/debug/build/*.js",
-      "@swapi/production/release": "./dist/production/release/build/*.js",
-      "default": "./dist/local/release/build/*.js"
+      "@swapi/production/release": "./dist/production/release/build/*.js"
     }
   },
   "dependencies": {

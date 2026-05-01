@@ -7,8 +7,7 @@
       "types": "./src/*.ts",
       "@swapi/shared/source": "./src/*.ts",
       "@swapi/debug": "./dist/debug/*.js",
-      "@swapi/release": "./dist/release/*.js",
-      "default": "./dist/release/*.js"
+      "@swapi/release": "./dist/release/*.js"
     }
   },
   "exports": {
