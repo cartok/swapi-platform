@@ -6,7 +6,6 @@ import { header, objectToString } from '@swapi/shared/logging/utils'
 
 import { env, GLOBAL_SWAPI_TARGET } from '#internal/env'
 import { createHono } from '#internal/hono'
-import { honoFetchWithForwardedProtocol } from '#internal/security/forwarded-headers'
 import { warmupSsrRenderEngine } from '#internal/ssr/ssr.handler'
 import type { ServerRunContext } from '#internal/types'
 
@@ -97,10 +96,7 @@ async function startServer(): Promise<Bun.Server<undefined>> {
     const server = Bun.serve({
       hostname: env.SWAPI_SERVER_HOST_INTERNAL,
       port: env.SWAPI_SERVER_PORT,
-      fetch:
-        GLOBAL_SWAPI_TARGET === 'local'
-          ? hono.fetch
-          : honoFetchWithForwardedProtocol(hono, runContext),
+      fetch: hono.fetch,
     })
     console.log(`Server running at: ${server.url}`)
 

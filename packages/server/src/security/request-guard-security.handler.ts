@@ -2,14 +2,23 @@ import { allowedHosts, GLOBAL_SWAPI_TARGET } from '#internal/env'
 import type { Handler } from '#internal/types'
 
 const allowedHostSet: Readonly<Set<string>> = new Set(allowedHosts)
+const isBehindTrustedProxy = Boolean(process.env['FLY_APP_NAME'])
 
 export const addRequestGuardHandler: Handler = (hono) => {
   hono.use('*', async (c, next) => {
     const requestUrl = new URL(c.req.url)
-    const protocol = requestUrl.protocol.slice(0, -1)
 
-    if (GLOBAL_SWAPI_TARGET !== 'local' && protocol !== 'https') {
-      throw new Error(`Invalid protocol ${protocol}.`)
+    if (GLOBAL_SWAPI_TARGET !== 'local') {
+      if (isBehindTrustedProxy) {
+        const forwardedProto = c.req.header('X-Forwarded-Proto')
+        if (forwardedProto !== 'https') {
+          return c.text('HTTPS required.', 400)
+        }
+      } else {
+        if (requestUrl.protocol === 'http') {
+          return c.text('Not behind trusted proxy. HTTPS required.', 400)
+        }
+      }
     }
 
     const hostHeader = c.req.header('host')
