@@ -10,7 +10,9 @@ import { warmupSsrRenderEngine } from '#internal/ssr/ssr.handler'
 import type { ServerRunContext } from '#internal/types'
 
 console.info(`Process id is: ${process.pid}`)
-console.info('Environment', process.env)
+if (GLOBAL_SWAPI_TARGET !== 'local') {
+  console.info('Environment', process.env)
+}
 
 // The timeout should be lower than the one defined in fly config for that health check.
 const FORCE_EXIT_TIMEOUT = 7_500
