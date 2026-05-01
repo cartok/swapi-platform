@@ -52,7 +52,7 @@ http_service:
     type: requests
   checks:
     - interval: 30s
-      grace_period: 8s
+      grace_period: 20s
       method: GET
       path: /status/ready
       headers:
