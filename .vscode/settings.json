@@ -13,6 +13,7 @@
   "css.lint.unknownAtRules": "ignore",
   "js/ts.preferences.importModuleSpecifier": "non-relative",
   "js/ts.preferences.preferTypeOnlyAutoImports": false,
+  "js/ts.preferGoToSourceDefinition": false,
   "js/ts.suggest.autoImports": true,
   "js/ts.suggest.includeCompletionsForImportStatements": true,
   "js/ts.tsdk.path": "node_modules/typescript/lib",
