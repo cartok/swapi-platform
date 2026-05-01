@@ -1,6 +1,6 @@
 import type { Handler } from '#internal/types'
 
-export const addDebugPaths: Handler = (hono) => {
+export const addDebugRoutesHandler: Handler = (hono) => {
   hono.get('/debug/fail-error', () => {
     throw Error('Triggered fail on error.')
   })

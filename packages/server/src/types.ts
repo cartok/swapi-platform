@@ -10,7 +10,7 @@ export interface HonoEnv {
   }
 }
 
-export type Handler<T = void> = (server: Hono<HonoEnv>, runContext: HonoRunContext) => T
+export type Handler<T = void> = (hono: Hono<HonoEnv>, runContext: HonoRunContext) => T
 
 export interface RunContext {
   server: {

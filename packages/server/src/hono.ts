@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 
 import { addAssetHandler } from '#internal/assets/asset.handler'
-import { addDebugPaths as addDebugRoutesHandler } from '#internal/debug/debug.handler'
+import { addDebugRoutesHandler } from '#internal/debug/debug-routes.handler'
 import { addDeviceContextHandler } from '#internal/device/device-context.handler'
 import { addDeviceRedirectHandler } from '#internal/device/device-redirect.handler'
 import { GLOBAL_SWAPI_TARGET } from '#internal/env'

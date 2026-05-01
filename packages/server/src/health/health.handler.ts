@@ -12,7 +12,7 @@ export const addHealthChecksHandler: Handler = (hono, runContext) => {
         secretEnv.SWAPI_SECRET_HEALTH_CHECK_TOKEN !==
           c.req.header('X-Secret-Health-Check-Token')
       ) {
-        return c.text('Forbidden', 400)
+        return c.body(null, 400)
       }
       return next()
     })
