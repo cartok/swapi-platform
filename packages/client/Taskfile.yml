@@ -54,6 +54,7 @@ tasks:
         ref: .PROFILE | default "release"
       TARGET:
         ref: .TARGET | default "local"
+      TSCONFIG: './tsconfig/tsconfig.vite{{if eq .PROFILE "release"}}.release{{end}}.json'
     requires:
       vars:
         - name: PROFILE
@@ -69,6 +70,16 @@ tasks:
         vars:
           PROFILE: '{{.PROFILE}}'
           TARGET: '{{.TARGET}}'
+    sources: &app-sources
+      - ./index.html
+      - ./package.json
+      - ./vite.config.ts
+      - ./.env/.env.{{.TARGET}}.{{.PROFILE}}
+      - ./tsconfig/tsconfig.app.json
+      - ./tsconfig/tsconfig.app.base.json
+      - '{{.TSCONFIG}}'
+      - ./{src,public}/**/*
+      - ../../bun.lock
 
   build:browser:
     vars:
@@ -78,7 +89,6 @@ tasks:
         ref: .TARGET | default "local"
       VARIANT_PATH: '{{.TARGET}}/{{.PROFILE}}'
       DIST_DIR: './dist/{{.VARIANT_PATH}}/browser'
-      TSCONFIG: './tsconfig/tsconfig.vite{{if eq .PROFILE "release"}}.release{{end}}.json'
     requires:
       vars:
         - name: PROFILE
@@ -97,16 +107,7 @@ tasks:
       - ./.env/.env.{{.TARGET}}.{{.PROFILE}}
     env:
       SWAPI_RUN_MODE: build
-    sources:
-      - ./index.html
-      - ./package.json
-      - ./vite.config.ts
-      - ./.env/.env.{{.TARGET}}.{{.PROFILE}}
-      - ./tsconfig/tsconfig.app.json
-      - ./tsconfig/tsconfig.app.base.json
-      - '{{.TSCONFIG}}'
-      - ./{src,public}/**/*
-      - ../../bun.lock
+    sources: *app-sources
     generates:
       - '{{.DIST_DIR}}/**/*'
     cmds:
@@ -122,7 +123,6 @@ tasks:
         ref: .TARGET | default "local"
       VARIANT_PATH: '{{.TARGET}}/{{.PROFILE}}'
       DIST_DIR: './dist/{{.VARIANT_PATH}}/ssr'
-      TSCONFIG: './tsconfig/tsconfig.vite{{if eq .PROFILE "release"}}.release{{end}}.json'
     requires:
       vars:
         - name: PROFILE
@@ -141,16 +141,7 @@ tasks:
       - ./.env/.env.{{.TARGET}}.{{.PROFILE}}
     env:
       SWAPI_RUN_MODE: build
-    sources:
-      - ./index.html
-      - ./package.json
-      - ./vite.config.ts
-      - ./.env/.env.{{.TARGET}}.{{.PROFILE}}
-      - ./tsconfig/tsconfig.app.json
-      - ./tsconfig/tsconfig.app.base.json
-      - '{{.TSCONFIG}}'
-      - ./{src,public}/**/*
-      - ../../bun.lock
+    sources: *app-sources
     generates:
       - '{{.DIST_DIR}}/**/*'
     cmds:

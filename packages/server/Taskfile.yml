@@ -80,17 +80,17 @@ tasks:
           PROFILE: '{{.PROFILE}}'
           TARGET: '{{.TARGET}}'
     dotenv:
-      - ./.env/.env.{{.TARGET}}.{{.PROFILE}}
+      - &env-file ./.env/.env.{{.TARGET}}.{{.PROFILE}}
     env:
       SWAPI_RUN_MODE: build
     sources:
+      - *env-file
       - '{{.TSCONFIG}}'
       - ./package.json
-      - ./.env/.env.{{.TARGET}}.{{.PROFILE}}
       - '{{.BUILD_DIST_DIR}}/ssg/render.js'
       - '{{.CLIENT_DIST_ROOT}}/browser/**/*'
-      - '{{.CLIENT_DIST_ROOT}}/dist-paths.*'
       - '{{.CLIENT_DIST_ROOT}}/ssr/**/*'
+      - '{{.CLIENT_DIST_ROOT}}/dist-paths.*'
       - ../../bun.lock
     generates:
       - '{{.CLIENT_SSG_DIST_DIR}}/index.html'
@@ -144,13 +144,13 @@ tasks:
         vars:
           PROFILE: '{{.PROFILE}}'
     dotenv:
-      - ./.env/.env.{{.TARGET}}.{{.PROFILE}}
+      - &env-file ./.env/.env.{{.TARGET}}.{{.PROFILE}}
     env:
       SWAPI_RUN_MODE: build
     sources:
+      - *env-file
       - '{{.TSCONFIG}}'
       - ./package.json
-      - ./.env/.env.{{.TARGET}}.{{.PROFILE}}
       - ./src/**/*
       - ../../bun.lock
     generates:
@@ -186,13 +186,13 @@ tasks:
           PROFILE: '{{.PROFILE}}'
           TARGET: '{{.TARGET}}'
     dotenv:
-      - ./.env/.env.{{.TARGET}}.{{.PROFILE}}
+      - &env-file ./.env/.env.{{.TARGET}}.{{.PROFILE}}
     env:
       SWAPI_RUN_MODE: build
     sources:
+      - *env-file
       - ./tsconfig/tsconfig.server.bundle.json
       - ./rolldown.config.ts
-      - ./docker/**/*.ts
       - '{{.BUILD_DIST_DIR}}/**/*'
       - '{{.CLIENT_DIST_ROOT}}/**/*'
       - ../../bun.lock

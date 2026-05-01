@@ -7,6 +7,7 @@ import { envToOxcDefine } from '@swapi/shared/environment/globals'
 import type { OutputOptions } from 'rolldown'
 import { defineConfig } from 'rolldown'
 
+// This import had to be relative.
 import { env } from './src/env.js'
 
 logEnv(env, 'App Server Environment Variables')
