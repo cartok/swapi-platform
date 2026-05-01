@@ -66,7 +66,6 @@ export const addDeviceContextHandler: Handler = (hono) => {
       'Accept-CH',
       'Sec-CH-UA-Form-Factors, Sec-CH-Viewport-Width, Sec-CH-Viewport-Height',
     )
-    c.header('Vary', 'Sec-CH-UA-Form-Factors')
     return next()
   })
 }
