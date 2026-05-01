@@ -21,12 +21,12 @@ export const addDeviceContextHandler: Handler = (hono) => {
     }
 
     // Get client hints from low-entropy headers.
-    const mobileHeader = c.req.header('sec-ch-ua-mobile')
+    const mobileHeader = c.req.header('Sec-CH-UA-Mobile')
 
     // Get client hints from high-entropy headers.
-    const formFactorsHeader = c.req.header('sec-ch-ua-form-factors')
-    const widthHeader = c.req.header('sec-ch-viewport-width')
-    const heightHeader = c.req.header('sec-ch-viewport-height')
+    const formFactorsHeader = c.req.header('Sec-CH-UA-Form-Factors')
+    const widthHeader = c.req.header('Sec-CH-Viewport-Width')
+    const heightHeader = c.req.header('Sec-CH-Viewport-Height')
 
     // Parse headers and store them.
     const headerDeviceFormat = parseDeviceFormatHeaders({
@@ -63,10 +63,10 @@ export const addDeviceContextHandler: Handler = (hono) => {
 
     // Request high-entropy client hints (available from the next navigation/request).
     c.header(
-      'accept-ch',
-      'sec-ch-ua-form-factors, sec-ch-viewport-width, sec-ch-viewport-height',
+      'Accept-CH',
+      'Sec-CH-UA-Form-Factors, Sec-CH-Viewport-Width, Sec-CH-Viewport-Height',
     )
-    c.header('vary', 'sec-ch-ua-form-factors')
+    c.header('Vary', 'Sec-CH-UA-Form-Factors')
     return next()
   })
 }

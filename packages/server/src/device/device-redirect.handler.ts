@@ -48,7 +48,7 @@ export const addDeviceRedirectHandler: Handler = (hono) => {
       return next()
     }
 
-    c.header('cache-control', 'no-store, private')
+    c.header('Cache-Control', 'no-store, private')
     setCookie(c, JUST_REDIRECTED_COOKIE_KEY, 'true', {
       sameSite: 'lax',
       httpOnly: true,

@@ -21,7 +21,7 @@ export const addRequestGuardHandler: Handler = (hono) => {
       }
     }
 
-    const hostHeader = c.req.header('host')
+    const hostHeader = c.req.header('Host')
     if (!hostHeader) {
       return c.text('Missing host header.', 400)
     }

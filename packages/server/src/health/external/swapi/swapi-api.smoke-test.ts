@@ -27,7 +27,7 @@ export async function runSwapiApiSmokeTest(): Promise<void> {
     )
   }
 
-  const contentType = response.headers.get('content-type')?.toLowerCase()
+  const contentType = response.headers.get('Content-Type')?.toLowerCase()
   if (!contentType?.includes('application/json')) {
     throw new Error(
       `SWAPI API Smoke Test failed for ${SWAPI_API_HEALTH_CHECK_URL}: ` +

@@ -8,7 +8,7 @@ export const addRequestContextHandler: Handler = (hono) => {
   hono.get('*', (c, next) => {
     const isDocumentRequest = isHtmlDocumentRequest({
       pathname: c.req.path,
-      acceptHeader: c.req.header('accept'),
+      acceptHeader: c.req.header('Accept'),
     })
 
     c.set('isHtmlDocumentRequest', isDocumentRequest)

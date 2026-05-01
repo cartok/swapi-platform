@@ -30,7 +30,7 @@ export async function runSsrSmokeTest(): Promise<void> {
     )
   }
 
-  const contentType = response.headers.get('content-type')?.toLowerCase()
+  const contentType = response.headers.get('Content-Type')?.toLowerCase()
   if (!contentType?.includes('text/html')) {
     throw new Error(
       `SSR Smoke Test failed for ${SSR_SMOKE_TEST_URL.pathname}: ` +
