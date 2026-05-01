@@ -25,6 +25,7 @@
 - [x] At least log out a warning if in-flight request count is reaching configured fly.io soft limit
 - [ ] Test if in-flight requests telemetry behaves correct
 - [ ] Semaphore + FIFO-Queue and logging for SSR rendering
+- [ ] Additional rate limiting
 
 ## Performance
 

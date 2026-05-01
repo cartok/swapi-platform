@@ -9,7 +9,7 @@
 - [ ] Add a global page cursor style and use it while dragging the image slider.
 - [ ] Add SVG sprite-sheet generation.
 - [ ] Refactor to Tailwind (4, via vite & lightningcss)
-- [ ] Add storybook
+- [ ] Add Storybook
 
 ---
 

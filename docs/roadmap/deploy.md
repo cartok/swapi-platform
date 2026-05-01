@@ -20,7 +20,7 @@
     - Check if there is any machine running (started)
       - If not, run `fly machine start --app <machine-id>`, `flyctl checks list --app <name>`
       - Else only run `flyctl checks list --app <name>`
-- [ ] When deploying with --local-only, the image size is x3 bigger.
+- [x] When deploying with --local-only, the image size is x3 bigger.
 
 ---
 

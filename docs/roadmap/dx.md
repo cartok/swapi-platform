@@ -12,5 +12,5 @@
 ---
 
 - [ ] Git Hooks for linting, testing
-- [ ] Fix at least in the server project: Files that were build and then deleted (the sources) are not discovered as deleted, cause TS resolves to the built .js files.
+- [x] Fix at least in the server project: Files that were build and then deleted (the sources) are not discovered as deleted, cause TS resolves to the built .js files.
 - [ ] Taskfile: re-check `sources`, `generates`, `preconditions`
