@@ -3,6 +3,7 @@ import { indexHtmlPath } from '@swapi/client/dist-paths'
 
 import { CACHE_TAGS, DOCUMENT_CACHE_HEADERS } from '#internal/cache/cache'
 import { allowedHosts } from '#internal/env'
+import { abortResponse } from '#internal/request/abort.handler'
 import { enableAngularServerMode } from '#internal/shared/angular-server-mode'
 import type { Handler } from '#internal/types'
 
@@ -22,11 +23,25 @@ export const addSsrHandler: Handler = (hono) => {
 
     const angularRenderEngine = await getAngularRenderEngine()
     const url = c.req.url
+
+    const abortController = c.get('abortController')
+    if (abortController.signal.aborted) {
+      return abortResponse(c, 'Before rendering SSR')
+    }
+
     const html = await angularRenderEngine.render({
       url,
       documentFilePath: indexHtmlPath,
     })
+
     console.log(`SSR: Rendered ${url}`)
+
+    if (
+      abortController.signal.aborted &&
+      abortController.abortContext?.source === 'client'
+    ) {
+      return abortResponse(c, 'Before rendering SSR')
+    }
 
     return c.html(html, 200, {
       ...DOCUMENT_CACHE_HEADERS,

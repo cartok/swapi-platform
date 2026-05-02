@@ -8,6 +8,7 @@ import { GLOBAL_SWAPI_TARGET } from '#internal/env'
 import { addErrorHandler } from '#internal/error/error.handler'
 import { addHealthChecksHandler } from '#internal/health/health.handler'
 import { addIndexingHandler } from '#internal/indexing/indexing.handler'
+import { addAbortHandler } from '#internal/request/abort.handler'
 import { addInFlightRequestsHandler } from '#internal/request/in-flight-requests.handler'
 import { addRequestContextHandler } from '#internal/request/request-context.handler'
 import { addRequestGuardHandler } from '#internal/security/request-guard-security.handler'
@@ -24,6 +25,7 @@ export function createHono(runContext: HonoRunContext): Hono<HonoEnv> {
   }
 
   addInFlightRequestsHandler(hono, runContext)
+  addAbortHandler(hono, runContext)
 
   addHealthChecksHandler(hono, runContext)
   addRequestContextHandler(hono, runContext)

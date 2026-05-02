@@ -1,9 +1,12 @@
-import { access, constants, readFile } from 'node:fs/promises'
+import { readFile } from 'node:fs/promises'
 import { normalize, resolve, sep } from 'node:path'
 
 import { ssgDistPath } from '@swapi/client/dist-paths'
+import { isAbortLikeError } from '@swapi/shared/errors/abort-error'
 
 import { CACHE_TAGS, DOCUMENT_CACHE_HEADERS } from '#internal/cache/cache'
+import { isErrorCode, SERVER_ERROR_CODES } from '#internal/error/error'
+import { abortResponse } from '#internal/request/abort.handler'
 import type { Handler } from '#internal/types'
 
 export const addSsgHandler: Handler = (hono) => {
@@ -21,16 +24,36 @@ export const addSsgHandler: Handler = (hono) => {
       return next()
     }
 
+    const abortController = c.get('abortController')
+    if (abortController.signal.aborted) {
+      return abortResponse(c, 'Before SSG file loading')
+    }
+
     try {
-      await access(ssgFilePath, constants.F_OK)
+      const html = await readFile(ssgFilePath, {
+        encoding: 'utf8',
+        signal: abortController.signal,
+      })
+
+      if (
+        abortController.signal.aborted &&
+        abortController.abortContext?.source === 'client'
+      ) {
+        return abortResponse(c, 'Before serving SSG file')
+      }
+
       console.log('SSG: Serve', ssgFilePath)
-      const html = await readFile(ssgFilePath, 'utf8')
+
       return c.html(html, 200, {
         ...DOCUMENT_CACHE_HEADERS,
         'Cache-Tag': [CACHE_TAGS.HTML, CACHE_TAGS.SSG],
       })
     } catch (error) {
-      if (isErrorCode(error, 'ENOENT')) {
+      if (isAbortLikeError(error)) {
+        return abortResponse(c, 'On error during SSG file loading')
+      }
+
+      if (isErrorCode(error, SERVER_ERROR_CODES.ENOENT)) {
         return next()
       }
 
@@ -51,12 +74,4 @@ function isInsideSsgDirectory(filePath: string, dirPath: string): boolean {
     normalizedFilePath === normalizedDirPath ||
     normalizedFilePath.startsWith(`${normalizedDirPath}${sep}`)
   )
-}
-
-function isErrorCode(error: unknown, code: string): boolean {
-  if (!(error instanceof Error)) {
-    return false
-  }
-
-  return 'code' in error && typeof error.code === 'string' && error.code === code
 }

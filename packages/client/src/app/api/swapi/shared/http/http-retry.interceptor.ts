@@ -5,6 +5,7 @@ import type {
   HttpResourceRequest,
 } from '@angular/common/http'
 import { HttpContext, HttpContextToken, HttpErrorResponse } from '@angular/common/http'
+import { isAbortLikeError } from '@swapi/shared/errors/abort-error'
 import { retry, tap, timer } from 'rxjs'
 
 interface HttpRetryPolicy {
@@ -111,23 +112,6 @@ function isRetryableError(error: unknown): boolean {
   }
 
   return isRetryableStatusCode(error.status)
-}
-
-function isAbortLikeError(error: unknown): boolean {
-  if (typeof DOMException !== 'undefined' && error instanceof DOMException) {
-    return error.name === 'AbortError'
-  }
-
-  if (typeof ProgressEvent !== 'undefined' && error instanceof ProgressEvent) {
-    return error.type === 'abort'
-  }
-
-  if (error !== null && typeof error === 'object') {
-    const maybe = error as { name?: unknown; code?: unknown }
-    return maybe.name === 'AbortError' || maybe.code === 'ERR_ABORTED'
-  }
-
-  return false
 }
 
 function isRetryableStatusCode(statusCode: number): boolean {

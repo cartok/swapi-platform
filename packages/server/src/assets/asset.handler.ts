@@ -17,6 +17,7 @@ import {
   UNHASHED_SCRIPT_AND_STYLE_CACHE_HEADERS,
   withCacheTagHeader,
 } from '#internal/cache/cache'
+import { abortResponse } from '#internal/request/abort.handler'
 import type { Handler } from '#internal/types'
 
 const VITE_MANIFEST_PATH = resolve(ssrDistPath, '.vite/manifest.json')
@@ -27,6 +28,11 @@ export const addAssetHandler: Handler = (hono) => {
     if (c.get('isHtmlDocumentRequest')) {
       return next()
     }
+
+    if (c.get('abortController').signal.aborted) {
+      return Promise.resolve(abortResponse(c, 'Before serving asset'))
+    }
+
     return serveStatic({
       root: browserDistPath,
       onFound: (path, c) => {

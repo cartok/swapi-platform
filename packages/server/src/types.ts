@@ -1,12 +1,15 @@
 import type { DeviceContext } from '@swapi/shared/device/context'
 import type { Hono } from 'hono'
 
+import type { HonoAbortControllerInterface } from '#internal/request/abort.handler'
+
 export interface HonoEnv {
   Bindings: object
   Variables: {
     deviceContext: DeviceContext
     isHtmlDocumentRequest: boolean
     runContext: HonoRunContext
+    abortController: HonoAbortControllerInterface
   }
 }
 
