@@ -1,5 +1,5 @@
 import { readFile } from 'node:fs/promises'
-import { normalize, resolve, sep } from 'node:path'
+import { normalize, resolve } from 'node:path'
 
 import { ssgDistPath } from '@swapi/client/dist-paths'
 import { isAbortLikeError } from '@swapi/shared/errors/abort-error'
@@ -19,8 +19,8 @@ export const addSsgHandler: Handler = (hono) => {
       return next()
     }
 
-    const ssgFilePath = resolveSsgFilePath(c.req.path)
-    if (!isInsideSsgDirectory(ssgFilePath, ssgDistPath)) {
+    const ssgFilePath = securelyResolveSsgFilePath(c.req.path)
+    if (!ssgFilePath) {
       return next()
     }
 
@@ -62,16 +62,17 @@ export const addSsgHandler: Handler = (hono) => {
   })
 }
 
-function resolveSsgFilePath(pathname: string): string {
-  const normalizedPath = pathname.replace(/^\/+|\/+$/g, '')
-  return resolve(ssgDistPath, normalizedPath, 'index.html')
+function securelyResolveSsgFilePath(pathname: string): string | null {
+  const relativeFilePathSegment = urlPathToRelativeFilePathSegment(pathname)
+  const absolutePath = resolve(ssgDistPath, relativeFilePathSegment, 'index.html')
+  const normalizedAbsoluteFilePath = normalize(absolutePath)
+  const normalizedAbsoluteDistPath = normalize(ssgDistPath)
+  if (!normalizedAbsoluteFilePath.startsWith(`${normalizedAbsoluteDistPath}/`)) {
+    return null
+  }
+  return normalizedAbsoluteFilePath
 }
 
-function isInsideSsgDirectory(filePath: string, dirPath: string): boolean {
-  const normalizedFilePath = normalize(filePath)
-  const normalizedDirPath = normalize(resolve(dirPath))
-  return (
-    normalizedFilePath === normalizedDirPath ||
-    normalizedFilePath.startsWith(`${normalizedDirPath}${sep}`)
-  )
+function urlPathToRelativeFilePathSegment(urlPath: string): string {
+  return urlPath.replace(/^\/|\/$/g, '')
 }
