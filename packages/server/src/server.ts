@@ -2,7 +2,7 @@ import fs from 'node:fs'
 import { constants } from 'node:os'
 import process, { resourceUsage } from 'node:process'
 
-import { header, objectToString } from '@swapi/shared/logging/utils'
+import { errorToString, logHeading, objectToString } from '@swapi/shared/log/log'
 
 import { env, GLOBAL_SWAPI_TARGET } from '#internal/env'
 import { createHono } from '#internal/hono'
@@ -64,22 +64,21 @@ process.on('unhandledRejection', (reason) => {
 
 process.on('uncaughtException', (error) => {
   try {
-    const errorMessage = (error.stack ?? `${error.name}: ${error.message}`) + '\n'
-    fs.writeSync(process.stderr.fd, header('error'))
-    fs.writeSync(process.stderr.fd, errorMessage)
+    fs.writeSync(process.stderr.fd, logHeading('error'))
+    fs.writeSync(process.stderr.fd, errorToString(error))
 
-    fs.writeSync(process.stderr.fd, header('run context'))
+    fs.writeSync(process.stderr.fd, logHeading('run context'))
     fs.writeSync(process.stderr.fd, objectToString(runContext))
 
     if (GLOBAL_SWAPI_TARGET !== 'production') {
-      fs.writeSync(process.stderr.fd, header('env'))
+      fs.writeSync(process.stderr.fd, logHeading('env'))
       fs.writeSync(process.stderr.fd, objectToString(env))
 
-      fs.writeSync(process.stderr.fd, header('resources'))
+      fs.writeSync(process.stderr.fd, logHeading('resources'))
       const resources = objectToString(resourceUsage())
       fs.writeSync(process.stderr.fd, resources)
 
-      fs.writeSync(process.stderr.fd, header('report'))
+      fs.writeSync(process.stderr.fd, logHeading('report'))
       const report = process.report.getReport(error)
       fs.writeSync(process.stderr.fd, JSON.stringify(report))
     }

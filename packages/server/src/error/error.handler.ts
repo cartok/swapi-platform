@@ -1,10 +1,15 @@
 import { isAbortLikeError } from '@swapi/shared/errors/abort-error'
-import { header } from '@swapi/shared/logging/utils'
+import {
+  errorToString,
+  logHeading,
+  objectToString,
+  responseToString,
+} from '@swapi/shared/log/log'
 import { PATHS } from '@swapi/shared/routing/paths'
 import type { Context } from 'hono'
 
 import { NO_STORE_CACHE_HEADERS } from '#internal/cache/cache'
-import { isHTTPResponseError } from '#internal/error/error'
+import { isHonoHTTPResponseError } from '#internal/error/error'
 import { abortResponse } from '#internal/request/abort.handler'
 import type { Handler, HonoEnv } from '#internal/types'
 
@@ -27,34 +32,17 @@ export const addErrorHandler: Handler = (hono, runContext) => {
 
 function logError(error: Error, c: Context<HonoEnv>): void {
   try {
-    console.error(header('hono error handler'))
-    console.error('Hono Variables:', JSON.stringify(c.var))
+    console.error(logHeading('hono error handler'))
+    console.error(errorToString(error))
 
-    if (isHTTPResponseError(error)) {
-      const errorResponse = error.getResponse()
-      console.error(
-        'Error Response:',
-        JSON.stringify({
-          status: errorResponse.status,
-          statusText: errorResponse.statusText,
-          text: errorResponse.statusText,
-        }),
-      )
+    if (isHonoHTTPResponseError(error)) {
+      const response = error.getResponse()
+      console.error(responseToString(response))
     }
 
-    console.error(
-      'Error:',
-      JSON.stringify({
-        method: c.req.method,
-        url: c.req.url,
-        name: error.name,
-        message: error.message,
-      }),
-    )
-
-    console.error(error.stack)
+    console.error(objectToString(c.var))
   } catch (error) {
-    console.error(error)
+    console.error(errorToString(error))
   }
 }
 
