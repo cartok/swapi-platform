@@ -21,6 +21,10 @@ export function createHono(runContext: HonoRunContext): Hono<HonoEnv> {
   const hono = new Hono<HonoEnv>({ strict: false })
 
   if (GLOBAL_SWAPI_TARGET === 'local') {
+    hono.get(
+      '/.well-known/appspecific/com.chrome.devtools.json',
+      () => new Response(null, { status: 204 }),
+    )
     addDebugRoutesHandler(hono, runContext)
   }
 
