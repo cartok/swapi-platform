@@ -126,8 +126,7 @@ tasks:
     cmds:
       - bunx --no-install prettier --write --list-different ./
 
-  DOCKER: &docker
-    internal: true
+  docker:build:
     vars:
       PROFILE:
         ref: .PROFILE | default "release"
@@ -142,10 +141,6 @@ tasks:
     dotenv:
       - ./packages/server/.env/.env.{{.TARGET}}.{{.PROFILE}}.docker
       - ./packages/server/.env/.env.{{.TARGET}}.{{.PROFILE}}
-
-  docker:build:
-    <<: *docker
-    internal: false
     deps:
       - task: lint
     cmds:
@@ -159,8 +154,22 @@ tasks:
         ./
 
   docker:start:
-    <<: *docker
-    internal: false
+    vars:
+      PROFILE:
+        ref: .PROFILE | default "release"
+      TARGET:
+        ref: .TARGET | default "local"
+      THROTTLED:
+        ref: .THROTTLED | default "true"
+    requires:
+      vars:
+        - name: PROFILE
+          enum: [release]
+        - name: TARGET
+          enum: [local, testing, production]
+    dotenv:
+      - ./packages/server/.env/.env.{{.TARGET}}.{{.PROFILE}}.docker
+      - ./packages/server/.env/.env.{{.TARGET}}.{{.PROFILE}}
     deps:
       - task: docker:build
         vars:
@@ -170,8 +179,13 @@ tasks:
       - docker rm --force {{.DOCKER_IMAGE_NAME}} >/dev/null 2>&1 || true
       - >
         docker run --rm
+        --name={{.DOCKER_IMAGE_NAME}}
         --publish 127.0.0.1:${SWAPI_SERVER_PORT}:${SWAPI_SERVER_PORT}
-        --name {{.DOCKER_IMAGE_NAME}}
+        {{if eq .THROTTLED "true"}}
+        --cpus=1.0
+        --memory=256m
+        --memory-swap=256m
+        {{end}}
         {{.DOCKER_IMAGE_NAME}}:{{.TARGET}}-{{.PROFILE}}
 
   fly:build-config:
