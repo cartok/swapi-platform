@@ -212,8 +212,8 @@ tasks:
         --publish 127.0.0.1:${SWAPI_SERVER_PORT}:${SWAPI_SERVER_PORT}
         {{if eq .THROTTLED "true"}}
         --cpus=1.0
-        --memory=256m
-        --memory-swap=256m
+        --memory=512m
+        --memory-swap=512m
         {{end}}
         {{.DOCKER_IMAGE_NAME}}:{{.TARGET}}-{{.PROFILE}}
 

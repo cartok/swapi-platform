@@ -8,7 +8,7 @@ deploy:
 
 vm:
   - size: shared-cpu-1x
-    memory: 256MB
+    memory: 512MB
     cpu_kind: shared
     cpus: 1
 
