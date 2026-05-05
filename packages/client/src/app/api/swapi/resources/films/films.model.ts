@@ -1,4 +1,4 @@
-import type { SwapiImageDataMock, SwapiResource } from '@/api/swapi/shared/types/model'
+import type { SwapiImageDataMock, SwapiResource } from '@/api/swapi/types/model'
 
 /**
  * A Star Wars film

@@ -3,18 +3,12 @@ import type { Injector, ResourceStatus, Signal } from '@angular/core'
 import { computed, runInInjectionContext, untracked } from '@angular/core'
 import { SWAPI_BASE_URL_STRING } from '@swapi/shared/apis/external/urls'
 
-import type { RetryableHttpResourceMethodOptions } from '@/api/swapi/shared/http/http-retry.interceptor'
-import { retryableHttpResourceRequest } from '@/api/swapi/shared/http/http-retry.interceptor'
-import type { SwapiItemCacheStore } from '@/api/swapi/shared/http/swapi-item-cache.store'
-import type {
-  SwapiResourceCollectionDto,
-  SwapiResourceDto,
-} from '@/api/swapi/shared/types/dto'
-import type {
-  SwapiResource,
-  SwapiResourceCollection,
-} from '@/api/swapi/shared/types/model'
-import { extractSwapiIdOptional } from '@/api/swapi/shared/utils/mapping'
+import type { SwapiItemCacheStore } from '@/api/swapi/swapi-item-cache.store'
+import type { SwapiResourceCollectionDto, SwapiResourceDto } from '@/api/swapi/types/dto'
+import type { SwapiResource, SwapiResourceCollection } from '@/api/swapi/types/model'
+import { extractSwapiIdOptional } from '@/api/swapi/utils/mapping'
+import type { RetryableHttpResourceMethodOptions } from '@/http/http-retry.interceptor'
+import { retryableHttpResourceRequest } from '@/http/http-retry.interceptor'
 
 const DEFAULT_CACHE_TTL_MS = 1000 * 60 * 60
 

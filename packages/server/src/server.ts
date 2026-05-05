@@ -1,13 +1,13 @@
 import fs from 'node:fs'
-import { constants } from 'node:os'
+import { availableParallelism, constants } from 'node:os'
 import process, { resourceUsage } from 'node:process'
 
 import { errorToString, logHeading, objectToString } from '@swapi/shared/log/log'
 
 import { env, GLOBAL_SWAPI_TARGET } from '#internal/env'
 import { createHono } from '#internal/hono'
-import { warmupSsrRenderEngine } from '#internal/ssr/ssr.handler'
-import type { ServerRunContext } from '#internal/types'
+import { RenderWorkerPool } from '#internal/ssr/render-worker-pool'
+import type { ServerRuntimeMetrics, ServerRuntimeServices } from '#internal/types'
 
 console.info(`Process id is: ${process.pid}`)
 if (GLOBAL_SWAPI_TARGET !== 'local') {
@@ -19,7 +19,7 @@ const FORCE_EXIT_TIMEOUT = 7_500
 const INFLIGHT_REQUESTS_TIMEOUT = 6_000
 const INFLIGHT_REQUESTS_POLL = 100
 
-const runContext: ServerRunContext = {
+const runtimeMetrics: ServerRuntimeMetrics = {
   server: {
     ready: false,
     ssrReady: false,
@@ -30,7 +30,39 @@ const runContext: ServerRunContext = {
     inFlightRequests: 0,
     caughtExceptions: 0,
   },
-}
+  ssrWorkerPool: {
+    workerFailures: 0,
+    workerRestarts: 0,
+    workerTerminations: 0,
+    clientAborts: 0,
+    requestTimeoutAborts: 0,
+    renderTimeoutAborts: 0,
+  },
+} as const
+
+const poolSize = Math.max(1, availableParallelism() - 1)
+const renderPoolPromise = RenderWorkerPool.create({
+  workerFile: resolveRenderWorkerFile(),
+  workerCount: poolSize,
+  maxQueuedJobs: 6,
+  queueTimeoutMs: 250,
+  renderAbortTimeoutMs: 1_500,
+  requestAbortWorkerGraceMs: 500,
+  renderTimeoutWorkerGraceMs: 500,
+  workerRecoveryInitialBackoffMs: 50,
+  workerRecoveryMaxBackoffMs: 500,
+  workerRecoveryMaxAttempts: 5,
+  workerRecoveryCooldownMs: 2_000,
+  metrics: runtimeMetrics.ssrWorkerPool,
+})
+
+const runtimeServicesPromise: Promise<ServerRuntimeServices> = renderPoolPromise.then(
+  (renderPool) => ({
+    ssr: {
+      renderPool,
+    },
+  }),
+)
 
 process.once('beforeExit', () => {
   console.log('Event loop emptied.')
@@ -57,8 +89,8 @@ process.on('SIGTERM', (signal) => {
 })
 
 process.on('unhandledRejection', (reason) => {
-  runContext.server.unhandledRejections++
-  console.error(runContext)
+  runtimeMetrics.server.unhandledRejections++
+  console.error(runtimeMetrics)
   console.error(reason)
 })
 
@@ -68,7 +100,7 @@ process.on('uncaughtException', (error) => {
     fs.writeSync(process.stderr.fd, errorToString(error))
 
     fs.writeSync(process.stderr.fd, logHeading('run context'))
-    fs.writeSync(process.stderr.fd, objectToString(runContext))
+    fs.writeSync(process.stderr.fd, objectToString(runtimeMetrics))
 
     if (GLOBAL_SWAPI_TARGET !== 'production') {
       fs.writeSync(process.stderr.fd, logHeading('env'))
@@ -93,7 +125,8 @@ const server = await startServer()
 
 async function startServer(): Promise<Bun.Server<undefined>> {
   try {
-    const hono = createHono(runContext)
+    const runtimeServices = await runtimeServicesPromise
+    const hono = createHono(runtimeMetrics, runtimeServices)
     const server = Bun.serve({
       hostname: env.SWAPI_SERVER_HOST_INTERNAL,
       port: env.SWAPI_SERVER_PORT,
@@ -101,9 +134,8 @@ async function startServer(): Promise<Bun.Server<undefined>> {
     })
     console.log(`Server running at: ${server.url}`)
 
-    await warmupSsrRenderEngine()
-    runContext.server.ssrReady = true
-    runContext.server.ready = true
+    runtimeMetrics.server.ssrReady = true
+    runtimeMetrics.server.ready = true
 
     return server
   } catch (error) {
@@ -113,12 +145,12 @@ async function startServer(): Promise<Bun.Server<undefined>> {
 }
 
 async function shutdown(reason: string, code = 1) {
-  if (runContext.server.shutdownStarted) return
+  if (runtimeMetrics.server.shutdownStarted) return
   console.error(`Shutdown started by: ${reason}`)
 
-  runContext.server.shutdownStarted = true
-  runContext.server.ready = false
-  runContext.server.ssrReady = false
+  runtimeMetrics.server.shutdownStarted = true
+  runtimeMetrics.server.ready = false
+  runtimeMetrics.server.ssrReady = false
 
   const forceExit = setTimeout(() => {
     console.error(`Forced shutdown after ${FORCE_EXIT_TIMEOUT}ms timeout.`)
@@ -127,18 +159,21 @@ async function shutdown(reason: string, code = 1) {
 
   try {
     await server.stop()
-    if (runContext.hono.inFlightRequests > 0) {
+
+    if (runtimeMetrics.hono.inFlightRequests > 0) {
       const deadline = Date.now() + INFLIGHT_REQUESTS_TIMEOUT
       do {
         console.log(
-          `Waiting for ${runContext.hono.inFlightRequests} in-flight request(s).`,
+          `Waiting for ${runtimeMetrics.hono.inFlightRequests} in-flight request(s).`,
         )
         await new Promise((resolve) => setTimeout(resolve, INFLIGHT_REQUESTS_POLL))
-      } while (runContext.hono.inFlightRequests > 0 && Date.now() < deadline)
+      } while (runtimeMetrics.hono.inFlightRequests > 0 && Date.now() < deadline)
       console.warn(
-        `Exiting with ${runContext.hono.inFlightRequests} in-flight request(s) still open.`,
+        `Exiting with ${runtimeMetrics.hono.inFlightRequests} in-flight request(s) still open.`,
       )
     }
+
+    await closeRenderPool()
 
     clearTimeout(forceExit)
     console.log('Shutdown complete.')
@@ -149,6 +184,24 @@ async function shutdown(reason: string, code = 1) {
   }
 }
 
+async function closeRenderPool(): Promise<void> {
+  try {
+    const runtimeServices = await runtimeServicesPromise
+    await runtimeServices.ssr.renderPool.close()
+  } catch (error) {
+    console.error('Error during render worker pool shutdown.', error)
+  }
+}
+
 function signalExitCode(signal: NodeJS.Signals) {
   return 128 + constants.signals[signal]
+}
+
+function resolveRenderWorkerFile(): URL {
+  const renderWorkerFileName =
+    process.env['SWAPI_SSR_WORKER_VARIANT'] === 'jit'
+      ? 'render-worker.jit.js'
+      : 'render-worker.js'
+
+  return new URL(`./ssr/${renderWorkerFileName}`, import.meta.url)
 }

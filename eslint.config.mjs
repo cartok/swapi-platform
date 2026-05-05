@@ -139,7 +139,10 @@ export default defineConfig(
     },
   },
   {
-    files: ['./packages/client/src/app/api/swapi/**/*.ts'],
+    files: [
+      './packages/client/src/app/api/swapi/**/*.ts',
+      './packages/client/src/app/http/http-retry.interceptor.ts',
+    ],
     rules: {
       '@angular-eslint/no-experimental': ['off'],
     },

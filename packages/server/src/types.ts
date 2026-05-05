@@ -1,21 +1,26 @@
 import type { DeviceContext } from '@swapi/shared/device/context'
 import type { Hono } from 'hono'
 
-import type { HonoAbortControllerInterface } from '#internal/request/abort.handler'
+import type { MultiSignalAbortController } from '#internal/signal/multi-signal-abort-controller'
+import type { RenderWorkerPool } from '#internal/ssr/render-worker-pool'
+import type { RenderWorkerPoolMetrics } from '#internal/ssr/render-worker-pool.types'
 
 export interface HonoEnv {
   Bindings: object
   Variables: {
     deviceContext: DeviceContext
     isHtmlDocumentRequest: boolean
-    runContext: HonoRunContext
-    abortController: HonoAbortControllerInterface
+    abortController: MultiSignalAbortController
   }
 }
 
-export type Handler<T = void> = (hono: Hono<HonoEnv>, runContext: HonoRunContext) => T
+export type Handler<T = void> = (
+  hono: Hono<HonoEnv>,
+  runtimeMetrics: HonoRuntimeMetrics,
+  runtimeServices: HonoRuntimeServices,
+) => T
 
-export interface RunContext {
+export interface RuntimeMetrics {
   server: {
     ready: boolean
     ssrReady: boolean
@@ -26,14 +31,31 @@ export interface RunContext {
     inFlightRequests: number
     caughtExceptions: number
   }
+  ssrWorkerPool: RenderWorkerPoolMetrics
 }
 
-export interface ServerRunContext {
-  server: RunContext['server']
-  hono: Readonly<RunContext['hono']>
+export interface RuntimeServices {
+  ssr: {
+    renderPool: RenderWorkerPool
+  }
 }
 
-export interface HonoRunContext {
-  server: Readonly<RunContext['server']>
-  hono: RunContext['hono']
+export interface ServerRuntimeMetrics {
+  server: RuntimeMetrics['server']
+  hono: Readonly<RuntimeMetrics['hono']>
+  ssrWorkerPool: RuntimeMetrics['ssrWorkerPool']
+}
+
+export interface HonoRuntimeMetrics {
+  server: Readonly<RuntimeMetrics['server']>
+  hono: RuntimeMetrics['hono']
+  ssrWorkerPool: RuntimeMetrics['ssrWorkerPool']
+}
+
+export interface ServerRuntimeServices {
+  ssr: RuntimeServices['ssr']
+}
+
+export interface HonoRuntimeServices {
+  ssr: RuntimeServices['ssr']
 }

@@ -1,3 +1,4 @@
+import { errorToString } from '@swapi/shared/log/log'
 import type { HTTPResponseError } from 'hono/types'
 
 export const SERVER_ERROR_CODES = {
@@ -25,4 +26,10 @@ export function isErrorCode<const ErrorCode extends ServerErrorCode>(
   const { code } = error as { code?: unknown }
 
   return typeof code === 'string' && code === errorCode
+}
+
+export function toError(value: unknown): Error {
+  if (value instanceof Error) return value
+
+  return new Error(errorToString(value))
 }

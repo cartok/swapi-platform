@@ -6,7 +6,7 @@ import {
   extractSwapiIds,
   toMandatoryString,
   toOptionalString,
-} from '@/api/swapi/shared/utils/mapping'
+} from '@/api/swapi/utils/mapping'
 
 export function mapPlanetDtoToModel(dto: PlanetDto): Planet {
   const id = extractSwapiId(dto.url)

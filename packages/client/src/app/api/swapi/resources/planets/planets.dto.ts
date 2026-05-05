@@ -1,4 +1,4 @@
-import type { SwapiResourceDto } from '@/api/swapi/shared/types/dto'
+import type { SwapiResourceDto } from '@/api/swapi/types/dto'
 
 /**
  * A planet.

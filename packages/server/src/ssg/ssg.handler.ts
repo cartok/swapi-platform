@@ -6,7 +6,7 @@ import { isAbortLikeError } from '@swapi/shared/errors/abort-error'
 
 import { CACHE_TAGS, DOCUMENT_CACHE_HEADERS } from '#internal/cache/cache'
 import { isErrorCode, SERVER_ERROR_CODES } from '#internal/error/error'
-import { abortResponse } from '#internal/request/abort.handler'
+import { createAbortResponse } from '#internal/request/request-abort.handler'
 import type { Handler } from '#internal/types'
 
 export const addSsgHandler: Handler = (hono) => {
@@ -26,7 +26,7 @@ export const addSsgHandler: Handler = (hono) => {
 
     const abortController = c.get('abortController')
     if (abortController.signal.aborted) {
-      return abortResponse(c, 'Before SSG file loading')
+      return createAbortResponse(c, 'Before SSG file loading')
     }
 
     try {
@@ -34,15 +34,14 @@ export const addSsgHandler: Handler = (hono) => {
         encoding: 'utf8',
         signal: abortController.signal,
       })
+      console.log('SSG: Loaded', ssgFilePath)
 
       if (
         abortController.signal.aborted &&
         abortController.abortContext?.source === 'client'
       ) {
-        return abortResponse(c, 'Before serving SSG file')
+        return createAbortResponse(c, 'Before serving SSG file')
       }
-
-      console.log('SSG: Serve', ssgFilePath)
 
       return c.html(html, 200, {
         ...DOCUMENT_CACHE_HEADERS,
@@ -50,7 +49,7 @@ export const addSsgHandler: Handler = (hono) => {
       })
     } catch (error) {
       if (isAbortLikeError(error)) {
-        return abortResponse(c, 'On error during SSG file loading')
+        return createAbortResponse(c, 'On error during SSG file loading')
       }
 
       if (isErrorCode(error, SERVER_ERROR_CODES.ENOENT)) {

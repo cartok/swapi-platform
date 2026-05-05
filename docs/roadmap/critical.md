@@ -9,8 +9,13 @@
 - [x] Send (503 or similar) status code in critical error case with `no-store` cache headers.
 - [x] Server: Make requests generally cancelable, so that the server stops working if client stopped requesting.
 - [x] Server: General request timeout
-- [ ] Server: Make SSR rendering cancelable by client cancelation or timeouts by creating a worker solution including a queue.
-- [ ] To allow SSR rendering abortion via singals and to gather information about the rendering result, so that it can be treated on server side: Create SSR rendering context object for each request, using HttpInterceptor with HttpContext Token
+- [x] Server: Make SSR rendering cancelable by client cancelation or timeouts by creating a worker solution including a queue.
+- [x] To allow SSR rendering abortion via singals and to gather information about the rendering result, so that it can be treated on server side: Create SSR rendering context object for each request, using HttpInterceptor with HttpContext Token
+
+---
+
+- [ ] Add mock data, incl. some routes that error on purpose
+- [ ] Update README
 
 ---
 

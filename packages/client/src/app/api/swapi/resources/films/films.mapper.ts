@@ -8,7 +8,7 @@ import {
   toOptionalDate,
   toOptionalString,
   toRomanNumber,
-} from '@/api/swapi/shared/utils/mapping'
+} from '@/api/swapi/utils/mapping'
 
 export function mapFilmDtoToModel(dto: FilmDto): Film {
   const id = extractSwapiId(dto.url)

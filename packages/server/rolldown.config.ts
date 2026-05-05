@@ -21,6 +21,7 @@ const externalDependencies = new Set(['@swapi/client/dist-paths'])
 const serverBundleConfig = defineConfig({
   input: {
     server: `./dist/${buildVariantPath}/build/server.js`,
+    ['ssr/render-worker']: `./dist/${buildVariantPath}/build/ssr/render-worker.js`,
   },
   tsconfig: './tsconfig/tsconfig.server.bundle.json',
   platform: 'node',
@@ -35,7 +36,10 @@ const serverBundleConfig = defineConfig({
   },
   external: (id) => externalDependencies.has(id),
   transform: {
-    define: envToOxcDefine(env),
+    define: {
+      ...envToOxcDefine(env),
+      ngServerMode: 'true',
+    },
   },
   output: {
     dir: `./dist/${buildVariantPath}/bundle`,

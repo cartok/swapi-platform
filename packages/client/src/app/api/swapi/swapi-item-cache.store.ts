@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 
-import type { SwapiResource } from '@/api/swapi/shared/types/model'
+import type { SwapiResource } from '@/api/swapi/types/model'
 
 @Injectable({
   providedIn: 'root',
@@ -29,15 +29,12 @@ export class SwapiItemCacheStore {
   setItem<TModel extends SwapiResource>(
     resourcePath: string,
     item: TModel,
-    /**
-     * Item cache duration in milliseconds.
-     */
-    ttl: number,
+    ttlMs: number,
   ): void {
     const cacheKey = SwapiItemCacheStore.cacheKey(resourcePath, item.id)
     this.itemCache.set(cacheKey, {
       item,
-      expiresAt: Date.now() + ttl,
+      expiresAt: Date.now() + ttlMs,
     })
   }
 

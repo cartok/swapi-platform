@@ -44,7 +44,6 @@ tasks:
       - ./.env/.env.local.{{.PROFILE}}
     env:
       SWAPI_RUN_MODE: source
-    interactive: true
     cmds:
       - 'echo "Hint: This task does not do SSG automatically and will fallback to SSR."'
       - >
@@ -52,7 +51,8 @@ tasks:
         --conditions @swapi/shared/source
         --conditions @swapi/server/source
         --conditions @swapi/local/{{.PROFILE}}
-        --watch ./src/server.jit.ts
+        --hot
+        ./src/server.jit.ts
 
   build:with-ssg:
     vars:

@@ -1,4 +1,5 @@
-import type { ApplicationRef } from '@angular/core'
+import type { ApplicationRef, InjectionToken } from '@angular/core'
 import type { BootstrapContext } from '@angular/platform-browser'
 
-export default function bootstrap(context: BootstrapContext): Promise<ApplicationRef>
+export function bootstrap(context: BootstrapContext): Promise<ApplicationRef>
+export const SSR_ABORT_SIGNAL: InjectionToken<AbortSignal | null>

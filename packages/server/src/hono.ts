@@ -8,16 +8,19 @@ import { GLOBAL_SWAPI_TARGET } from '#internal/env'
 import { addErrorHandler } from '#internal/error/error.handler'
 import { addHealthChecksHandler } from '#internal/health/health.handler'
 import { addIndexingHandler } from '#internal/indexing/indexing.handler'
-import { addAbortHandler } from '#internal/request/abort.handler'
 import { addInFlightRequestsHandler } from '#internal/request/in-flight-requests.handler'
+import { addAbortHandler } from '#internal/request/request-abort.handler'
 import { addRequestContextHandler } from '#internal/request/request-context.handler'
 import { addRequestGuardHandler } from '#internal/security/request-guard-security.handler'
 import { addSecureHeadersHandler } from '#internal/security/secure-headers-security.handler'
 import { addSsgHandler } from '#internal/ssg/ssg.handler'
 import { addSsrHandler } from '#internal/ssr/ssr.handler'
-import type { HonoEnv, HonoRunContext } from '#internal/types'
+import type { HonoEnv, HonoRuntimeMetrics, HonoRuntimeServices } from '#internal/types'
 
-export function createHono(runContext: HonoRunContext): Hono<HonoEnv> {
+export function createHono(
+  runtimeMetrics: HonoRuntimeMetrics,
+  runtimeServices: HonoRuntimeServices,
+): Hono<HonoEnv> {
   const hono = new Hono<HonoEnv>({ strict: false })
 
   if (GLOBAL_SWAPI_TARGET === 'local') {
@@ -25,24 +28,24 @@ export function createHono(runContext: HonoRunContext): Hono<HonoEnv> {
       '/.well-known/appspecific/com.chrome.devtools.json',
       () => new Response(null, { status: 204 }),
     )
-    addDebugRoutesHandler(hono, runContext)
+    addDebugRoutesHandler(hono, runtimeMetrics, runtimeServices)
   }
 
-  addInFlightRequestsHandler(hono, runContext)
-  addAbortHandler(hono, runContext)
+  addInFlightRequestsHandler(hono, runtimeMetrics, runtimeServices)
+  addAbortHandler(hono, runtimeMetrics, runtimeServices)
 
-  addHealthChecksHandler(hono, runContext)
-  addRequestContextHandler(hono, runContext)
-  addSecureHeadersHandler(hono, runContext)
-  addRequestGuardHandler(hono, runContext)
-  addIndexingHandler(hono, runContext)
-  addAssetHandler(hono, runContext)
-  addDeviceContextHandler(hono, runContext)
-  addDeviceRedirectHandler(hono, runContext)
-  addSsgHandler(hono, runContext)
-  addSsrHandler(hono, runContext)
+  addHealthChecksHandler(hono, runtimeMetrics, runtimeServices)
+  addRequestContextHandler(hono, runtimeMetrics, runtimeServices)
+  addSecureHeadersHandler(hono, runtimeMetrics, runtimeServices)
+  addRequestGuardHandler(hono, runtimeMetrics, runtimeServices)
+  addIndexingHandler(hono, runtimeMetrics, runtimeServices)
+  addAssetHandler(hono, runtimeMetrics, runtimeServices)
+  addDeviceContextHandler(hono, runtimeMetrics, runtimeServices)
+  addDeviceRedirectHandler(hono, runtimeMetrics, runtimeServices)
+  addSsgHandler(hono, runtimeMetrics, runtimeServices)
+  addSsrHandler(hono, runtimeMetrics, runtimeServices)
 
-  addErrorHandler(hono, runContext)
+  addErrorHandler(hono, runtimeMetrics, runtimeServices)
 
   return hono
 }

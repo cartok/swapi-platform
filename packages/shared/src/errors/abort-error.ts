@@ -7,6 +7,7 @@ export function isAbortLikeError(error: unknown): boolean {
   }
 
   const { name, code } = error as { name?: unknown; code?: unknown }
+
   return isAbortLikeName(name) || isAbortLikeCode(code)
 }
 

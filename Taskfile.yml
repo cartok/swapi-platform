@@ -29,10 +29,39 @@ tasks:
     aliases:
       - i
     preconditions:
-      - sh: command -v bun
+      - command -v bun
     cmds:
       - bun install --link-native-bins
       - bunx browser-driver-manager install chrome
+
+  dev:
+    vars:
+      PROFILE:
+        ref: .PROFILE | default "debug"
+    requires:
+      vars:
+        - name: PROFILE
+          enum: [debug, release]
+    interactive: true
+    preconditions:
+      - command -v watchexec
+      - command -v go-task
+    cmds:
+      - >
+        watchexec --restart --quiet
+        --watch ./bun.lock
+        --watch ./packages/client/index.html
+        --watch ./packages/client/public
+        --watch ./packages/client/src
+        --watch ./packages/client/tsconfig
+        --watch ./packages/client/vite.config.ts
+        --watch ./packages/server/src/ssr/render-worker.ts
+        --watch ./packages/server/src/ssr/render-worker.jit.ts
+        --watch ./packages/server/src/ssr/render-worker.types.ts
+        --watch ./packages/shared/generated
+        --watch ./packages/shared/src
+        --watch ./packages/tsconfig
+        -- go-task server:dev PROFILE={{.PROFILE}}
 
   lint:
     vars:

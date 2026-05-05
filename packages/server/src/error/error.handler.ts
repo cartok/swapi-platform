@@ -10,16 +10,16 @@ import type { Context } from 'hono'
 
 import { NO_STORE_CACHE_HEADERS } from '#internal/cache/cache'
 import { isHonoHTTPResponseError } from '#internal/error/error'
-import { abortResponse } from '#internal/request/abort.handler'
+import { createAbortResponse } from '#internal/request/request-abort.handler'
 import type { Handler, HonoEnv } from '#internal/types'
 
-export const addErrorHandler: Handler = (hono, runContext) => {
+export const addErrorHandler: Handler = (hono, runtimeMetrics) => {
   hono.onError((error, c) => {
     if (c.get('abortController').signal.aborted && isAbortLikeError(error)) {
-      return abortResponse(c, 'Global error handler')
+      return createAbortResponse(c, 'Global error handler')
     }
 
-    runContext.hono.caughtExceptions++
+    runtimeMetrics.hono.caughtExceptions++
     logError(error, c)
 
     if (isErrorPageUrl(c.req.url)) {

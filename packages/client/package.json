@@ -38,8 +38,7 @@
       "@swapi/testing/debug": "./dist/testing/debug/ssr/main.server.js",
       "@swapi/testing/release": "./dist/testing/release/ssr/main.server.js",
       "@swapi/production/debug": "./dist/production/debug/ssr/main.server.js",
-      "@swapi/production/release": "./dist/production/release/ssr/main.server.js",
-      "default": "./dist/local/release/ssr/main.server.js"
+      "@swapi/production/release": "./dist/production/release/ssr/main.server.js"
     },
     "./dist-paths": {
       "types": "./src/dist-paths.ts",
@@ -48,8 +47,17 @@
       "@swapi/testing/debug": "./dist/testing/debug/dist-paths.js",
       "@swapi/testing/release": "./dist/testing/release/dist-paths.js",
       "@swapi/production/debug": "./dist/production/debug/dist-paths.js",
-      "@swapi/production/release": "./dist/production/release/dist-paths.js",
-      "default": "./dist/local/release/dist-paths.js"
+      "@swapi/production/release": "./dist/production/release/dist-paths.js"
+    },
+    "./ssr-abort-signal-token": {
+      "types": "./src/app/http/ssr-abort-signal.token.ts",
+      "@swapi/client/source": "./src/app/http/ssr-abort-signal.token.ts",
+      "@swapi/local/debug": "./dist/local/debug/ssr/main.server.js",
+      "@swapi/local/release": "./dist/local/release/ssr/main.server.js",
+      "@swapi/testing/debug": "./dist/testing/debug/ssr/main.server.js",
+      "@swapi/testing/release": "./dist/testing/release/ssr/main.server.js",
+      "@swapi/production/debug": "./dist/production/debug/ssr/main.server.js",
+      "@swapi/production/release": "./dist/production/release/ssr/main.server.js"
     }
   }
 }

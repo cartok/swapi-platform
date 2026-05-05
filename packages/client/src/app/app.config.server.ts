@@ -1,4 +1,4 @@
-import { provideHttpClient, withFetch } from '@angular/common/http'
+import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http'
 import type { ApplicationConfig } from '@angular/core'
 import { mergeApplicationConfig } from '@angular/core'
 import { provideRouter, withRouterConfig } from '@angular/router'
@@ -7,6 +7,7 @@ import { provideServerRendering, withRoutes } from '@angular/ssr'
 import { appConfigBase } from '@/app.config.base'
 import { routes } from '@/app.routes'
 import { serverRoutes } from '@/app.routes.server'
+import { ssrAbortInterceptor } from '@/http/ssr-abort.interceptor'
 
 const config: ApplicationConfig = {
   providers: [
@@ -17,7 +18,7 @@ const config: ApplicationConfig = {
         paramsInheritanceStrategy: 'always',
       }),
     ),
-    provideHttpClient(withFetch()),
+    provideHttpClient(withFetch(), withInterceptors([ssrAbortInterceptor])),
   ],
 }
 

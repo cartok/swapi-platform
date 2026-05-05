@@ -7,7 +7,7 @@ import { deleteCookie, getCookie, setCookie } from 'hono/cookie'
 
 import { skipDeviceDetection } from '#internal/device/skip-device-detection'
 import { GLOBAL_SWAPI_TARGET } from '#internal/env'
-import { abortResponse } from '#internal/request/abort.handler'
+import { createAbortResponse } from '#internal/request/request-abort.handler'
 import type { Handler } from '#internal/types'
 
 const JUST_REDIRECTED_COOKIE_KEY = 'justRedirected'
@@ -58,7 +58,7 @@ export const addDeviceRedirectHandler: Handler = (hono) => {
     })
 
     if (c.get('abortController').signal.aborted) {
-      return abortResponse(c, 'Before redirecting to device URL')
+      return createAbortResponse(c, 'Before redirecting to device URL')
     }
 
     return c.redirect(relativeDeviceContextUrl)

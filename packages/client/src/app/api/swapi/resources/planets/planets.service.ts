@@ -4,11 +4,11 @@ import { inject, Injectable, Injector } from '@angular/core'
 import type { PlanetDto } from '@/api/swapi/resources/planets/planets.dto'
 import { mapPlanetDtoToModel } from '@/api/swapi/resources/planets/planets.mapper'
 import type { Planet } from '@/api/swapi/resources/planets/planets.model'
-import type { RetryableHttpResourceMethodOptions } from '@/api/swapi/shared/http/http-retry.interceptor'
-import { SwapiItemCacheStore } from '@/api/swapi/shared/http/swapi-item-cache.store'
-import type { SwapiServiceResult } from '@/api/swapi/shared/http/swapi-resource.service'
-import { SwapiResourceService } from '@/api/swapi/shared/http/swapi-resource.service'
-import type { SwapiResourceCollection } from '@/api/swapi/shared/types/model'
+import { SwapiItemCacheStore } from '@/api/swapi/swapi-item-cache.store'
+import type { SwapiServiceResult } from '@/api/swapi/swapi-resource.service'
+import { SwapiResourceService } from '@/api/swapi/swapi-resource.service'
+import type { SwapiResourceCollection } from '@/api/swapi/types/model'
+import type { RetryableHttpResourceMethodOptions } from '@/http/http-retry.interceptor'
 
 @Injectable()
 export class PlanetsService {

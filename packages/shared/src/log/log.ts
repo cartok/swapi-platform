@@ -2,6 +2,25 @@ export function logHeading(heading: string): string {
   return `>>> ${heading.toUpperCase()}\n`
 }
 
+type Primitive = string | number | boolean | bigint | symbol | null | undefined
+
+export function isPrimitive(value: unknown): value is Primitive {
+  return value === null || (typeof value !== 'object' && typeof value !== 'function')
+}
+
+export function unknownToString(value: unknown): string {
+  if (isPrimitive(value)) {
+    return String(value)
+  }
+  if (value instanceof Error) {
+    return errorToString(value)
+  }
+  if (value instanceof Response) {
+    return responseToString(value)
+  }
+  return objectToString(value)
+}
+
 export function objectToString(object: object): string {
   try {
     return JSON.stringify(object)

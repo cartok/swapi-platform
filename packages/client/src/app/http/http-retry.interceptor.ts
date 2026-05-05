@@ -19,7 +19,7 @@ export interface RetryableHttpResourceMethodOptions {
 }
 
 const RETRYABLE_HTTP_METHODS = new Set<string>(['GET', 'HEAD'])
-const DEFAULT_HTTP_REQUEST_TIMEOUT_MS = 4000
+const HTTP_REQUEST_TIMEOUT_MS = 1500
 
 export const MINIMAL_HTTP_RETRY_POLICY: HttpRetryPolicy = {
   retryCount: 3,
@@ -143,7 +143,7 @@ export function retryableHttpResourceRequest(
     const url = urlFactory()
     const request: HttpResourceRequest = {
       url,
-      timeout: DEFAULT_HTTP_REQUEST_TIMEOUT_MS,
+      timeout: HTTP_REQUEST_TIMEOUT_MS,
     }
 
     if (!retryPolicy) {
