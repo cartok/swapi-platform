@@ -6,7 +6,7 @@ import { MultiSignalAbortController } from '#internal/signal/multi-signal-abort-
 import { toAbortReason } from '#internal/signal/signal'
 import type { Handler, HonoEnv } from '#internal/types'
 
-const TIMEOUT_GLOBAL = 3500
+const TIMEOUT_GLOBAL = 5000
 
 export const addAbortHandler: Handler = (hono) => {
   hono.get('*', (c, next) => {

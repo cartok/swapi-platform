@@ -41,32 +41,33 @@ const runtimeMetrics: ServerRuntimeMetrics = {
 } as const
 
 /**
- * Benchmark winners (with extra worker compute load):
- * - 1 CPU / 256MB:
- *   workerCount=1, maxQueuedJobs=32, queueTimeoutMs=1200, renderAbortTimeoutMs=3000
- *   load_80: 97.92% 2xx, success_rps=6.12, p95=1.351s
- *   load_200: 41.83% 2xx, success_rps=6.33, p95=1.384s, 503=349/600, 000=0
- *   fly concurrency (requests): soft_limit=8, hard_limit=12
- * - 1 CPU / 512MB:
- *   workerCount=2, maxQueuedJobs=32, queueTimeoutMs=1200, renderAbortTimeoutMs=3000
- *   load_80: 100% 2xx, success_rps=9.67, p95=0.862s
- *   load_200: 69.33% 2xx, success_rps=9.95, p95=1.417s, 503=184/600, 000=0
- *   fly concurrency (requests): soft_limit=10, hard_limit=16
- * - 2 CPU / 512MB:
- *   workerCount=2, maxQueuedJobs=32, queueTimeoutMs=1200, renderAbortTimeoutMs=3000
- *   load_80: 100% 2xx, success_rps=12.44, p95=0.660s
- *   load_200: 85.17% 2xx, success_rps=12.74, p95=1.390s, 503=89/600, 000=0
- *   fly concurrency (requests): soft_limit=14, hard_limit=20
- *
  * Benchmark setup:
  * - Docker server start via `go-task docker:start` with Taskfile CPU/RAM throttling profile.
- * - Synthetic request load via curl (`-L`) against SSR routes:
- *   `/r;format=mobile/movies`, `/r;format=mobile/characters`, `/r;format=mobile/planets`.
+ * - Synthetic request load via curl (`-L`) against SSR routes: `/movies` and `/movie/1`.
  * - load_80: 80 requests per route at concurrency 8.
  * - load_200: 200 requests per route at concurrency 20.
- * - Artificial constant SSR latency: 40ms delay before worker-pool render call.
- * - Artificial worker compute load: 80ms busy-loop before `engine.render` in SSR worker.
+ * - Artificial constant SSR latency: 65ms delay before worker-pool render call.
+ * - Mock data for SWAPI with artificial delay range.
  * - Metrics recorded: 2xx rate, success_rps, p95 latency, plus 503 and transport failures (000).
+ *
+ * Benchmark winners:
+ * 1 CPU / 256MB (Profile C):
+ * - workerCount=1, maxQueuedJobs=40, queueTimeoutMs=1400, renderAbortTimeoutMs=3200,
+ *   TIMEOUT_GLOBAL=5000
+ * - aggregated (/movies + /movie/1, load_80 + load_200): 23.75% 2xx, success_rps=2.02, p95=1.897s
+ * - fly concurrency (requests): soft_limit=5, hard_limit=8
+ *
+ * 1 CPU / 512MB (Profile C):
+ * - workerCount=2, maxQueuedJobs=40, queueTimeoutMs=1400, renderAbortTimeoutMs=3200,
+ *   TIMEOUT_GLOBAL=5000
+ * - aggregated (/movies + /movie/1, load_80 + load_200): 46.79% 2xx, success_rps=3.98, p95=1.959s
+ * - fly concurrency (requests): soft_limit=8, hard_limit=12
+ *
+ * 2 CPU / 512MB (Profile C):
+ * - workerCount=2, maxQueuedJobs=40, queueTimeoutMs=1400, renderAbortTimeoutMs=3200,
+ *   TIMEOUT_GLOBAL=5000
+ * - aggregated (/movies + /movie/1, load_80 + load_200): 47.32% 2xx, success_rps=4.04, p95=1.935s
+ * - fly concurrency (requests): soft_limit=10, hard_limit=16
  *
  * Fly costs:
  * - https://fly.io/docs/about/pricing/#started-fly-machines
@@ -74,9 +75,9 @@ const runtimeMetrics: ServerRuntimeMetrics = {
 const renderPoolPromise = RenderWorkerPool.create({
   workerFile: resolveRenderWorkerFile(),
   workerCount: 2,
-  maxQueuedJobs: 32,
-  queueTimeoutMs: 1_200,
-  renderAbortTimeoutMs: 3_000,
+  maxQueuedJobs: 40,
+  queueTimeoutMs: 1_400,
+  renderAbortTimeoutMs: 3_200,
   requestAbortWorkerGraceMs: 500,
   renderTimeoutWorkerGraceMs: 500,
   workerRecoveryInitialBackoffMs: 50,
