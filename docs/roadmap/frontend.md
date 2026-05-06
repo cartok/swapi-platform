@@ -12,6 +12,7 @@
 - [ ] Add Storybook
 - [ ] Render error UI in page content, if critical API resource failed
 - [ ] Ensure client then hydrates error UI and retries after a small delay so that the user can understand whats going on.
+- [ ] Prevent horizontal CLS, which is caused by the vertical scroll bar appearing after first paint.
 
 ---
 
