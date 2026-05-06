@@ -6,6 +6,7 @@ export const browserEnv = parseEnv(AppBrowserEnvSchema, {
   SWAPI_LOG_LEVEL: process.env['SWAPI_LOG_LEVEL'],
   SWAPI_PROFILE: process.env['SWAPI_PROFILE'],
   SWAPI_TARGET: process.env['SWAPI_TARGET'],
+  SWAPI_USE_MOCK: process.env['SWAPI_USE_MOCK'],
 })
 
 export const buildEnv = parseEnv(AppBuildEnvSchema, {

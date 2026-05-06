@@ -3,6 +3,7 @@ import type { ApplicationConfig } from '@angular/core'
 import { mergeApplicationConfig } from '@angular/core'
 import { provideRouter, withInMemoryScrolling, withRouterConfig } from '@angular/router'
 
+import { swapiMockInterceptor } from '@/api/swapi/swapi.mock.interceptor'
 import { appConfigBase } from '@/app.config.base'
 import { routes } from '@/app.routes'
 import { httpRetryInterceptor } from '@/http/http-retry.interceptor'
@@ -18,7 +19,10 @@ const config: ApplicationConfig = {
         paramsInheritanceStrategy: 'always',
       }),
     ),
-    provideHttpClient(withFetch(), withInterceptors([httpRetryInterceptor])),
+    provideHttpClient(
+      withFetch(),
+      withInterceptors([swapiMockInterceptor, httpRetryInterceptor]),
+    ),
   ],
 }
 

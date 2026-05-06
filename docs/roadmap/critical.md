@@ -14,7 +14,7 @@
 
 ---
 
-- [ ] Add mock data, incl. some routes that error on purpose
+- [x] Add mock data, incl. some routes that error on purpose
 - [ ] Update README
 
 ---

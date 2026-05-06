@@ -6,6 +6,8 @@ This repository started as a successful job application challenge implementation
 
 ## Live Demos
 
+> Currently the SWAPI is down due to a expired TLS certificate, but data is mocked with an artificial request delay at the moment until I created my own backend.
+
 - [Test domain (Fly.io behind Cloudflare)](https://swapi-platform.cartok.dev/)
 - [Fly.io test domain](https://swapi-platform.fly.dev/)
 
@@ -66,6 +68,17 @@ SWAPI is intentionally integrated defensively because of schema and data inconsi
 
 - See details in [docs/swapi.md](./docs/swapi.md)
 - Includes known API behavior differences, mapping strategy, and fallback decisions
+
+### Temporary SWAPI Mock Mode
+
+As of **May 2026**, the public `swapi.dev` API is unstable due to an expired TLS certificate.
+To keep the app reliably usable across environments, the client currently serves SWAPI responses from local mock data.
+
+- Mock source: SWAPI fixture data (`Juriy/swapi`) transformed to SWAPI-compatible `films`, `people`, and `planets` API responses
+- Activation: `SWAPI_USE_MOCK=true` in client environment files
+- Mock transport behavior: includes an artificial per-request delay (`150-450ms`) for both success and `404` responses
+
+This is a temporary fallback until the app is switched to its own backend.
 
 ## Setup
 
@@ -166,6 +179,7 @@ Main runtime variables:
 - `SWAPI_TARGET` (`local|testing|production`)
 - `SWAPI_PROFILE` (`debug|release`)
 - `SWAPI_RUN_MODE` (`source|build`)
+- `SWAPI_USE_MOCK` (`true|false`, client runtime flag for SWAPI mock responses)
 - `SWAPI_SERVER_PORT`
 - `SWAPI_SERVER_HOST`
 - `SWAPI_ALLOWED_HOSTS`

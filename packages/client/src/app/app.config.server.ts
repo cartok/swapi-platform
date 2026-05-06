@@ -4,6 +4,7 @@ import { mergeApplicationConfig } from '@angular/core'
 import { provideRouter, withRouterConfig } from '@angular/router'
 import { provideServerRendering, withRoutes } from '@angular/ssr'
 
+import { swapiMockInterceptor } from '@/api/swapi/swapi.mock.interceptor'
 import { appConfigBase } from '@/app.config.base'
 import { routes } from '@/app.routes'
 import { serverRoutes } from '@/app.routes.server'
@@ -18,7 +19,10 @@ const config: ApplicationConfig = {
         paramsInheritanceStrategy: 'always',
       }),
     ),
-    provideHttpClient(withFetch(), withInterceptors([ssrAbortInterceptor])),
+    provideHttpClient(
+      withFetch(),
+      withInterceptors([ssrAbortInterceptor, swapiMockInterceptor]),
+    ),
   ],
 }
 

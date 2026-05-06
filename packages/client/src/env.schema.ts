@@ -8,7 +8,12 @@ import {
   RunModeSchema,
 } from '../../shared/src/environment/env'
 
-export const AppBrowserEnvSchema = CommonEnvSchema
+export const AppBrowserEnvSchema = Type.Intersect([
+  CommonEnvSchema,
+  Type.Object({
+    SWAPI_USE_MOCK: Type.Readonly(Type.Boolean()),
+  }),
+])
 
 export type AppBrowserEnv = Static<typeof AppBrowserEnvSchema>
 
