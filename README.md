@@ -62,6 +62,16 @@ This repository started as a successful job application challenge implementation
   - _The search input in the header is only UI demonstration, and has no functionality._
 - DeviceService with route-aware and browser-aware breakpoint handling
 
+## Reliability and Production Features
+
+- Clear client/server request behavior for stable, predictable runtime behavior.
+- Automatic cancellation of obsolete in-flight requests during fast navigation to reduce unnecessary backend load.
+- CDN-ready caching model with explicit cache headers and cache tagging support.
+- Consistent HTTP error and timeout responses with cache-safe semantics.
+- Isolated SSR execution in a worker pool with controlled concurrency and bounded queueing.
+- Worker recovery and runtime metrics for observability and operational diagnostics.
+- Graceful shutdown with in-flight request draining for safer deploys and restarts.
+
 ## SWAPI Integration Notes
 
 SWAPI is intentionally integrated defensively because of schema and data inconsistencies.
