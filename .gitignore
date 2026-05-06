@@ -23,6 +23,7 @@ generated/
 !.vscode/tasks.json
 
 # Everything else
+.env.cf
 .env.fly
 fly.*.toml
 fly.*.yml
