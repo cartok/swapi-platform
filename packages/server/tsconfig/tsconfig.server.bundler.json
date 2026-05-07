@@ -2,7 +2,7 @@
   "extends": [
     "@swapi/tsconfig/tsconfig.base",
     "@swapi/tsconfig/tsconfig.rules",
-    "@swapi/tsconfig/tsconfig.node.script"
+    "@swapi/tsconfig/tsconfig.bundler"
   ],
   "compilerOptions": {
     "noEmit": true,

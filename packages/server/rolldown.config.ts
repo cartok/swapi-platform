@@ -23,7 +23,7 @@ const serverBundleConfig = defineConfig({
     server: `./dist/${buildVariantPath}/build/server.js`,
     ['ssr/render-worker']: `./dist/${buildVariantPath}/build/ssr/render-worker.js`,
   },
-  tsconfig: './tsconfig/tsconfig.server.bundle.json',
+  tsconfig: './tsconfig/tsconfig.server.bundler.json',
   platform: 'node',
   plugins: [createAngularLinkerAotPlugin({ sourceMaps: babelSourcemap })],
   resolve: {
