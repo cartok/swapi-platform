@@ -2,6 +2,7 @@
   "files": [],
   "compilerOptions": {
     "experimentalDecorators": true,
+    "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitOverride": true,
     "noImplicitReturns": true,
