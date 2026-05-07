@@ -7,10 +7,10 @@ import { addDeviceRedirectHandler } from '#internal/device/device-redirect.handl
 import { GLOBAL_SWAPI_TARGET } from '#internal/env'
 import { addErrorHandler } from '#internal/error/error.handler'
 import { addHealthChecksHandler } from '#internal/health/health.handler'
-import { addIndexingHandler } from '#internal/indexing/indexing.handler'
 import { addInFlightRequestsHandler } from '#internal/request/in-flight-requests.handler'
 import { addAbortHandler } from '#internal/request/request-abort.handler'
 import { addRequestContextHandler } from '#internal/request/request-context.handler'
+import { addRobotsHandler } from '#internal/robots/robots.handler'
 import { addRequestGuardHandler } from '#internal/security/request-guard-security.handler'
 import { addSecureHeadersHandler } from '#internal/security/secure-headers-security.handler'
 import { addSsgHandler } from '#internal/ssg/ssg.handler'
@@ -38,7 +38,7 @@ export function createHono(
   addRequestContextHandler(hono, runtimeMetrics, runtimeServices)
   addSecureHeadersHandler(hono, runtimeMetrics, runtimeServices)
   addRequestGuardHandler(hono, runtimeMetrics, runtimeServices)
-  addIndexingHandler(hono, runtimeMetrics, runtimeServices)
+  addRobotsHandler(hono, runtimeMetrics, runtimeServices)
   addAssetHandler(hono, runtimeMetrics, runtimeServices)
   addDeviceContextHandler(hono, runtimeMetrics, runtimeServices)
   addDeviceRedirectHandler(hono, runtimeMetrics, runtimeServices)
