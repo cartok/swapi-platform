@@ -147,4 +147,10 @@ export default defineConfig(
       '@angular-eslint/no-experimental': ['off'],
     },
   },
+  {
+    files: ['./packages/worker/worker-configuration.d.ts'],
+    linterOptions: {
+      reportUnusedDisableDirectives: 'off',
+    },
+  },
 )

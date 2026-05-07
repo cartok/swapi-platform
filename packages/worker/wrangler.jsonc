@@ -1,0 +1,21 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "swapi-platform-device-redirection",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-05-07",
+  // "compatibility_flags": ["nodejs_compat", "remove_nodejs_compat_eol_v24"],
+  "env": {
+    "test": {
+      "route": {
+        "pattern": "worker-device-redirection.cartok.dev/*",
+        "zone_name": "cartok.dev",
+      },
+    },
+    "production": {
+      "route": {
+        "pattern": "swapi-platform.cartok.dev/*",
+        "zone_name": "cartok.dev",
+      },
+    },
+  },
+}

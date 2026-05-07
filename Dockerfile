@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.23
 ARG BUN_VERSION=1.3.13
 ARG NODE_ENV
 ARG PROFILE
@@ -14,12 +15,9 @@ WORKDIR /app
 COPY ./.npmrc ./
 COPY ./.node-version ./
 COPY ./.bun-version ./
-COPY ./package.json ./
 COPY ./bun.lock ./
-COPY ./packages/tsconfig/package.json ./packages/tsconfig/
-COPY ./packages/shared/package.json ./packages/shared/
-COPY ./packages/server/package.json ./packages/server/
-COPY ./packages/client/package.json ./packages/client/
+COPY ./package.json ./
+COPY --parents ./packages/*/package.json ./
 
 RUN bun install --frozen-lockfile --link-native-bins --no-progress
 
@@ -56,9 +54,7 @@ COPY ./packages/shared/src/ ./packages/shared/src
 COPY ./packages/server/src/ ./packages/server/src
 COPY ./packages/client/src/ ./packages/client/src
 
-COPY ./packages/shared/Taskfile.yml ./packages/shared/
-COPY ./packages/server/Taskfile.yml ./packages/server/
-COPY ./packages/client/Taskfile.yml ./packages/client/
+COPY --parents ./packages/*/Taskfile.yml ./
 
 FROM code AS build-bundle
 ARG NODE_ENV

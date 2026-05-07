@@ -1,0 +1,55 @@
+version: 3
+
+tasks:
+  clean:
+    cmds:
+      - rm -f ./tsconfig/*.tsbuildinfo || true
+      - rm -rf ./.wrangler || true
+      - rm -rf ./dist || true
+      - rm -rf {{.TYPES_DIR}} || true
+
+  lint:
+    deps:
+      - task: typegen
+    sources:
+      - ./src/**/*
+      - ./tsconfig/tsconfig.worker.json
+      - ../../bun.lock
+    cmds:
+      - bunx --no-install tsc --noEmit --project ./tsconfig/tsconfig.worker.json
+
+  typegen:
+    cmds:
+      - cmd: >
+          bunx --no-install wrangler types
+          --env-interface CloudflareBindings
+        if: >
+          !
+          bunx --no-install wrangler types
+          --env-interface CloudflareBindings
+          --check
+
+  dev:
+    deps:
+      - task: typegen
+    cmds:
+      - bunx --no-install wrangler dev
+
+  deploy:
+    vars:
+      TARGET:
+        ref: .TARGET | default "test"
+    requires:
+      vars:
+        - name: TARGET
+          enum: [test, production]
+    deps:
+      - task: typegen
+    cmds:
+      - >
+        bunx --no-install wrangler
+        {{if eq .TARGET "test"}}
+        --env test
+        {{end}}
+        deploy
+        --minify

@@ -16,6 +16,9 @@ includes:
   shared:
     taskfile: ./packages/shared
     dir: ./packages/shared
+  worker:
+    taskfile: ./packages/worker
+    dir: ./packages/worker
 
 tasks:
   clean:
@@ -112,9 +115,7 @@ tasks:
       - task: server:lint
         vars:
           PROFILE: '{{.PROFILE}}'
-      - task: shared:lint
-        vars:
-          PROFILE: '{{.PROFILE}}'
+      - task: worker:lint
 
   lint:eslint:
     sources:

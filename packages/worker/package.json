@@ -1,0 +1,13 @@
+{
+  "name": "worker",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@swapi/server": "workspace:*",
+    "@swapi/shared": "workspace:*",
+    "hono": "catalog:"
+  },
+  "devDependencies": {
+    "wrangler": "^4.4.0"
+  }
+}
