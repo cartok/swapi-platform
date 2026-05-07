@@ -22,7 +22,6 @@ tasks:
     sources:
       - '{{.TSCONFIG}}'
       - ./src/**/*
-      - ./docker/**/*
       - ../../bun.lock
     cmds:
       - bunx --no-install tsc --noEmit --project '{{.TSCONFIG}}'
