@@ -2,7 +2,7 @@ import console from 'node:console'
 import { readFileSync } from 'node:fs'
 import { extname, normalize, resolve } from 'node:path'
 
-import { browserDistPath, ssrDistPath } from '@swapi/client/dist-paths'
+import { browserDistPath } from '@swapi/client/dist-paths'
 import { serveStatic } from 'hono/bun'
 import type { Manifest } from 'vite'
 
@@ -20,7 +20,7 @@ import {
 import { createAbortResponse } from '#internal/request/request-abort.handler'
 import type { Handler } from '#internal/types'
 
-const VITE_MANIFEST_PATH = resolve(ssrDistPath, '.vite/manifest.json')
+const VITE_MANIFEST_PATH = resolve(browserDistPath, '.vite/manifest.json')
 const ASSET_PATHS: ReadonlySet<string> = readAssetPaths()
 
 export const addAssetHandler: Handler = (hono) => {
