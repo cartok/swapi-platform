@@ -48,7 +48,6 @@ tasks:
     interactive: true
     preconditions:
       - command -v watchexec
-      - command -v go-task
     cmds:
       - >
         watchexec --restart --quiet
@@ -64,7 +63,7 @@ tasks:
         --watch ./packages/shared/generated
         --watch ./packages/shared/src
         --watch ./packages/tsconfig
-        -- go-task server:dev PROFILE={{.PROFILE}}
+        -- task server:dev PROFILE={{.PROFILE}}
 
   lint:
     vars:
