@@ -52,16 +52,3 @@ function isHtmlDocumentRequest({
 
   return true
 }
-
-function hasHtmlAcceptHeader(acceptHeader: string | undefined): boolean {
-  if (!acceptHeader) {
-    return false
-  }
-
-  const normalizedAcceptHeader = acceptHeader.toLowerCase()
-
-  return (
-    normalizedAcceptHeader.includes('text/html') ||
-    normalizedAcceptHeader.includes('application/xhtml+xml')
-  )
-}
