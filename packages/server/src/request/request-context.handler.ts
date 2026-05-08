@@ -1,7 +1,3 @@
-import { readdirSync } from 'node:fs'
-
-import { browserDistPath } from '@swapi/client/dist-paths'
-
 import type { Handler } from '#internal/types'
 
 export const addRequestContextHandler: Handler = (hono) => {
@@ -16,20 +12,17 @@ export const addRequestContextHandler: Handler = (hono) => {
   })
 }
 
-const STATIC_DIRECTORY_EXCLUDED_PREFIXES: readonly string[] =
-  resolveStaticDirectoryExcludedPrefixes()
-
-const DOCUMENT_REQUEST_EXCLUDED_PATHS: ReadonlySet<string> = new Set([
+const DOCUMENT_REQUEST_EXCLUDED_FILES: ReadonlySet<string> = new Set([
   '/favicon.ico',
   '/robots.txt',
 ])
 
-const DOCUMENT_REQUEST_EXCLUDED_PREFIXES: readonly string[] = [
-  ...STATIC_DIRECTORY_EXCLUDED_PREFIXES,
+const DOCUMENT_REQUEST_EXCLUDED_PATHS: readonly string[] = [
+  '/assets/',
+  '/status/',
+  '/debug/',
   '/.well-known/',
   '/cdn-cgi/',
-  '/debug/',
-  '/status/',
 ]
 
 function isHtmlDocumentRequest({
@@ -39,37 +32,25 @@ function isHtmlDocumentRequest({
   pathname: string
   acceptHeader: string | undefined
 }): boolean {
-  if (isExcludedDocumentPath(pathname)) {
+  if (!acceptHeader) {
     return false
   }
 
-  if (isFileRequestPath(pathname)) {
+  if (!acceptHeader.includes('text/html')) {
     return false
   }
 
-  return hasHtmlAcceptHeader(acceptHeader)
-}
-
-function isFileRequestPath(pathname: string): boolean {
-  try {
-    return /\.[a-zA-Z0-9]+$/.test(decodeURIComponent(pathname))
-  } catch {
-    return /\.[a-zA-Z0-9]+$/.test(pathname)
-  }
-}
-
-function isExcludedDocumentPath(pathname: string): boolean {
-  if (DOCUMENT_REQUEST_EXCLUDED_PATHS.has(pathname)) {
-    return true
-  }
-
-  for (const prefix of DOCUMENT_REQUEST_EXCLUDED_PREFIXES) {
+  for (const prefix of DOCUMENT_REQUEST_EXCLUDED_PATHS) {
     if (pathname.startsWith(prefix)) {
-      return true
+      return false
     }
   }
 
-  return false
+  if (DOCUMENT_REQUEST_EXCLUDED_FILES.has(pathname)) {
+    return false
+  }
+
+  return true
 }
 
 function hasHtmlAcceptHeader(acceptHeader: string | undefined): boolean {
@@ -83,19 +64,4 @@ function hasHtmlAcceptHeader(acceptHeader: string | undefined): boolean {
     normalizedAcceptHeader.includes('text/html') ||
     normalizedAcceptHeader.includes('application/xhtml+xml')
   )
-}
-
-function resolveStaticDirectoryExcludedPrefixes(): readonly string[] {
-  const prefixes: string[] = []
-  const entries = readdirSync(browserDistPath, { withFileTypes: true })
-
-  for (const entry of entries) {
-    if (!entry.isDirectory()) {
-      continue
-    }
-
-    prefixes.push(`/${entry.name}/`)
-  }
-
-  return prefixes
 }

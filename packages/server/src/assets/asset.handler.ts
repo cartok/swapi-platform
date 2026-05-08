@@ -47,9 +47,11 @@ export const addAssetHandler: Handler = (hono) => {
 
 function resolveAssetCacheHeaders(filePath: string): Record<string, string> {
   const fileExtension = readFileExtension(filePath)
+
   if (fileExtension === 'map') {
     return NO_STORE_CACHE_HEADERS
   }
+
   if (fileExtension === null) {
     console.warn(`Will serve file that has no file extension: ${filePath}`)
     return NO_STORE_CACHE_HEADERS
