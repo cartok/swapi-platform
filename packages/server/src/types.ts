@@ -14,11 +14,11 @@ export interface HonoEnv {
   }
 }
 
-export type Handler<T = void> = (
+export type Handler = (
   hono: Hono<HonoEnv>,
   runtimeMetrics: HonoRuntimeMetrics,
   runtimeServices: HonoRuntimeServices,
-) => T
+) => void
 
 export interface RuntimeMetrics {
   server: {
