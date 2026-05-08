@@ -1,6 +1,6 @@
 import type { Handler } from '#internal/types'
 
-export const addRequestContextHandler: Handler = (hono) => {
+export const addDocumentRequestContextHandler: Handler = (hono) => {
   hono.get('*', (c, next) => {
     const isDocumentRequest = isHtmlDocumentRequest({
       pathname: c.req.path,
