@@ -1,4 +1,4 @@
-import type { DeviceContext } from '@swapi/shared/device/context'
+import type { DeviceContext } from '@swapi/shared/device/device'
 import type { Hono } from 'hono'
 
 import type { MultiSignalAbortController } from '#internal/signal/multi-signal-abort-controller'

@@ -2,7 +2,7 @@ import {
   BREAKPOINTS,
   DEVICE_FORMATS,
   deviceContextToPathSegment,
-} from '#internal/device/context'
+} from '#internal/device/device'
 import { PATHS } from '#internal/routing/paths'
 
 export const DEVICE_CONTEXT_PATH_SEGMENTS: readonly string[] =

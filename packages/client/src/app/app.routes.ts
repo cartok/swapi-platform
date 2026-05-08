@@ -1,5 +1,5 @@
 import type { Routes, UrlSegment } from '@angular/router'
-import type { DeviceContext } from '@swapi/shared/device/context'
+import type { DeviceContext } from '@swapi/shared/device/device'
 import {
   DEFAULT_DEVICE_FORMAT,
   DEVICE_CONTEXT_PATH_PARAM_PREFIX,
@@ -11,7 +11,7 @@ import {
   isWidthBreakpointValid,
   LenientDeviceContextSchema,
   parseDeviceContext,
-} from '@swapi/shared/device/context'
+} from '@swapi/shared/device/device'
 import { PATHS } from '@swapi/shared/routing/paths'
 
 const actualRoutes: Routes = [

@@ -6,14 +6,14 @@ import type {
   DeviceContext,
   HeightBreakpoint,
   WidthBreakpoint,
-} from '@swapi/shared/device/context'
+} from '@swapi/shared/device/device'
 import {
   BREAKPOINTS,
   DEFAULT_DEVICE_FORMAT,
   DEVICE_CONTEXT_PATH_PARAM_PREFIX,
   DeviceContextSchema,
   parseDeviceContext,
-} from '@swapi/shared/device/context'
+} from '@swapi/shared/device/device'
 import { distinctUntilChanged, filter, map } from 'rxjs'
 
 import { injectIsBrowser } from '@/shared/utils/platform'

@@ -121,7 +121,7 @@ tasks:
   generate:custom-media-tokens:
     sources:
       - ./generators/custom-media-tokens.*
-      - ./src/device/context.ts
+      - ./src/device/device.ts
       - ../../bun.lock
     generates:
       - ./generated/css/media.css
