@@ -20,6 +20,7 @@ This repository started as a successful job application challenge implementation
 - Modern Angular architecture with standalone components, zoneless change detection, and lazy-loaded routes
 - Hybrid rendering setup with CSR, SSR, and SSG in one codebase
 - Device-aware server-first routing using Client Hints + URL device context parameters
+  > Currently this feature might not be available, as I move it to a CF Worker which will be used for the one free WAF Rule (rate limiting for everything despite assets) and device URL redirection. This way there will no longer be 302 redirects from Fly.io which should improve a lot.
 - Strict environment/schema validation and shared typed contracts across packages
 - Defensive third-party API integration for SWAPI with explicit DTO-to-model mapping
 - Docker-ready build and runtime setup
@@ -67,6 +68,7 @@ This repository started as a successful job application challenge implementation
 - Clear client/server request behavior for stable, predictable runtime behavior.
 - Automatic cancellation of obsolete in-flight requests during fast navigation to reduce unnecessary backend load.
 - CDN-ready caching model with explicit cache headers and cache tagging support.
+  > Currently working towards fixing caching issues.
 - Consistent HTTP error and timeout responses with cache-safe semantics.
 - Isolated SSR execution in a worker pool with controlled concurrency and bounded queueing.
 - Worker recovery and runtime metrics for observability and operational diagnostics.

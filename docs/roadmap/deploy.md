@@ -24,12 +24,13 @@
 
 ---
 
-- [ ] Github Action for linting, testing
-- [ ] Github Action for deployment
-
----
-
 - [ ] Add external
   - [ ] Monitoring
   - [ ] Alerting
   - [ ] Logging
+
+---
+
+- [ ] Github Action for linting, testing
+- [ ] Github Action for deployment
+- [ ] CF Cache busting via given cache tags.
