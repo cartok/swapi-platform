@@ -29,27 +29,84 @@ tasks:
           --env-interface CloudflareBindings
           --check
 
-  dev:
+  deps:
     deps:
       - task: typegen
+      - task: :shared:build
+        vars:
+          PROFILE: release
+          TARGET: testing
+
+  dev:
+    desc: 'Start `server:dev` separately'
+    deps:
+      - task: deps
     cmds:
-      - bunx --no-install wrangler dev
+      - bunx --no-install wrangler dev --port 52000
+
+  build:
+    vars:
+      CF_TARGET:
+        ref: .CF_TARGET | default "testing"
+    requires:
+      vars:
+        - name: CF_TARGET
+          enum: [testing, production]
+    deps:
+      - task: deps
+      - task: lint
+    sources:
+      - ./package.json
+      - ./worker-configuration.d.ts
+      - ./wrangler.jsonc
+      - ./src/**/*
+      - ./tsconfig/**/*
+      - ../shared/dist/release/**/*
+      - ../../bun.lock
+    generates:
+      - ./dist/**/*
+    cmds:
+      - rm -rf ./dist || true
+      - >
+        bunx --no-install wrangler deploy
+        --env {{.CF_TARGET}}
+        --outdir ./dist
+        --metafile ./dist/bundle-meta.json
+        --dry-run
+
+  start:
+    desc: 'Start `server:dev` separately'
+    vars:
+      CF_TARGET:
+        ref: .CF_TARGET | default "testing"
+    requires:
+      vars:
+        - name: CF_TARGET
+          enum: [testing, production]
+    deps:
+      - task: build
+        vars:
+          CF_TARGET: '{{.CF_TARGET}}'
+    cmds:
+      - >
+        bunx --no-install wrangler dev
+        --env {{.CF_TARGET}}
+        --no-bundle
+        --port 53000
+        ./dist/index.js
 
   deploy:
     vars:
-      TARGET:
-        ref: .TARGET | default "test"
+      CF_TARGET:
+        ref: .CF_TARGET | default "production"
     requires:
       vars:
-        - name: TARGET
-          enum: [test, production]
+        - name: CF_TARGET
+          enum: [testing, production]
     deps:
-      - task: typegen
+      - task: build
+        vars:
+          CF_TARGET: 'production'
     cmds:
-      - >
-        bunx --no-install wrangler
-        {{if eq .TARGET "test"}}
-        --env test
-        {{end}}
-        deploy
-        --minify
+      - bunx --no-install wrangler deploy --env {{.CF_TARGET}} --minify
+      - bunx --no-install wrangler deployments list --env {{.CF_TARGET}}

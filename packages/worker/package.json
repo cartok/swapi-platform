@@ -1,9 +1,14 @@
 {
-  "name": "worker",
+  "name": "@swapi/worker",
   "private": true,
   "type": "module",
+  "imports": {
+    "#internal/*": {
+      "types": "./src/*.ts",
+      "default": "./src/*.ts"
+    }
+  },
   "dependencies": {
-    "@swapi/server": "workspace:*",
     "@swapi/shared": "workspace:*",
     "hono": "catalog:"
   },

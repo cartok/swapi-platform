@@ -2,8 +2,6 @@ import { Hono } from 'hono'
 
 import { addAssetHandler } from '#internal/assets/asset.handler'
 import { addDebugRoutesHandler } from '#internal/debug/debug-routes.handler'
-import { addDeviceContextHandler } from '#internal/device/device-context.handler'
-import { addDeviceRedirectHandler } from '#internal/device/device-redirect.handler'
 import { GLOBAL_SWAPI_TARGET } from '#internal/env'
 import { addErrorHandler } from '#internal/error/error.handler'
 import { addHealthChecksHandler } from '#internal/health/health.handler'
@@ -40,8 +38,6 @@ export function createHono(
   addRequestGuardHandler(hono, runtimeMetrics, runtimeServices)
   addRobotsHandler(hono, runtimeMetrics, runtimeServices)
   addAssetHandler(hono, runtimeMetrics, runtimeServices)
-  addDeviceContextHandler(hono, runtimeMetrics, runtimeServices)
-  addDeviceRedirectHandler(hono, runtimeMetrics, runtimeServices)
   addSsgHandler(hono, runtimeMetrics, runtimeServices)
   addSsrHandler(hono, runtimeMetrics, runtimeServices)
 

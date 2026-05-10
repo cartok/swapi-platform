@@ -2,9 +2,12 @@ import { readFile } from 'node:fs/promises'
 import { normalize, resolve } from 'node:path'
 
 import { ssgDistPath } from '@swapi/client/dist-paths'
+import { DOCUMENT_CACHE_HEADERS } from '@swapi/shared/cache/cache-control'
+import { CACHE_TAGS } from '@swapi/shared/cache/cache-tags'
+import { createCommitBasedWeakETagHeader } from '@swapi/shared/cache/etags'
 import { isAbortLikeError } from '@swapi/shared/errors/abort-error'
 
-import { CACHE_TAGS, DOCUMENT_CACHE_HEADERS } from '#internal/cache/cache'
+import { GLOBAL_DEPLOYED_GIT_SHA } from '#internal/env'
 import { isErrorCode, SERVER_ERROR_CODES } from '#internal/error/error'
 import { createAbortResponse } from '#internal/request/request-abort.handler'
 import type { Handler } from '#internal/types'
@@ -46,6 +49,7 @@ export const addSsgHandler: Handler = (hono) => {
       return c.html(html, 200, {
         ...DOCUMENT_CACHE_HEADERS,
         'Cache-Tag': [CACHE_TAGS.HTML, CACHE_TAGS.SSG],
+        ...createCommitBasedWeakETagHeader(GLOBAL_DEPLOYED_GIT_SHA),
       })
     } catch (error) {
       if (isAbortLikeError(error)) {

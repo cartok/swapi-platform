@@ -1,10 +1,10 @@
 import type { DeviceCookie } from '@swapi/shared/generated/types/device-cookie.types'
 import { validate } from '@swapi/shared/generated/validators/device-cookie.validator'
+import { env } from 'cloudflare:workers'
 import type { Context } from 'hono'
 import { bodyLimit } from 'hono/body-limit'
 import { deleteCookie, getCookie, setCookie } from 'hono/cookie'
 
-import { GLOBAL_SWAPI_TARGET } from '#internal/env'
 import type { Handler } from '#internal/types'
 
 const DEVICE_COOKIE_KEY = 'device'
@@ -60,10 +60,10 @@ export const addDeviceCookieHandler: Handler = (hono) => {
       // Set new cookie from request body.
       setCookie(c, DEVICE_COOKIE_KEY, JSON.stringify(requestBody), {
         sameSite: 'lax',
-        secure: GLOBAL_SWAPI_TARGET !== 'local',
+        secure: env.TARGET !== 'local',
         path: '/',
         maxAge:
-          GLOBAL_SWAPI_TARGET !== 'local'
+          env.TARGET !== 'local'
             ? PRODUCTION_DEVICE_COOKIE_MAX_AGE_SECONDS
             : LOCAL_DEVICE_COOKIE_MAX_AGE_SECONDS,
       })

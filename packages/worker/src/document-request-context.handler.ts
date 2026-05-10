@@ -4,12 +4,13 @@ import type { Handler } from '#internal/types'
 
 export const addDocumentRequestContextHandler: Handler = (hono) => {
   hono.get('*', (c, next) => {
-    const isDocumentRequest = isHtmlDocumentRequest({
-      pathname: c.req.path,
-      acceptHeader: c.req.header('Accept'),
-    })
-
-    c.set('isHtmlDocumentRequest', isDocumentRequest)
+    c.set(
+      'isHtmlDocumentRequest',
+      isHtmlDocumentRequest({
+        pathname: c.req.path,
+        acceptHeader: c.req.header('Accept'),
+      }),
+    )
     return next()
   })
 }

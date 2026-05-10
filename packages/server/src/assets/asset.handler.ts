@@ -3,25 +3,28 @@ import { readFileSync } from 'node:fs'
 import { extname, normalize, resolve } from 'node:path'
 
 import { browserDistPath } from '@swapi/client/dist-paths'
+import {
+  HASHED_FILE_CACHE_HEADERS,
+  NO_STORE_CACHE_HEADERS,
+  UNHASHED_ASSET_CACHE_HEADERS,
+  UNHASHED_SCRIPT_AND_STYLE_CACHE_HEADERS,
+} from '@swapi/shared/cache/cache-control'
+import { fileExtensionCacheTagHeadersMap } from '@swapi/shared/cache/cache-tags'
+import { createFileBasedWeakETagHeader } from '@swapi/shared/cache/etags'
+import {
+  ASSET_FILE_EXTENSION_SET,
+  isRegisteredFileExtension,
+  SCRIPT_FILE_EXTENSION_SET,
+  STYLE_FILE_EXTENSION_SET,
+} from '@swapi/shared/cache/file-extensions'
 import { serveStatic } from 'hono/bun'
 import type { Manifest } from 'vite'
 
-import {
-  ASSET_FILE_EXTENSION_SET,
-  HASHED_FILE_CACHE_HEADERS,
-  isRegisteredFileExtension,
-  NO_STORE_CACHE_HEADERS,
-  SCRIPT_FILE_EXTENSION_SET,
-  STYLE_FILE_EXTENSION_SET,
-  UNHASHED_MEDIA_CACHE_HEADERS,
-  UNHASHED_SCRIPT_AND_STYLE_CACHE_HEADERS,
-  withCacheTagHeader,
-} from '#internal/cache/cache'
 import { createAbortResponse } from '#internal/request/request-abort.handler'
 import type { Handler } from '#internal/types'
 
-const VITE_MANIFEST_PATH = resolve(browserDistPath, '.vite/manifest.json')
-const ASSET_PATHS: ReadonlySet<string> = readAssetPaths()
+const viteManifestPath = resolve(browserDistPath, '.vite/manifest.json')
+const viteAssets: ReadonlySet<string> = readAssetPaths()
 
 export const addAssetHandler: Handler = (hono) => {
   hono.get('*', (c, next) => {
@@ -35,18 +38,27 @@ export const addAssetHandler: Handler = (hono) => {
 
     return serveStatic({
       root: browserDistPath,
-      onFound: (path, c) => {
-        const cacheHeaders = resolveAssetCacheHeaders(path)
-        for (const [headerName, headerValue] of Object.entries(cacheHeaders)) {
-          c.header(headerName, headerValue)
+      onFound: async (path, c) => {
+        const headers = await resolveHeaders({
+          filePath: path,
+          requestPath: c.req.path,
+        })
+        for (const [k, v] of Object.entries(headers)) {
+          c.header(k, v)
         }
       },
     })(c, next)
   })
 }
 
-function resolveAssetCacheHeaders(filePath: string): Record<string, string> {
-  const fileExtension = readFileExtension(filePath)
+async function resolveHeaders({
+  filePath,
+  requestPath,
+}: {
+  filePath: string
+  requestPath: string
+}): Promise<Record<string, string>> {
+  const fileExtension = fileExtensionFromPath(filePath)
 
   if (fileExtension === 'map') {
     return NO_STORE_CACHE_HEADERS
@@ -58,28 +70,37 @@ function resolveAssetCacheHeaders(filePath: string): Record<string, string> {
   }
 
   if (isRegisteredFileExtension(fileExtension)) {
-    if (ASSET_PATHS.has(normalize(filePath))) {
-      return withCacheTagHeader({
-        cacheControlHeaders: HASHED_FILE_CACHE_HEADERS,
-        fileExtension,
-      })
-    }
+    const cacheTagHeader = fileExtensionCacheTagHeadersMap.get(fileExtension)
 
-    if (
-      SCRIPT_FILE_EXTENSION_SET.has(fileExtension) ||
-      STYLE_FILE_EXTENSION_SET.has(fileExtension)
-    ) {
-      return withCacheTagHeader({
-        cacheControlHeaders: UNHASHED_SCRIPT_AND_STYLE_CACHE_HEADERS,
-        fileExtension,
+    if (viteAssets.has(normalize(filePath))) {
+      return {
+        ...HASHED_FILE_CACHE_HEADERS,
+        ...cacheTagHeader,
+      }
+    } else {
+      const weakETagHeader = await createFileBasedWeakETagHeader({
+        filePath,
+        requestPath,
       })
-    }
 
-    if (ASSET_FILE_EXTENSION_SET.has(fileExtension)) {
-      return withCacheTagHeader({
-        cacheControlHeaders: UNHASHED_MEDIA_CACHE_HEADERS,
-        fileExtension,
-      })
+      if (
+        SCRIPT_FILE_EXTENSION_SET.has(fileExtension) ||
+        STYLE_FILE_EXTENSION_SET.has(fileExtension)
+      ) {
+        return {
+          ...UNHASHED_SCRIPT_AND_STYLE_CACHE_HEADERS,
+          ...cacheTagHeader,
+          ...weakETagHeader,
+        }
+      }
+
+      if (ASSET_FILE_EXTENSION_SET.has(fileExtension)) {
+        return {
+          ...UNHASHED_ASSET_CACHE_HEADERS,
+          ...cacheTagHeader,
+          ...weakETagHeader,
+        }
+      }
     }
   }
 
@@ -88,7 +109,7 @@ function resolveAssetCacheHeaders(filePath: string): Record<string, string> {
 }
 
 function readAssetPaths(): ReadonlySet<string> {
-  const manifest = JSON.parse(readFileSync(VITE_MANIFEST_PATH, 'utf8')) as Manifest
+  const manifest = JSON.parse(readFileSync(viteManifestPath, 'utf8')) as Manifest
   const hashedPaths = new Set<string>()
 
   for (const chunk of Object.values(manifest)) {
@@ -104,7 +125,7 @@ function readAssetPaths(): ReadonlySet<string> {
   return hashedPaths
 }
 
-function readFileExtension(filePath: string): string | null {
+function fileExtensionFromPath(filePath: string): string | null {
   const fileExtension = extname(filePath).toLowerCase()
   if (fileExtension === '') {
     return null

@@ -10,7 +10,6 @@ export async function runSsrSmokeTest(): Promise<void> {
   const headers: HeadersInit = {
     Accept: acceptedContentType,
     Host: env.SWAPI_SERVER_HOST,
-    'X-Skip-Device-Detection': 'true',
     'X-Skip-SSG': 'true',
   }
 

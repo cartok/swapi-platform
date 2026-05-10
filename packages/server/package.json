@@ -20,7 +20,8 @@
     "@swapi/client": "workspace:*",
     "@swapi/shared": "workspace:*",
     "hono": "catalog:",
-    "tslib": "catalog:"
+    "tslib": "catalog:",
+    "xxhash-wasm": "^1.1.0"
   },
   "devDependencies": {
     "@angular/compiler-cli": "catalog:angular",

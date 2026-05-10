@@ -11,6 +11,7 @@ import simpleImportSort from 'eslint-plugin-simple-import-sort'
 export default defineConfig(
   globalIgnores([
     '**/.cache/**',
+    '**/.wrangler/**',
     '**/dist/**',
     '**/docs/**',
     '**/generated/**',

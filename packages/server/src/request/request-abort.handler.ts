@@ -1,6 +1,6 @@
+import { NO_STORE_CACHE_HEADERS } from '@swapi/shared/cache/cache-control'
 import type { Context } from 'hono'
 
-import { NO_STORE_CACHE_HEADERS } from '#internal/cache/cache'
 import { GLOBAL_SWAPI_TARGET } from '#internal/env'
 import { MultiSignalAbortController } from '#internal/signal/multi-signal-abort-controller'
 import { toAbortReason } from '#internal/signal/signal'

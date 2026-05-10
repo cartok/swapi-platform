@@ -88,13 +88,14 @@ export function isHeightBreakpointValid(height: number): height is HeightBreakpo
 }
 
 export const DEVICE_CONTEXT_PATH_PARAM_PREFIX = 'r'
-export const isDeviceContextPathSegment = new RegExp(
-  `^${DEVICE_CONTEXT_PATH_PARAM_PREFIX};`,
-)
+
+export function getIsDeviceContextPath(path: string): boolean {
+  return path.startsWith(`/${DEVICE_CONTEXT_PATH_PARAM_PREFIX};`)
+}
 
 /**
- * Creates a prefix path that makes use of Angular's matrix parameters to pass
- * device-specific information.
+ * Serializes a device context into the first path segment using Angular matrix
+ * parameters (for example `r;format=mobile;width=768;height=820`).
  */
 export function deviceContextToPathSegment(deviceContext: DeviceContext): string {
   const matrixParams = [`format=${deviceContext.format}`]
@@ -114,6 +115,62 @@ export function deviceContextToPathSegment(deviceContext: DeviceContext): string
   }
 
   return [DEVICE_CONTEXT_PATH_PARAM_PREFIX, ...matrixParams].join(';')
+}
+
+/**
+ * Extracts the matrix parameter object from the first path segment when the
+ * request path starts with the device context prefix (`/r;...`).
+ *
+ * Returns `null` for non-device paths or malformed matrix parameters.
+ */
+export function extractDeviceContextFromPath(
+  path: string,
+): Record<string, string> | null {
+  if (!getIsDeviceContextPath(path)) {
+    return null
+  }
+
+  const nextSegmentSeparatorIndex = path.indexOf('/', 1)
+  const firstPathSegment =
+    nextSegmentSeparatorIndex === -1
+      ? path.slice(1)
+      : path.slice(1, nextSegmentSeparatorIndex)
+
+  if (!firstPathSegment) {
+    return null
+  }
+
+  return parseMatrixParametersFromPathSegment(firstPathSegment)
+}
+
+function parseMatrixParametersFromPathSegment(
+  pathSegment: string,
+): Record<string, string> | null {
+  const pathSegmentParts = pathSegment.split(';')
+  if (pathSegmentParts.length < 2) {
+    return null
+  }
+
+  const parsedMatrixParameters: Record<string, string> = {}
+
+  for (let i = 1; i < pathSegmentParts.length; i++) {
+    const parameter = pathSegmentParts[i]
+    const separatorIndex = parameter.indexOf('=')
+    if (separatorIndex < 1 || separatorIndex >= parameter.length - 1) {
+      return null
+    }
+
+    const key = parameter.slice(0, separatorIndex)
+    const value = parameter.slice(separatorIndex + 1)
+
+    if (!key || !value) {
+      return null
+    }
+
+    parsedMatrixParameters[key] = value
+  }
+
+  return parsedMatrixParameters
 }
 
 export function parseDeviceContext(

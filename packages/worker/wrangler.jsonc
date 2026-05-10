@@ -2,16 +2,34 @@
   "$schema": "../../node_modules/wrangler/config-schema.json",
   "name": "swapi-platform-device-redirection",
   "main": "src/index.ts",
+  "minify": true,
   "compatibility_date": "2026-05-07",
-  // "compatibility_flags": ["nodejs_compat", "remove_nodejs_compat_eol_v24"],
+  "vars": {
+    "TARGET": "local",
+    "ORIGIN_PROTOCOL": "http",
+    "ORIGIN_HOST": "localhost",
+    "ORIGIN_PORT": "50000",
+  },
   "env": {
-    "test": {
+    "testing": {
+      "vars": {
+        "TARGET": "testing",
+        "ORIGIN_PROTOCOL": "http",
+        "ORIGIN_HOST": "localhost",
+        "ORIGIN_PORT": "50000",
+      },
       "route": {
-        "pattern": "worker-device-redirection.cartok.dev/*",
+        "pattern": "test-swapi-platform.cartok.dev/*",
         "zone_name": "cartok.dev",
       },
     },
     "production": {
+      "vars": {
+        "TARGET": "production",
+        "ORIGIN_PROTOCOL": "https",
+        "ORIGIN_HOST": "swapi-platform.fly.dev",
+        "ORIGIN_PORT": "443",
+      },
       "route": {
         "pattern": "swapi-platform.cartok.dev/*",
         "zone_name": "cartok.dev",

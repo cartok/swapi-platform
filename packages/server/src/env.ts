@@ -20,6 +20,13 @@ const AppServerEnvSchema = Type.Intersect(
       SWAPI_ALLOWED_HOSTS: Type.Readonly(Type.String({ minLength: 1 })),
       SWAPI_BUILD_MINIFY: Type.Readonly(Type.Boolean()),
       SWAPI_BUILD_SOURCEMAP: Type.Readonly(BuildSourcemapSchema),
+      SWAPI_DEPLOYED_GIT_SHA: Type.Readonly(
+        Type.String({
+          minLength: 40,
+          maxLength: 40,
+          default: '0000000000000000000000000000000000000000',
+        }),
+      ),
       SWAPI_FLY_CHECK_ALIFE_TIMEOUT: Type.Readonly(Type.Integer({ minimum: 1 })),
       SWAPI_FLY_CHECK_ERRORS_TIMEOUT: Type.Readonly(Type.Integer({ minimum: 1 })),
       SWAPI_FLY_CHECK_SSR_TIMEOUT: Type.Readonly(Type.Integer({ minimum: 1 })),
@@ -55,6 +62,7 @@ export const env = parseEnv(AppServerEnvSchema, {
   SWAPI_ALLOWED_HOSTS: process.env['SWAPI_ALLOWED_HOSTS'],
   SWAPI_BUILD_MINIFY: process.env['SWAPI_BUILD_MINIFY'],
   SWAPI_BUILD_SOURCEMAP: process.env['SWAPI_BUILD_SOURCEMAP'],
+  SWAPI_DEPLOYED_GIT_SHA: process.env['SWAPI_DEPLOYED_GIT_SHA'],
   SWAPI_FLY_CHECK_ALIFE_TIMEOUT: process.env['SWAPI_FLY_CHECK_ALIFE_TIMEOUT'],
   SWAPI_FLY_CHECK_ERRORS_TIMEOUT: process.env['SWAPI_FLY_CHECK_ERRORS_TIMEOUT'],
   SWAPI_FLY_CHECK_SSR_TIMEOUT: process.env['SWAPI_FLY_CHECK_SSR_TIMEOUT'],
@@ -74,6 +82,12 @@ export const env = parseEnv(AppServerEnvSchema, {
 
 export type AppServerEnv = Static<typeof AppServerEnvSchema>
 
+/**
+ * The environment variables that are globally made available through rolldown on build time
+ * need a fallback for unbundled builds, which is why there are here referenced like that.
+ * They are defined one by one in order to have a result that works for DCE.
+ * Therefore any variable listed here must be used instead of the runtime variables in `env`.
+ */
 export const GLOBAL_NODE_ENV = typeof NODE_ENV === 'undefined' ? env.NODE_ENV : NODE_ENV
 export const GLOBAL_SWAPI_PROFILE =
   typeof SWAPI_PROFILE === 'undefined' ? env.SWAPI_PROFILE : SWAPI_PROFILE
@@ -81,6 +95,10 @@ export const GLOBAL_SWAPI_RUN_MODE =
   typeof SWAPI_RUN_MODE === 'undefined' ? env.SWAPI_RUN_MODE : SWAPI_RUN_MODE
 export const GLOBAL_SWAPI_TARGET =
   typeof SWAPI_TARGET === 'undefined' ? env.SWAPI_TARGET : SWAPI_TARGET
+export const GLOBAL_DEPLOYED_GIT_SHA =
+  typeof SWAPI_DEPLOYED_GIT_SHA === 'undefined'
+    ? env.SWAPI_DEPLOYED_GIT_SHA
+    : SWAPI_DEPLOYED_GIT_SHA
 
 const parsedAllowedHosts = env.SWAPI_ALLOWED_HOSTS.split(',')
   .map((x) => x.trim().toLowerCase())

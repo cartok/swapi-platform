@@ -1,9 +1,36 @@
+import { isErrorPagePath } from '@swapi/shared/routing/is-error-page-path'
+import { PATHS } from '@swapi/shared/routing/paths'
+import { env } from 'cloudflare:workers'
 import { Hono } from 'hono'
 
-const hono = new Hono<{ Bindings: CloudflareBindings }>()
+import { addClientHintsHandler } from '#internal/device-context.handler'
+import { addDeviceRedirectHandler } from '#internal/device-redirect.handler'
+import { addDocumentRequestContextHandler } from '#internal/document-request-context.handler'
+import type { HonoEnv } from '#internal/types'
 
-hono.get('/', (c) => {
-  return c.text('Hello Hono <3')
+const hono = new Hono<HonoEnv>()
+
+addDocumentRequestContextHandler(hono)
+addClientHintsHandler(hono)
+addDeviceRedirectHandler(hono)
+
+hono.get('*', (c) => {
+  const requestUrl = new URL(c.req.url)
+  const relativeRequestUrl = requestUrl.pathname + requestUrl.search
+  const originBaseUrl = `${env.ORIGIN_PROTOCOL}://${env.ORIGIN_HOST}:${env.ORIGIN_PORT}`
+  const originUrl = new URL(relativeRequestUrl, originBaseUrl)
+  const request = new Request(originUrl, c.req.raw)
+
+  return fetch(request)
+})
+
+hono.onError((error, c) => {
+  console.error(error)
+  if (isErrorPagePath(c.req.path)) {
+    return c.text('Internal Server Error', 500, { 'Cache-Control': 'no-store' })
+  }
+
+  return c.redirect(`/${PATHS.SSG.ERROR_PATH}`)
 })
 
 export default hono

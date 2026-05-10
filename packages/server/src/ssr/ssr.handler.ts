@@ -1,4 +1,8 @@
-import { CACHE_TAGS, DOCUMENT_CACHE_HEADERS } from '#internal/cache/cache'
+import { DOCUMENT_CACHE_HEADERS } from '@swapi/shared/cache/cache-control'
+import { CACHE_TAGS } from '@swapi/shared/cache/cache-tags'
+import { createCommitBasedWeakETagHeader } from '@swapi/shared/cache/etags'
+
+import { GLOBAL_DEPLOYED_GIT_SHA } from '#internal/env'
 import { createAbortResponse } from '#internal/request/request-abort.handler'
 import {
   RenderPoolClosedError,
@@ -34,6 +38,7 @@ export const addSsrHandler: Handler = (hono, runtimeMetrics, runtimeServices) =>
       return c.html(result.html, 200, {
         ...DOCUMENT_CACHE_HEADERS,
         'Cache-Tag': [CACHE_TAGS.HTML, CACHE_TAGS.SSR],
+        ...createCommitBasedWeakETagHeader(GLOBAL_DEPLOYED_GIT_SHA),
       })
     } catch (error) {
       if (error instanceof RenderRequestTimeoutError) {

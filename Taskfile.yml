@@ -161,6 +161,8 @@ tasks:
         ref: .PROFILE | default "release"
       TARGET:
         ref: .TARGET | default "local"
+      DEPLOYED_GIT_SHA:
+        sh: git rev-parse --verify HEAD
     requires:
       vars:
         - name: PROFILE
@@ -178,6 +180,7 @@ tasks:
         --build-arg NODE_ENV=${NODE_ENV}
         --build-arg PROFILE=${SWAPI_PROFILE}
         --build-arg TARGET=${SWAPI_TARGET}
+        --build-arg DEPLOYED_GIT_SHA={{.DEPLOYED_GIT_SHA}}
         --tag {{.DOCKER_IMAGE_NAME}}:${SWAPI_TARGET}-${SWAPI_PROFILE}
         {{.CLI_ARGS}}
         ./
@@ -277,6 +280,8 @@ tasks:
         ref: .FAST | default "false"
       CONFIG:
         sh: mktemp /tmp/fly.XXXXXX.yaml
+      DEPLOYED_GIT_SHA:
+        sh: git rev-parse --verify HEAD
     requires:
       vars:
         - name: PROFILE
@@ -311,6 +316,7 @@ tasks:
         --build-arg NODE_ENV=${NODE_ENV}
         --build-arg PROFILE=${SWAPI_PROFILE}
         --build-arg TARGET=${SWAPI_TARGET}
+        --build-arg DEPLOYED_GIT_SHA={{.DEPLOYED_GIT_SHA}}
         --compression zstd
         --compression-level 7
         {{.CLI_ARGS}}
