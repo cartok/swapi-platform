@@ -18,4 +18,4 @@
 
 - [x] CF Worker Proxy with the Device Redirection functionallity
   - [x] Rate limiting by using the free WAF rule
-  - [ ] Recheck HTML caching afterwards (no more 302 on fly.io)
+  - [x] Recheck HTML caching afterwards (no more 302 on fly.io)
