@@ -51,6 +51,10 @@ export const addDeviceRedirectHandler: Handler = (hono) => {
       c.header(k, v)
     }
 
+    if (c.req.raw.signal.aborted) {
+      return c.text('Client aborted', 499 as never, NO_STORE_CACHE_HEADERS)
+    }
+
     return c.redirect(relativeRedirectUrl)
   })
 }
