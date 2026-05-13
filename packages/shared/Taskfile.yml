@@ -45,7 +45,7 @@ tasks:
     vars:
       PROFILE:
         ref: .PROFILE | default "debug"
-      TSCONFIG: './tsconfig/tsconfig.src{{if eq .PROFILE "release"}}.release{{end}}.json'
+      TSCONFIG: './tsconfig/tsconfig.shared{{if eq .PROFILE "release"}}.release{{end}}.json'
     requires:
       vars:
         - name: PROFILE
@@ -63,7 +63,7 @@ tasks:
       PROFILE:
         ref: .PROFILE | default "debug"
       DIST_DIR: './dist/{{.PROFILE}}'
-      TSCONFIG: './tsconfig/tsconfig.src{{if eq .PROFILE "release"}}.release{{end}}.json'
+      TSCONFIG: './tsconfig/tsconfig.shared{{if eq .PROFILE "release"}}.release{{end}}.json'
     requires:
       vars:
         - name: PROFILE

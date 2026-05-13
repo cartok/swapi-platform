@@ -1,6 +1,6 @@
 {
   "extends": [
-    "./tsconfig.src.json",
+    "./tsconfig.shared.json",
     "@swapi/tsconfig/tsconfig.release",
     "@swapi/tsconfig/tsconfig.lib.release"
   ]

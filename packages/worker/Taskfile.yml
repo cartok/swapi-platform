@@ -6,7 +6,6 @@ tasks:
       - rm -f ./tsconfig/*.tsbuildinfo || true
       - rm -rf ./.wrangler || true
       - rm -rf ./dist || true
-      - rm -rf {{.TYPES_DIR}} || true
 
   lint:
     deps:
@@ -30,30 +29,51 @@ tasks:
           --check
 
   deps:
+    vars:
+      PROFILE:
+        ref: .PROFILE | default "debug"
+    requires:
+      vars:
+        - name: PROFILE
+          enum: [debug, release]
     deps:
       - task: typegen
       - task: :shared:build
         vars:
-          PROFILE: release
-          TARGET: testing
+          PROFILE: '{{.PROFILE}}'
 
   dev:
+    vars:
+      PROFILE:
+        ref: .PROFILE | default "debug"
+    requires:
+      vars:
+        - name: PROFILE
+          enum: [debug, release]
     desc: 'Start `server:dev` separately'
     deps:
       - task: deps
+        vars:
+          PROFILE: '{{.PROFILE}}'
     cmds:
       - bunx --no-install wrangler dev --port 52000
 
   build:
     vars:
+      PROFILE:
+        ref: .PROFILE | default "debug"
       CF_TARGET:
         ref: .CF_TARGET | default "testing"
     requires:
       vars:
+        - name: PROFILE
+          enum: [debug, release]
         - name: CF_TARGET
           enum: [testing, production]
     deps:
       - task: deps
+        vars:
+          PROFILE: '{{.PROFILE}}'
       - task: lint
     sources:
       - ./package.json
@@ -77,15 +97,20 @@ tasks:
   start:
     desc: 'Start `server:dev` separately'
     vars:
+      PROFILE:
+        ref: .PROFILE | default "debug"
       CF_TARGET:
         ref: .CF_TARGET | default "testing"
     requires:
       vars:
+        - name: PROFILE
+          enum: [debug, release]
         - name: CF_TARGET
           enum: [testing, production]
     deps:
       - task: build
         vars:
+          PROFILE: '{{.PROFILE}}'
           CF_TARGET: '{{.CF_TARGET}}'
     cmds:
       - >
@@ -97,15 +122,20 @@ tasks:
 
   deploy:
     vars:
+      PROFILE:
+        ref: .PROFILE | default "debug"
       CF_TARGET:
         ref: .CF_TARGET | default "production"
     requires:
       vars:
+        - name: PROFILE
+          enum: [debug, release]
         - name: CF_TARGET
           enum: [testing, production]
     deps:
       - task: build
         vars:
+          PROFILE: '{{.PROFILE}}'
           CF_TARGET: 'production'
     cmds:
       - bunx --no-install wrangler deploy --env {{.CF_TARGET}} --minify

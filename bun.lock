@@ -50,12 +50,20 @@
         "vitest": "catalog:testing",
       },
     },
+    "packages/hono": {
+      "name": "@swapi/hono",
+      "dependencies": {
+        "@swapi/shared": "workspace:*",
+        "hono": "catalog:",
+      },
+    },
     "packages/server": {
       "name": "@swapi/server",
       "dependencies": {
         "@angular/compiler": "catalog:angular",
         "@angular/ssr": "catalog:angular",
         "@swapi/client": "workspace:*",
+        "@swapi/hono": "workspace:*",
         "@swapi/shared": "workspace:*",
         "hono": "catalog:",
         "tslib": "catalog:",
@@ -93,6 +101,7 @@
     "packages/worker": {
       "name": "@swapi/worker",
       "dependencies": {
+        "@swapi/hono": "workspace:*",
         "@swapi/shared": "workspace:*",
         "hono": "catalog:",
       },
@@ -707,6 +716,8 @@
     "@stylistic/eslint-plugin": ["@stylistic/eslint-plugin@5.10.0", "", { "dependencies": { "@eslint-community/eslint-utils": "^4.9.1", "@typescript-eslint/types": "^8.56.0", "eslint-visitor-keys": "^4.2.1", "espree": "^10.4.0", "estraverse": "^5.3.0", "picomatch": "^4.0.3" }, "peerDependencies": { "eslint": "^9.0.0 || ^10.0.0" } }, "sha512-nPK52ZHvot8Ju/0A4ucSX1dcPV2/1clx0kLcH5wDmrE4naKso7TUC/voUyU1O9OTKTrR6MYip6LP0ogEMQ9jPQ=="],
 
     "@swapi/client": ["@swapi/client@workspace:packages/client"],
+
+    "@swapi/hono": ["@swapi/hono@workspace:packages/hono"],
 
     "@swapi/server": ["@swapi/server@workspace:packages/server"],
 

@@ -47,8 +47,8 @@ tasks:
       - 'echo "Hint: This task does not do SSG automatically and will fallback to SSR."'
       - >
         bunx --no-install bun
-        --conditions @swapi/shared/source
         --conditions @swapi/server/source
+        --conditions @swapi/shared/source
         --conditions @swapi/local/{{.PROFILE}}
         --hot
         ./src/server.jit.ts

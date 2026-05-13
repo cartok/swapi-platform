@@ -32,29 +32,22 @@ WORKDIR /app
 COPY ./.taskrc.yml ./
 
 COPY ./packages/tsconfig/ ./packages/tsconfig
+COPY --parents ./packages/*/tsconfig/*.json ./
 
 COPY ./packages/client/public/ ./packages/client/public
+COPY ./packages/client/index.html ./packages/client/
 
 COPY ./packages/client/.env/${VARIANT_ENV_FILE} ./packages/client/.env/
 COPY ./packages/server/.env/${VARIANT_ENV_FILE} ./packages/server/.env/
 COPY ./packages/server/.env/${VARIANT_ENV_FILE_DOCKER} ./packages/server/.env/
 
-COPY ./packages/client/index.html ./packages/client/
-
-COPY ./packages/shared/tsconfig/*.json ./packages/shared/tsconfig/
-COPY ./packages/server/tsconfig/*.json ./packages/server/tsconfig/
-COPY ./packages/client/tsconfig/*.json ./packages/client/tsconfig/
-
-COPY ./Taskfile.yml ./
-
 COPY ./packages/client/vite.config.ts ./packages/client/
 COPY ./packages/server/rolldown.config.ts ./packages/server/
 
 COPY ./packages/shared/generators/ ./packages/shared/generators
-COPY ./packages/shared/src/ ./packages/shared/src
-COPY ./packages/server/src/ ./packages/server/src
-COPY ./packages/client/src/ ./packages/client/src
+COPY --parents ./packages/*/src/ ./
 
+COPY ./Taskfile.yml ./
 COPY --parents ./packages/*/Taskfile.yml ./
 
 FROM code AS build-bundle

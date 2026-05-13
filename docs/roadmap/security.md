@@ -11,7 +11,7 @@
 - [ ] Send 404 on invalid paths and log it:
 
   I. Worker
-  1. Asset match by a Set of vite manifest entries + files in public dir. Eventually add the previous manifest aswell.
+  1. Asset match by a Set of vite manifest entries + files in public dir. Eventually add the previous manifest aswell + /.well-known and maybe similar?
   2. Otherwise check if it's HTML request else 404
   3. If valid, create and sign timestamp and set it as header by a json string. Before step 1. Check if the header is set and return 404 if it is.
 
