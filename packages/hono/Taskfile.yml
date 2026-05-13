@@ -1,0 +1,39 @@
+version: 3
+
+tasks:
+  clean:
+    cmds:
+      - rm -f ./tsconfig/*.tsbuildinfo || true
+      - rm -rf ./dist || true
+
+  lint:
+    sources:
+      - ./src/**/*
+      - ./tsconfig/tsconfig.hono.json
+      - ../../bun.lock
+    cmds:
+      - bunx --no-install tsc --noEmit --project ./tsconfig/tsconfig.hono.json
+
+  build:
+    vars:
+      PROFILE:
+        ref: .PROFILE | default "debug"
+      DIST_DIR: './dist/{{.PROFILE}}'
+      TSCONFIG: './tsconfig/tsconfig.hono{{if eq .PROFILE "release"}}.release{{end}}.json'
+    requires:
+      vars:
+        - name: PROFILE
+          enum: [debug, release]
+    deps:
+      - task: :shared:build
+        vars:
+          PROFILE: '{{.PROFILE}}'
+    sources:
+      - ./package.json
+      - '{{.TSCONFIG}}'
+      - ./src/**/*
+      - ../../bun.lock
+    generates:
+      - '{{.DIST_DIR}}/**/*'
+    cmds:
+      - bunx --no-install tsc --project '{{.TSCONFIG}}' --outDir '{{.DIST_DIR}}'

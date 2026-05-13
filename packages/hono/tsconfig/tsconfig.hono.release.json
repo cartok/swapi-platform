@@ -1,0 +1,7 @@
+{
+  "extends": [
+    "./tsconfig.hono.json",
+    "@swapi/tsconfig/tsconfig.release",
+    "@swapi/tsconfig/tsconfig.lib.release"
+  ]
+}

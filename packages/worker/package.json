@@ -9,6 +9,7 @@
     }
   },
   "dependencies": {
+    "@swapi/hono": "workspace:*",
     "@swapi/shared": "workspace:*",
     "hono": "catalog:"
   },

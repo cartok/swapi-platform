@@ -1,0 +1,27 @@
+{
+  "name": "@swapi/hono",
+  "private": true,
+  "type": "module",
+  "imports": {
+    "#internal/*": {
+      "types": "./src/*.ts",
+      "@swapi/hono/source": "./src/*.ts",
+      "@swapi/debug": "./dist/debug/*.js",
+      "@swapi/release": "./dist/release/*.js",
+      "workerd": "./dist/release/*.js"
+    }
+  },
+  "exports": {
+    "./*": {
+      "types": "./src/*.ts",
+      "@swapi/hono/source": "./src/*.ts",
+      "@swapi/debug": "./dist/debug/*.js",
+      "@swapi/release": "./dist/release/*.js",
+      "workerd": "./dist/release/*.js"
+    }
+  },
+  "dependencies": {
+    "@swapi/shared": "workspace:*",
+    "hono": "catalog:"
+  }
+}

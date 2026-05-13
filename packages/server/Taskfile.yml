@@ -43,6 +43,8 @@ tasks:
       - ./.env/.env.local.{{.PROFILE}}
     env:
       SWAPI_RUN_MODE: source
+    # TODO: Can not add node condition for @swapi/hono/source, due to a bun bug with more than 3 node conditions: https://github.com/oven-sh/bun/issues/30619
+    # Because of this this task is currently broken.
     cmds:
       - 'echo "Hint: This task does not do SSG automatically and will fallback to SSR."'
       - >
@@ -140,6 +142,9 @@ tasks:
           enum: [local, testing, production]
     deps:
       - task: :shared:build
+        vars:
+          PROFILE: '{{.PROFILE}}'
+      - task: :hono:build
         vars:
           PROFILE: '{{.PROFILE}}'
     dotenv:

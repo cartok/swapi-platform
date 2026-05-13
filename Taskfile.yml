@@ -10,6 +10,9 @@ includes:
   client:
     taskfile: ./packages/client
     dir: ./packages/client
+  hono:
+    taskfile: ./packages/hono
+    dir: ./packages/hono
   server:
     taskfile: ./packages/server
     dir: ./packages/server

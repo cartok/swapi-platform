@@ -1,0 +1,11 @@
+{
+  "extends": [
+    "@swapi/tsconfig/tsconfig.base",
+    "@swapi/tsconfig/tsconfig.rules",
+    "@swapi/tsconfig/tsconfig.bundler"
+  ],
+  "compilerOptions": {
+    "rootDir": "../src"
+  },
+  "include": ["../src/**/*.ts"]
+}

@@ -18,6 +18,7 @@
     "@angular/compiler": "catalog:angular",
     "@angular/ssr": "catalog:angular",
     "@swapi/client": "workspace:*",
+    "@swapi/hono": "workspace:*",
     "@swapi/shared": "workspace:*",
     "hono": "catalog:",
     "tslib": "catalog:",
