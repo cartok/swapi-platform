@@ -1,10 +1,12 @@
+import type { HonoHandler } from '@swapi/hono/types'
+
 import { allowedHosts, GLOBAL_SWAPI_TARGET } from '#internal/env'
-import type { Handler } from '#internal/types'
+import type { ServerHonoEnv } from '#internal/types'
 
 const allowedHostSet: Readonly<Set<string>> = new Set(allowedHosts)
 const isBehindTrustedProxy = Boolean(process.env['FLY_APP_NAME'])
 
-export const addRequestGuardHandler: Handler = (hono) => {
+export const addRequestGuardHandler: HonoHandler<ServerHonoEnv> = (hono) => {
   hono.use('*', async (c, next) => {
     const requestUrl = new URL(c.req.url)
 

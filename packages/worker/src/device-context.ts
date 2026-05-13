@@ -6,9 +6,11 @@ import {
 } from '@swapi/shared/device/device'
 import type { Context } from 'hono'
 
-import type { HonoEnv } from '#internal/types'
+import type { WorkerHonoEnv } from '#internal/types'
 
-export function parseDeviceContextFromHeaders(c: Context<HonoEnv>): DeviceContext {
+export function parseDeviceContextFromHeaders<env extends WorkerHonoEnv>(
+  c: Context<env>,
+): DeviceContext {
   // Get client hints from low-entropy headers.
   const mobileHeader = c.req.header('Sec-CH-UA-Mobile')
 

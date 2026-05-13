@@ -1,3 +1,4 @@
+import type { HonoHandler } from '@swapi/hono/types'
 import { NO_STORE_CACHE_HEADERS } from '@swapi/shared/cache/cache-control'
 import { isAbortLikeError } from '@swapi/shared/errors/abort-error'
 import {
@@ -12,9 +13,12 @@ import type { Context } from 'hono'
 
 import { isHonoHTTPResponseError } from '#internal/error/error'
 import { createAbortResponse } from '#internal/request/request-abort.handler'
-import type { Handler, HonoEnv } from '#internal/types'
+import type { HonoRuntimeOptions, ServerHonoEnv } from '#internal/types'
 
-export const addErrorHandler: Handler = (hono, runtimeMetrics) => {
+export const addErrorHandler: HonoHandler<ServerHonoEnv, HonoRuntimeOptions> = (
+  hono,
+  { runtimeMetrics },
+) => {
   hono.onError((error, c) => {
     if (c.get('abortController').signal.aborted && isAbortLikeError(error)) {
       return createAbortResponse(c, 'Global error handler')
@@ -31,7 +35,7 @@ export const addErrorHandler: Handler = (hono, runtimeMetrics) => {
   })
 }
 
-function logError(error: Error, c: Context<HonoEnv>): void {
+function logError<env extends ServerHonoEnv>(error: Error, c: Context<env>): void {
   try {
     console.error(logHeading('hono error handler'))
     console.error(errorToString(error))

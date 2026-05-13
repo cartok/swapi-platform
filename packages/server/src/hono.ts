@@ -13,35 +13,32 @@ import { addRequestGuardHandler } from '#internal/security/request-guard-securit
 import { addSecureHeadersHandler } from '#internal/security/secure-headers-security.handler'
 import { addSsgHandler } from '#internal/ssg/ssg.handler'
 import { addSsrHandler } from '#internal/ssr/ssr.handler'
-import type { HonoEnv, HonoRuntimeMetrics, HonoRuntimeServices } from '#internal/types'
+import type { HonoRuntimeOptions, ServerHonoEnv } from '#internal/types'
 
-export function createHono(
-  runtimeMetrics: HonoRuntimeMetrics,
-  runtimeServices: HonoRuntimeServices,
-): Hono<HonoEnv> {
-  const hono = new Hono<HonoEnv>({ strict: false })
+export function createHono(runtimeOptions: HonoRuntimeOptions): Hono<ServerHonoEnv> {
+  const hono = new Hono<ServerHonoEnv>({ strict: false })
 
   if (GLOBAL_SWAPI_TARGET === 'local') {
     hono.get(
       '/.well-known/appspecific/com.chrome.devtools.json',
       () => new Response(null, { status: 204 }),
     )
-    addDebugRoutesHandler(hono, runtimeMetrics, runtimeServices)
+    addDebugRoutesHandler(hono)
   }
 
-  addInFlightRequestsHandler(hono, runtimeMetrics, runtimeServices)
-  addAbortHandler(hono, runtimeMetrics, runtimeServices)
+  addInFlightRequestsHandler(hono, runtimeOptions)
+  addAbortHandler(hono)
 
-  addHealthChecksHandler(hono, runtimeMetrics, runtimeServices)
-  addDocumentRequestContextHandler(hono, runtimeMetrics, runtimeServices)
-  addSecureHeadersHandler(hono, runtimeMetrics, runtimeServices)
-  addRequestGuardHandler(hono, runtimeMetrics, runtimeServices)
-  addRobotsHandler(hono, runtimeMetrics, runtimeServices)
-  addAssetHandler(hono, runtimeMetrics, runtimeServices)
-  addSsgHandler(hono, runtimeMetrics, runtimeServices)
-  addSsrHandler(hono, runtimeMetrics, runtimeServices)
+  addHealthChecksHandler(hono, runtimeOptions)
+  addDocumentRequestContextHandler(hono)
+  addSecureHeadersHandler(hono)
+  addRequestGuardHandler(hono)
+  addRobotsHandler(hono)
+  addAssetHandler(hono)
+  addSsgHandler(hono)
+  addSsrHandler(hono, runtimeOptions)
 
-  addErrorHandler(hono, runtimeMetrics, runtimeServices)
+  addErrorHandler(hono, runtimeOptions)
 
   return hono
 }

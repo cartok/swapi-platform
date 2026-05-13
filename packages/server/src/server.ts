@@ -7,7 +7,7 @@ import { errorToString, logHeading, objectToString } from '@swapi/shared/log/log
 import { env, GLOBAL_SWAPI_TARGET } from '#internal/env'
 import { createHono } from '#internal/hono'
 import { RenderWorkerPool } from '#internal/ssr/render-worker-pool'
-import type { ServerRuntimeMetrics, ServerRuntimeServices } from '#internal/types'
+import type { HonoRuntimeOptions, ServerRuntimeMetrics } from '#internal/types'
 
 console.info(`Process id is: ${process.pid}`)
 if (GLOBAL_SWAPI_TARGET !== 'local') {
@@ -87,13 +87,12 @@ const renderPoolPromise = RenderWorkerPool.create({
   metrics: runtimeMetrics.ssrWorkerPool,
 })
 
-const runtimeServicesPromise: Promise<ServerRuntimeServices> = renderPoolPromise.then(
-  (renderPool) => ({
+const runtimeServicesPromise: Promise<HonoRuntimeOptions['runtimeServices']> =
+  renderPoolPromise.then((renderPool) => ({
     ssr: {
       renderPool,
     },
-  }),
-)
+  }))
 
 process.once('beforeExit', () => {
   console.log('Event loop emptied.')
@@ -157,7 +156,10 @@ const server = await startServer()
 async function startServer(): Promise<Bun.Server<undefined>> {
   try {
     const runtimeServices = await runtimeServicesPromise
-    const hono = createHono(runtimeMetrics, runtimeServices)
+    const hono = createHono({
+      runtimeMetrics,
+      runtimeServices,
+    })
     const server = Bun.serve({
       hostname: env.SWAPI_SERVER_HOST_INTERNAL,
       port: env.SWAPI_SERVER_PORT,

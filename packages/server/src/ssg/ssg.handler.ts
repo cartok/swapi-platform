@@ -2,6 +2,7 @@ import { readFile } from 'node:fs/promises'
 import { normalize, resolve } from 'node:path'
 
 import { ssgDistPath } from '@swapi/client/dist-paths'
+import type { HonoHandler } from '@swapi/hono/types'
 import { DOCUMENT_CACHE_HEADERS } from '@swapi/shared/cache/cache-control'
 import { CACHE_TAGS } from '@swapi/shared/cache/cache-tags'
 import { createCommitBasedWeakETagHeader } from '@swapi/shared/cache/etags'
@@ -10,9 +11,9 @@ import { isAbortLikeError } from '@swapi/shared/errors/abort-error'
 import { GLOBAL_DEPLOYED_GIT_SHA } from '#internal/env'
 import { isErrorCode, SERVER_ERROR_CODES } from '#internal/error/error'
 import { createAbortResponse } from '#internal/request/request-abort.handler'
-import type { Handler } from '#internal/types'
+import type { ServerHonoEnv } from '#internal/types'
 
-export const addSsgHandler: Handler = (hono) => {
+export const addSsgHandler: HonoHandler<ServerHonoEnv> = (hono) => {
   hono.get('*', async (c, next) => {
     if (!c.get('isHtmlDocumentRequest')) {
       return next()

@@ -7,9 +7,9 @@ import { Hono } from 'hono'
 import { addClientHintsHandler } from '#internal/device-context.handler'
 import { addDeviceRedirectHandler } from '#internal/device-redirect.handler'
 import { addDocumentRequestContextHandler } from '#internal/document-request-context.handler'
-import type { HonoEnv } from '#internal/types'
+import type { WorkerHonoEnv } from '#internal/types'
 
-const hono = new Hono<HonoEnv>()
+const hono = new Hono<WorkerHonoEnv>()
 
 addDocumentRequestContextHandler(hono)
 addClientHintsHandler(hono)

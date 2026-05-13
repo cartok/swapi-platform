@@ -1,6 +1,6 @@
 import assert from 'node:assert'
 
-import type { Context, Env } from 'hono'
+import type { Context } from 'hono'
 
 type AbortContext = ClientAbortContext | TimeoutAbortContext
 
@@ -27,9 +27,7 @@ export class MultiSignalAbortController extends AbortController {
     return this.#abortContext
   }
 
-  static createFromHonoContext<THonoEnv extends Env>(
-    c: Context<THonoEnv>,
-  ): MultiSignalAbortController {
+  static createFromHonoContext(c: Context): MultiSignalAbortController {
     const controller = new MultiSignalAbortController().addSignal(c.req.raw.signal, {
       source: 'client',
     })

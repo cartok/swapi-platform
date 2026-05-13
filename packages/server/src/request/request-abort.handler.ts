@@ -1,16 +1,17 @@
+import type { HonoHandler } from '@swapi/hono/types'
 import { NO_STORE_CACHE_HEADERS } from '@swapi/shared/cache/cache-control'
 import type { Context } from 'hono'
 
 import { GLOBAL_SWAPI_TARGET } from '#internal/env'
 import { MultiSignalAbortController } from '#internal/signal/multi-signal-abort-controller'
 import { toAbortReason } from '#internal/signal/signal'
-import type { Handler, HonoEnv } from '#internal/types'
+import type { ServerHonoEnv } from '#internal/types'
 
 const TIMEOUT_GLOBAL = 5000
 
-export const addAbortHandler: Handler = (hono) => {
+export const addAbortHandler: HonoHandler<ServerHonoEnv> = (hono) => {
   hono.get('*', (c, next) => {
-    const abortController = MultiSignalAbortController.createFromHonoContext<HonoEnv>(
+    const abortController = MultiSignalAbortController.createFromHonoContext(
       c,
     ).addTimeout({
       durationMs: TIMEOUT_GLOBAL,
@@ -23,7 +24,10 @@ export const addAbortHandler: Handler = (hono) => {
   })
 }
 
-export function createAbortResponse(c: Context<HonoEnv>, codeLocation: string): Response {
+export function createAbortResponse(
+  c: Context<ServerHonoEnv>,
+  codeLocation: string,
+): Response {
   const abortController = c.get('abortController')
 
   if (GLOBAL_SWAPI_TARGET !== 'production') {

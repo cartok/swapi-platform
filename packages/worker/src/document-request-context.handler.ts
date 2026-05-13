@@ -1,8 +1,9 @@
+import type { HonoHandler } from '@swapi/hono/types'
 import { isHtmlDocumentRequest } from '@swapi/shared/routing/is-html-document-request'
 
-import type { Handler } from '#internal/types'
+import type { WorkerHonoEnv } from '#internal/types'
 
-export const addDocumentRequestContextHandler: Handler = (hono) => {
+export const addDocumentRequestContextHandler: HonoHandler<WorkerHonoEnv> = (hono) => {
   hono.get('*', (c, next) => {
     c.set(
       'isHtmlDocumentRequest',

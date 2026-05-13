@@ -1,14 +1,15 @@
+import type { HonoHandler } from '@swapi/hono/types'
 import type { MiddlewareHandler } from 'hono'
 import { secureHeaders } from 'hono/secure-headers'
 
 import { GLOBAL_SWAPI_TARGET } from '#internal/env'
-import type { Handler, HonoEnv } from '#internal/types'
+import type { ServerHonoEnv } from '#internal/types'
 
-const globalSecureHeaders: MiddlewareHandler<HonoEnv> = secureHeaders({
+const globalSecureHeaders: MiddlewareHandler<ServerHonoEnv> = secureHeaders({
   strictTransportSecurity: GLOBAL_SWAPI_TARGET !== 'production' ? false : 'max-age=300',
 })
 
-const htmlDocumentSecureHeaders: MiddlewareHandler<HonoEnv> = secureHeaders({
+const htmlDocumentSecureHeaders: MiddlewareHandler<ServerHonoEnv> = secureHeaders({
   // Base security headers are already set by `globalSecureHeaders`.
   // Disable defaults here so this middleware only adds HTML-document policies
   // (CSP + Permissions-Policy) and does not override global values like HSTS.
@@ -53,7 +54,7 @@ const htmlDocumentSecureHeaders: MiddlewareHandler<HonoEnv> = secureHeaders({
   },
 })
 
-export const addSecureHeadersHandler: Handler = (hono) => {
+export const addSecureHeadersHandler: HonoHandler<ServerHonoEnv> = (hono) => {
   hono.use('*', globalSecureHeaders)
   hono.get('*', (c, next) => {
     if (!c.get('isHtmlDocumentRequest')) {

@@ -1,3 +1,4 @@
+import type { HonoHandler } from '@swapi/hono/types'
 import { NO_STORE_CACHE_HEADERS } from '@swapi/shared/cache/cache-control'
 import {
   DeviceContextSchema,
@@ -9,9 +10,9 @@ import {
 import { isErrorPagePath } from '@swapi/shared/routing/is-error-page-path'
 
 import { parseDeviceContextFromHeaders } from '#internal/device-context'
-import type { Handler } from '#internal/types'
+import type { WorkerHonoEnv } from '#internal/types'
 
-export const addDeviceRedirectHandler: Handler = (hono) => {
+export const addDeviceRedirectHandler: HonoHandler<WorkerHonoEnv> = (hono) => {
   hono.get('*', (c, next) => {
     if (!c.get('isHtmlDocumentRequest')) {
       return next()

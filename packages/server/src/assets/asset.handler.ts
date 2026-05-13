@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs'
 import { extname, normalize, resolve } from 'node:path'
 
 import { browserDistPath } from '@swapi/client/dist-paths'
+import type { HonoHandler } from '@swapi/hono/types'
 import {
   HASHED_FILE_CACHE_HEADERS,
   NO_STORE_CACHE_HEADERS,
@@ -21,12 +22,12 @@ import { serveStatic } from 'hono/bun'
 import type { Manifest } from 'vite'
 
 import { createAbortResponse } from '#internal/request/request-abort.handler'
-import type { Handler } from '#internal/types'
+import type { ServerHonoEnv } from '#internal/types'
 
 const viteManifestPath = resolve(browserDistPath, '.vite/manifest.json')
 const viteAssets: ReadonlySet<string> = readAssetPaths()
 
-export const addAssetHandler: Handler = (hono) => {
+export const addAssetHandler: HonoHandler<ServerHonoEnv> = (hono) => {
   hono.get('*', (c, next) => {
     if (c.get('isHtmlDocumentRequest')) {
       return next()

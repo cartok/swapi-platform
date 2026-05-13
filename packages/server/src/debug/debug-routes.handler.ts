@@ -1,6 +1,8 @@
-import type { Handler } from '#internal/types'
+import type { HonoHandler } from '@swapi/hono/types'
 
-export const addDebugRoutesHandler: Handler = (hono) => {
+import type { ServerHonoEnv } from '#internal/types'
+
+export const addDebugRoutesHandler: HonoHandler<ServerHonoEnv> = (hono) => {
   hono.get('/debug/fail-error', () => {
     throw Error('Triggered fail on error.')
   })

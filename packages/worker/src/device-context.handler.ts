@@ -1,6 +1,8 @@
-import type { Handler } from '#internal/types'
+import type { HonoHandler } from '@swapi/hono/types'
 
-export const addClientHintsHandler: Handler = (hono) => {
+import type { WorkerHonoEnv } from '#internal/types'
+
+export const addClientHintsHandler: HonoHandler<WorkerHonoEnv> = (hono) => {
   hono.get('*', (c, next) => {
     if (!c.get('isHtmlDocumentRequest')) {
       return next()

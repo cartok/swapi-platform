@@ -1,12 +1,5 @@
-import type { DeviceContext } from '@swapi/shared/device/device'
-import type { Hono } from 'hono'
+import type { BaseHonoEnv } from '@swapi/hono/types'
 
-export interface HonoEnv {
+export type WorkerHonoEnv = BaseHonoEnv<{
   Bindings: CloudflareBindings
-  Variables: {
-    deviceContext: DeviceContext
-    isHtmlDocumentRequest: boolean
-  }
-}
-
-export type Handler = (hono: Hono<HonoEnv>) => void
+}>

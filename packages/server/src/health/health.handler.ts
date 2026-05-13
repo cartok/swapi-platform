@@ -1,11 +1,15 @@
+import type { HonoHandler } from '@swapi/hono/types'
 import { errorToString } from '@swapi/shared/log/log'
 
 import { GLOBAL_SWAPI_TARGET, secretEnv } from '#internal/env'
 import { runSwapiApiSmokeTest } from '#internal/health/external/swapi/swapi-api.smoke-test'
 import { runSsrSmokeTest } from '#internal/health/ssr/ssr.smoke-test'
-import type { Handler } from '#internal/types'
+import type { HonoRuntimeOptions, ServerHonoEnv } from '#internal/types'
 
-export const addHealthChecksHandler: Handler = (hono, runtimeMetrics) => {
+export const addHealthChecksHandler: HonoHandler<ServerHonoEnv, HonoRuntimeOptions> = (
+  hono,
+  { runtimeMetrics },
+) => {
   if (GLOBAL_SWAPI_TARGET !== 'local') {
     hono.get('/status/*', async (c, next) => {
       if (

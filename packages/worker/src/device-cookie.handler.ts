@@ -1,3 +1,4 @@
+import type { HonoHandler } from '@swapi/hono/types'
 import type { DeviceCookie } from '@swapi/shared/generated/types/device-cookie.types'
 import { validate } from '@swapi/shared/generated/validators/device-cookie.validator'
 import { env } from 'cloudflare:workers'
@@ -5,14 +6,14 @@ import type { Context } from 'hono'
 import { bodyLimit } from 'hono/body-limit'
 import { deleteCookie, getCookie, setCookie } from 'hono/cookie'
 
-import type { Handler } from '#internal/types'
+import type { WorkerHonoEnv } from '#internal/types'
 
 const DEVICE_COOKIE_KEY = 'device'
 const DEVICE_COOKIE_BODY_LIMIT_BYTES = 200
 const PRODUCTION_DEVICE_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 7
 const LOCAL_DEVICE_COOKIE_MAX_AGE_SECONDS = 60 * 2
 
-export const addDeviceCookieHandler: Handler = (hono) => {
+export const addDeviceCookieHandler: HonoHandler<WorkerHonoEnv> = (hono) => {
   hono.post(
     '/device-cookie',
     bodyLimit({

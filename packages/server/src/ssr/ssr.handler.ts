@@ -1,3 +1,4 @@
+import type { HonoHandler } from '@swapi/hono/types'
 import { DOCUMENT_CACHE_HEADERS } from '@swapi/shared/cache/cache-control'
 import { CACHE_TAGS } from '@swapi/shared/cache/cache-tags'
 import { createCommitBasedWeakETagHeader } from '@swapi/shared/cache/etags'
@@ -11,9 +12,12 @@ import {
   RenderRequestTimeoutError,
   RenderTimeoutError,
 } from '#internal/ssr/render-worker-pool.errors'
-import type { Handler } from '#internal/types'
+import type { HonoRuntimeOptions, ServerHonoEnv } from '#internal/types'
 
-export const addSsrHandler: Handler = (hono, runtimeMetrics, runtimeServices) => {
+export const addSsrHandler: HonoHandler<ServerHonoEnv, HonoRuntimeOptions> = (
+  hono,
+  { runtimeMetrics, runtimeServices },
+) => {
   hono.get('*', async (c, next) => {
     if (!c.get('isHtmlDocumentRequest')) {
       return next()
