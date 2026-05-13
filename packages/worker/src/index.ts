@@ -1,3 +1,4 @@
+import { addDocumentRequestContextHandler } from '@swapi/hono/document-request-context.handler'
 import { NO_STORE_CACHE_HEADERS } from '@swapi/shared/cache/cache-control'
 import { isErrorPagePath } from '@swapi/shared/routing/is-error-page-path'
 import { PATHS } from '@swapi/shared/routing/paths'
@@ -6,7 +7,6 @@ import { Hono } from 'hono'
 
 import { addClientHintsHandler } from '#internal/device-context.handler'
 import { addDeviceRedirectHandler } from '#internal/device-redirect.handler'
-import { addDocumentRequestContextHandler } from '#internal/document-request-context.handler'
 import type { WorkerHonoEnv } from '#internal/types'
 
 const hono = new Hono<WorkerHonoEnv>()

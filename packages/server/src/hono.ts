@@ -1,3 +1,4 @@
+import { addDocumentRequestContextHandler } from '@swapi/hono/document-request-context.handler'
 import { Hono } from 'hono'
 
 import { addAssetHandler } from '#internal/assets/asset.handler'
@@ -5,7 +6,6 @@ import { addDebugRoutesHandler } from '#internal/debug/debug-routes.handler'
 import { GLOBAL_SWAPI_TARGET } from '#internal/env'
 import { addErrorHandler } from '#internal/error/error.handler'
 import { addHealthChecksHandler } from '#internal/health/health.handler'
-import { addDocumentRequestContextHandler } from '#internal/request/document-request-context.handler'
 import { addInFlightRequestsHandler } from '#internal/request/in-flight-requests.handler'
 import { addAbortHandler } from '#internal/request/request-abort.handler'
 import { addRobotsHandler } from '#internal/robots/robots.handler'
