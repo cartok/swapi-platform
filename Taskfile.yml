@@ -40,6 +40,10 @@ tasks:
       - bun install --link-native-bins
       - bunx browser-driver-manager install chrome
 
+  check-deps:
+    interactive: true
+    cmd: ./scripts/deps.zsh
+
   dev:
     vars:
       PROFILE:
