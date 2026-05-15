@@ -5,18 +5,18 @@
 - [ ] Disable shell history while adding fly secrets if necessary & if possible remove from clipboard. Or just do not send it to clipboard and store it into file & send it to target system via management cli.
 - [x] Ensure that server build does DCE on environment variables
 - [ ] Extra rate limiting through middleware on both sides
+- [ ] Add a signed header solution for requests:
+  1. **Worker:** Create a timestamp and sign it together with the request method and the request path. Set it as header by a JSON string
+  2. **Origin:** Check if validation header is set. If so, parse the header value, check if time delta is below 10ish seconds, create the signature out of it and compare the signature. If it's invalid, return 404, otherwise proceed.
+- [ ] Hide origin address, only alow CF TLS certificate, change DNS setup
 
 ---
 
-- [ ] Send 404 on invalid paths and log it:
+- [ ] **Worker:** Send 404 on invalid headers:
+  - Check what if any X-Forwarded-Proto, X-Secret-Health-Check, X-Skip-SSG header is set, and if so return 404.
+  - Otherwise delete all headers (check if it's fine to do so first)
+  - Check what of this really necessary on top of CF protections
 
-  I. Worker
-  1. Asset match by a Set of vite manifest entries + files in public dir. Eventually add the previous manifest aswell + /.well-known and maybe similar?
-  2. Otherwise check if it's HTML request else 404
-  3. If valid, create and sign timestamp and set it as header by a json string. Before step 1. Check if the header is set and return 404 if it is.
-
-  II. Origin
-  1. Check if validation header is set. If so, parse the header value, check if time delta is below 10ish seconds, create the signature out of it and compare the signature. If it's invalid, return 404, otherwise proceed.
-  2. If the validation header is not set: Do the same validation on the origin side. That code can be shared.
-
-- [ ] Check all other custom headers. If they exist but should not, send 404 and log it
+- [ ] Send 404 on invalid paths:
+  1. **Worker:** Check if request is a HTML request or one to /assest/, files in public dir, /.well-known/, /cdn-cgi/ (might not be necessary to check for origin)
+  2. **Origin:** Check if request is a HTML request or one to an entry of a `Set` that is generated out of the vite manifest and a new `public-manifest.json` that gets generated on client build and includes all files in the public dir. The `Set` is only generated once on server start. If the result is `false` return 404.
