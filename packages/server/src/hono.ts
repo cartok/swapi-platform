@@ -1,4 +1,4 @@
-import { addDocumentRequestContextHandler } from '@swapi/hono/document-request-context.handler'
+import { addDocumentRequestContextHandler } from '@swapi/hono/request/document-request-context.handler'
 import { Hono } from 'hono'
 
 import { addAssetHandler } from '#internal/assets/asset.handler'

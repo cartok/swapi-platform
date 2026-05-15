@@ -1,4 +1,4 @@
-import { addDocumentRequestContextHandler } from '@swapi/hono/document-request-context.handler'
+import { addDocumentRequestContextHandler } from '@swapi/hono/request/document-request-context.handler'
 import { NO_STORE_CACHE_HEADERS } from '@swapi/shared/cache/cache-control'
 import { isErrorPagePath } from '@swapi/shared/routing/is-error-page-path'
 import { PATHS } from '@swapi/shared/routing/paths'
