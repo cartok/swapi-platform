@@ -1,7 +1,6 @@
 {
   "files": [],
   "compilerOptions": {
-    "removeComments": true,
-    "skipLibCheck": true
+    "removeComments": true
   }
 }
