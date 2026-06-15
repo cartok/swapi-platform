@@ -8,7 +8,6 @@
   "files.associations": {
     "*.lock": "plaintext"
   },
-  "editor.wordBasedSuggestions": "matchingDocuments",
   "debug.terminal.clearBeforeReusing": true,
   "css.lint.unknownAtRules": "ignore",
   "js/ts.preferences.importModuleSpecifier": "non-relative",
@@ -17,10 +16,14 @@
   "js/ts.suggest.autoImports": true,
   "js/ts.suggest.includeCompletionsForImportStatements": true,
   "js/ts.tsdk.path": "node_modules/typescript/lib",
-  "js/ts.updateImportsOnFileMove.enabled": "prompt",
+  "js/ts.updateImportsOnFileMove.enabled": "always",
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
   },
+  "editor.rulers": [90],
+  "eslint.debug": false,
+  "eslint.format.enable": false,
+  "eslint.quiet": true,
   "eslint.useFlatConfig": true,
   "[typescript]": {
     "editor.formatOnSave": true,
@@ -50,23 +53,37 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "path-autocomplete.includeExtension": true
   },
-  "[yaml]": {
+  "[yml]": {
+    "editor.wordBasedSuggestions": "matchingDocuments",
     "editor.formatOnSave": false,
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.wordWrap": "wordWrapColumn",
-    "editor.wordWrapColumn": 100
+    "editor.wordWrapColumn": 100,
+    "editor.rulers": [100]
+  },
+  "[yaml]": {
+    "editor.wordBasedSuggestions": "matchingDocuments",
+    "editor.formatOnSave": false,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.wordWrap": "wordWrapColumn",
+    "editor.wordWrapColumn": 100,
+    "editor.rulers": [100]
   },
   "[markdown]": {
+    "editor.wordBasedSuggestions": "matchingDocuments",
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.wordWrap": "wordWrapColumn",
-    "editor.wordWrapColumn": 100
+    "editor.wordWrapColumn": 100,
+    "editor.rulers": [100]
   },
   "[json]": {
+    "editor.wordBasedSuggestions": "matchingDocuments",
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[jsonc]": {
+    "editor.wordBasedSuggestions": "matchingDocuments",
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
@@ -110,6 +127,11 @@
       ]
     }
   },
+  "path-autocomplete.excludedItems": {
+    "**/*.map": { "when": "**" },
+    "**/{.git,node_modules}": { "when": "**" },
+    "**/*.ts": { "when": "**", "context": "import.*" }
+  },
   "path-autocomplete.ignoredPrefixes": [
     "=\"/",
     "=\"./",
@@ -133,6 +155,7 @@
   },
   // EXTENSION: redhat.vscode-yaml and task.vscode-task
   "yaml.schemaStore.enable": true,
+  "yaml.keyOrdering": false,
   "yaml.schemas": {
     "https://taskfile.dev/schema.json": ["**/Taskfile.yml", "**/Taskfile.*.yml"],
     "https://json-schema.org/draft/2020-12/schema": [
