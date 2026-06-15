@@ -1,4 +1,4 @@
-import { readFile } from 'node:fs/promises'
+import { readdir } from 'node:fs/promises'
 import { normalize, resolve } from 'node:path'
 
 import { ssgDistPath } from '@swapi/client/dist-paths'
@@ -8,10 +8,57 @@ import { CACHE_TAGS } from '@swapi/shared/cache/cache-tags'
 import { createCommitBasedWeakETagHeader } from '@swapi/shared/cache/etags'
 import { isAbortLikeError } from '@swapi/shared/errors/abort-error'
 
-import { GLOBAL_DEPLOYED_GIT_SHA } from '#internal/env'
+import { DCE_GIT_COMMIT_SHA, DCE_SWAPI_LOCAL_E2E } from '#internal/env'
 import { isErrorCode, SERVER_ERROR_CODES } from '#internal/error/error'
 import { createAbortResponse } from '#internal/request/request-abort.handler'
 import type { ServerHonoEnv } from '#internal/types'
+
+let ssgCache: Map<string, string> | null = null
+
+// TODO: extra variable + E2E env union variable
+const useCache = DCE_SWAPI_LOCAL_E2E
+
+if (useCache) {
+  console.warn('SSG: Will use runtime cache.')
+  const ssgDirents = await readdir(ssgDistPath, {
+    recursive: true,
+    withFileTypes: true,
+  })
+
+  Bun.gc(true)
+  console.info('SSG: Memory usage BEFORE cache load:', getMemoryStatistics())
+  const ssgEntries = await Promise.all(
+    ssgDirents
+      .filter((x) => x.isFile())
+      .map(async (x): Promise<[string, string]> => {
+        const path = `${x.parentPath}/${x.name}`
+        const html = await Bun.file(path).text()
+
+        return [path, html]
+      }),
+  )
+
+  ssgCache = new Map(ssgEntries)
+
+  Bun.gc(true)
+  console.info('SSG: Memory usage AFTER cache load:', getMemoryStatistics())
+  console.info(`SSG: Created runtime cache. Loaded ${ssgEntries.length} HTML files.`)
+
+  function getMemoryStatistics() {
+    const memory = process.memoryUsage()
+
+    return {
+      heapUsedMb: bytesToMb(memory.heapUsed),
+      heapTotalMb: bytesToMb(memory.heapTotal),
+      rssMb: bytesToMb(memory.rss),
+      externalMb: bytesToMb(memory.external),
+    } as const
+  }
+
+  function bytesToMb(bytes: number): string {
+    return `${(bytes / 1024 / 1024).toFixed(2)} MB`
+  }
+}
 
 export const addSsgHandler: HonoHandler<ServerHonoEnv> = (hono) => {
   hono.get('*', async (c, next) => {
@@ -34,11 +81,14 @@ export const addSsgHandler: HonoHandler<ServerHonoEnv> = (hono) => {
     }
 
     try {
-      const html = await readFile(ssgFilePath, {
-        encoding: 'utf8',
-        signal: abortController.signal,
-      })
-      console.log('SSG: Loaded', ssgFilePath)
+      let html = ssgCache?.get(ssgFilePath)
+      if (html) {
+        console.info('SSG: Loaded from cache:', ssgFilePath)
+      } else {
+        html = await Bun.file(ssgFilePath).text()
+        console.info('SSG: Loaded file:', ssgFilePath)
+        ssgCache?.set(ssgFilePath, html)
+      }
 
       if (
         abortController.signal.aborted &&
@@ -50,7 +100,7 @@ export const addSsgHandler: HonoHandler<ServerHonoEnv> = (hono) => {
       return c.html(html, 200, {
         ...DOCUMENT_CACHE_HEADERS,
         'Cache-Tag': [CACHE_TAGS.HTML, CACHE_TAGS.SSG],
-        ...createCommitBasedWeakETagHeader(GLOBAL_DEPLOYED_GIT_SHA),
+        ...createCommitBasedWeakETagHeader(DCE_GIT_COMMIT_SHA),
       })
     } catch (error) {
       if (isAbortLikeError(error)) {

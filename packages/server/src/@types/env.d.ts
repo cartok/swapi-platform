@@ -2,8 +2,8 @@ import type { AppServerEnv } from '#internal/env'
 
 declare global {
   const NODE_ENV: AppServerEnv['NODE_ENV']
-  const SWAPI_DEPLOYED_GIT_SHA: AppServerEnv['SWAPI_DEPLOYED_GIT_SHA']
-  const SWAPI_PROFILE: AppServerEnv['SWAPI_PROFILE']
-  const SWAPI_RUN_MODE: AppServerEnv['SWAPI_RUN_MODE']
-  const SWAPI_TARGET: AppServerEnv['SWAPI_TARGET']
+  const SWAPI_BUILD_LEVEL: AppServerEnv['SWAPI_BUILD_LEVEL']
+  const SWAPI_GIT_COMMIT_SHA: AppServerEnv['SWAPI_GIT_COMMIT_SHA']
+  const SWAPI_LOCAL_E2E: AppServerEnv['SWAPI_LOCAL_E2E']
+  const SWAPI_TARGET_ENVIRONMENT: AppServerEnv['SWAPI_TARGET_ENVIRONMENT']
 }

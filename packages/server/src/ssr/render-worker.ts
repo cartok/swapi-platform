@@ -1,17 +1,12 @@
-import { readFile } from 'node:fs/promises'
 import { dirname } from 'node:path'
 import type { Transferable } from 'node:worker_threads'
 import { parentPort, threadId } from 'node:worker_threads'
 
 import type { InjectionToken } from '@angular/core'
-import type {
-  CommonEngine as CommonEngineType,
-  CommonEngineRenderOptions,
-} from '@angular/ssr/node'
+import type { CommonEngine as CommonEngineType } from '@angular/ssr/node'
 import { indexHtmlPath } from '@swapi/client/dist-paths'
 
-import { enableAngularServerMode } from '#internal/angular/angular-server-mode'
-import { allowedHosts } from '#internal/env'
+import { getAngularRenderContext } from '#internal/angular/angular-render-context'
 import { toError } from '#internal/error/error'
 import { toAbortReason } from '#internal/signal/signal'
 import type {
@@ -24,10 +19,10 @@ import type {
   WorkerWarmupRequest,
 } from '#internal/ssr/render-worker.types'
 
-interface SsrMainServerModule {
-  bootstrap: NonNullable<CommonEngineRenderOptions['bootstrap']>
-  SSR_ABORT_SIGNAL: InjectionToken<AbortSignal | null>
-}
+await import('#internal/angular/angular-render-context')
+let indexHtml: string
+let engine: CommonEngineType
+let ssrAbortSignalToken: InjectionToken<AbortSignal | null>
 
 const port = parentPort
 
@@ -42,17 +37,6 @@ let job:
       controller: AbortController
     }
   | undefined
-
-enableAngularServerMode()
-
-const angularSsrModulePromise = import('@angular/ssr/node')
-const mainServerModulePromise: Promise<SsrMainServerModule> =
-  import('@swapi/client/main.server')
-const indexHtmlPromise = readFile(indexHtmlPath, 'utf8')
-
-let indexHtml: string
-let engine: CommonEngineType
-let ssrAbortSignalToken: InjectionToken<AbortSignal | null>
 
 port.on('message', handleMessage)
 
@@ -144,7 +128,7 @@ async function handleRender(message: WorkerRenderRequest): Promise<void> {
 }
 
 function handleAbort(message: WorkerAbortRequest): void {
-  if (!job || job.id !== message.id) {
+  if (job?.id !== message.id) {
     return
   }
 
@@ -155,10 +139,13 @@ function handleAbort(message: WorkerAbortRequest): void {
   job.controller.abort(createAbortReason(message.reason))
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-async function handleWarmup(message: WorkerWarmupRequest): Promise<void> {
+async function handleWarmup(_message: WorkerWarmupRequest): Promise<void> {
   try {
-    await awaitDependencies()
+    const angularRenderContext = await getAngularRenderContext()
+    engine = angularRenderContext.engine
+    indexHtml = angularRenderContext.indexHtml
+    ssrAbortSignalToken = angularRenderContext.ssrAbortSignalToken
+
     postToParent({
       type: 'warmed-up',
       threadId,
@@ -177,21 +164,6 @@ function postToParent(
   transferList?: readonly Transferable[],
 ): void {
   port!.postMessage(message, transferList)
-}
-
-async function awaitDependencies(): Promise<void> {
-  const [{ CommonEngine }, { bootstrap, SSR_ABORT_SIGNAL }, document] = await Promise.all(
-    [angularSsrModulePromise, mainServerModulePromise, indexHtmlPromise],
-  )
-
-  ssrAbortSignalToken = SSR_ABORT_SIGNAL
-
-  engine = new CommonEngine({
-    bootstrap,
-    allowedHosts,
-  })
-
-  indexHtml = document
 }
 
 function createAbortReason(reason: WorkerAbortReason): DOMException {

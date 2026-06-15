@@ -15,11 +15,13 @@ logEnv(env, 'App Server SSG Environment Variables')
 enableAngularServerMode()
 await import('@angular/compiler')
 const { CommonEngine } = await import('@angular/ssr/node')
-const { ɵSERVER_CONTEXT } = await import('@angular/platform-server')
 const { bootstrap } = await import('@swapi/client/main.server')
+const { ɵSERVER_CONTEXT } = await import('@angular/platform-server')
 const angular = new CommonEngine({
   bootstrap,
   allowedHosts,
+  // TODO: fix token is overwritten by provideServerRendering in the server config
+  // could create a workaround either via env var or by creating a ssg entry point & config
   providers: [{ provide: ɵSERVER_CONTEXT, useValue: 'ssg' }],
 })
 

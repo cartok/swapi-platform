@@ -3,7 +3,7 @@ import { DOCUMENT_CACHE_HEADERS } from '@swapi/shared/cache/cache-control'
 import { CACHE_TAGS } from '@swapi/shared/cache/cache-tags'
 import { createCommitBasedWeakETagHeader } from '@swapi/shared/cache/etags'
 
-import { GLOBAL_DEPLOYED_GIT_SHA } from '#internal/env'
+import { DCE_GIT_COMMIT_SHA, DCE_SWAPI_LOCAL_E2E } from '#internal/env'
 import { createAbortResponse } from '#internal/request/request-abort.handler'
 import {
   RenderPoolClosedError,
@@ -13,6 +13,16 @@ import {
   RenderTimeoutError,
 } from '#internal/ssr/render-worker-pool.errors'
 import type { HonoRuntimeOptions, ServerHonoEnv } from '#internal/types'
+
+let ssrCache: Map<string, string> | null = null
+
+// TODO: extra variable + E2E env union variable
+const useCache = DCE_SWAPI_LOCAL_E2E
+
+if (useCache) {
+  console.warn('SSR: Will use runtime cache.')
+  ssrCache = new Map<string, string>()
+}
 
 export const addSsrHandler: HonoHandler<ServerHonoEnv, HonoRuntimeOptions> = (
   hono,
@@ -29,20 +39,30 @@ export const addSsrHandler: HonoHandler<ServerHonoEnv, HonoRuntimeOptions> = (
     }
 
     try {
-      const result = await runtimeServices.ssr.renderPool.render({
-        url: c.req.url,
-        requestController: abortController,
-      })
-      console.log(`SSR: Rendered ${c.req.url}`)
+      let html = ssrCache?.get(c.req.url)
 
-      if (result.kind === 'aborted-client') {
-        return createAbortResponse(c, 'During SSR rendering')
+      if (html) {
+        console.info('SSR: Loaded from cache:', c.req.url)
+      } else {
+        const workerSsrResult = await runtimeServices.ssr.renderPool.render({
+          url: c.req.url,
+          requestController: abortController,
+        })
+
+        if (workerSsrResult.kind === 'aborted-client') {
+          return createAbortResponse(c, 'During SSR rendering')
+        } else {
+          console.info('SSR: Rendered by worker:', c.req.url)
+          ssrCache?.set(c.req.url, workerSsrResult.html)
+
+          html = workerSsrResult.html
+        }
       }
 
-      return c.html(result.html, 200, {
+      return c.html(html, 200, {
         ...DOCUMENT_CACHE_HEADERS,
         'Cache-Tag': [CACHE_TAGS.HTML, CACHE_TAGS.SSR],
-        ...createCommitBasedWeakETagHeader(GLOBAL_DEPLOYED_GIT_SHA),
+        ...createCommitBasedWeakETagHeader(DCE_GIT_COMMIT_SHA),
       })
     } catch (error) {
       if (error instanceof RenderRequestTimeoutError) {

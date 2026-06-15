@@ -1,6 +1,6 @@
 import type { HonoHandler } from '@swapi/hono/types'
 
-import { allowedHosts, GLOBAL_SWAPI_TARGET } from '#internal/env'
+import { allowedHosts, DCE_SWAPI_TARGET_ENVIRONMENT } from '#internal/env'
 import type { ServerHonoEnv } from '#internal/types'
 
 const allowedHostSet: Readonly<Set<string>> = new Set(allowedHosts)
@@ -10,7 +10,7 @@ export const addRequestGuardHandler: HonoHandler<ServerHonoEnv> = (hono) => {
   hono.use('*', async (c, next) => {
     const requestUrl = new URL(c.req.url)
 
-    if (GLOBAL_SWAPI_TARGET !== 'local') {
+    if (DCE_SWAPI_TARGET_ENVIRONMENT !== 'local') {
       if (isBehindTrustedProxy) {
         const forwardedProto = c.req.header('X-Forwarded-Proto')
         if (forwardedProto !== 'https') {

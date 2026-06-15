@@ -3,7 +3,7 @@ import { Hono } from 'hono'
 
 import { addAssetHandler } from '#internal/assets/asset.handler'
 import { addDebugRoutesHandler } from '#internal/debug/debug-routes.handler'
-import { GLOBAL_SWAPI_TARGET } from '#internal/env'
+import { DCE_SWAPI_TARGET_ENVIRONMENT } from '#internal/env'
 import { addErrorHandler } from '#internal/error/error.handler'
 import { addHealthChecksHandler } from '#internal/health/health-checks.handler'
 import { addInFlightRequestsHandler } from '#internal/request/in-flight-requests.handler'
@@ -18,7 +18,7 @@ import type { HonoRuntimeOptions, ServerHonoEnv } from '#internal/types'
 export function createHono(runtimeOptions: HonoRuntimeOptions): Hono<ServerHonoEnv> {
   const hono = new Hono<ServerHonoEnv>({ strict: false })
 
-  if (GLOBAL_SWAPI_TARGET === 'local') {
+  if (DCE_SWAPI_TARGET_ENVIRONMENT === 'local') {
     hono.get(
       '/.well-known/appspecific/com.chrome.devtools.json',
       () => new Response(null, { status: 204 }),

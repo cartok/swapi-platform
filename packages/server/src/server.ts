@@ -1,16 +1,19 @@
 import fs from 'node:fs'
-import { constants } from 'node:os'
+import { availableParallelism, constants } from 'node:os'
 import process, { resourceUsage } from 'node:process'
 
+import { logEnv } from '@swapi/shared/environment/env'
 import { errorToString, logHeading, objectToString } from '@swapi/shared/log/log'
 
-import { env, GLOBAL_SWAPI_TARGET } from '#internal/env'
+import { DCE_SWAPI_LOCAL_E2E, DCE_SWAPI_TARGET_ENVIRONMENT, env } from '#internal/env'
 import { createHono } from '#internal/hono'
 import { RenderWorkerPool } from '#internal/ssr/render-worker-pool'
+import type { RenderWorkerPoolConfig } from '#internal/ssr/render-worker-pool.types'
 import type { HonoRuntimeOptions, ServerRuntimeMetrics } from '#internal/types'
 
 console.info(`Process id is: ${process.pid}`)
-if (GLOBAL_SWAPI_TARGET !== 'local') {
+logEnv(env, 'App Server Runtime Environment Variables')
+if (DCE_SWAPI_TARGET_ENVIRONMENT !== 'local') {
   console.info('Environment', process.env)
 }
 
@@ -40,55 +43,98 @@ const runtimeMetrics: ServerRuntimeMetrics = {
   },
 } as const
 
-/**
- * Benchmark setup:
- * - Docker server start via `go-task docker:start` with Taskfile CPU/RAM throttling profile.
- * - Synthetic request load via curl (`-L`) against SSR routes: `/movies` and `/movie/1`.
- * - load_80: 80 requests per route at concurrency 8.
- * - load_200: 200 requests per route at concurrency 20.
- * - Artificial constant SSR latency: 65ms delay before worker-pool render call.
- * - Mock data for SWAPI with artificial delay range.
- * - Metrics recorded: 2xx rate, success_rps, p95 latency, plus 503 and transport failures (000).
- *
- * Benchmark winners:
- * 1 CPU / 256MB (Profile C):
- * - workerCount=1, maxQueuedJobs=40, queueTimeoutMs=1400, renderAbortTimeoutMs=3200,
- *   TIMEOUT_GLOBAL=5000
- * - aggregated (/movies + /movie/1, load_80 + load_200): 23.75% 2xx, success_rps=2.02, p95=1.897s
- * - fly concurrency (requests): soft_limit=5, hard_limit=8
- *
- * 1 CPU / 512MB (Profile C):
- * - workerCount=2, maxQueuedJobs=40, queueTimeoutMs=1400, renderAbortTimeoutMs=3200,
- *   TIMEOUT_GLOBAL=5000
- * - aggregated (/movies + /movie/1, load_80 + load_200): 46.79% 2xx, success_rps=3.98, p95=1.959s
- * - fly concurrency (requests): soft_limit=8, hard_limit=12
- *
- * 2 CPU / 512MB (Profile C):
- * - workerCount=2, maxQueuedJobs=40, queueTimeoutMs=1400, renderAbortTimeoutMs=3200,
- *   TIMEOUT_GLOBAL=5000
- * - aggregated (/movies + /movie/1, load_80 + load_200): 47.32% 2xx, success_rps=4.04, p95=1.935s
- * - fly concurrency (requests): soft_limit=10, hard_limit=16
- *
- * Fly costs:
- * - https://fly.io/docs/about/pricing/#started-fly-machines
- */
-const renderPoolPromise = RenderWorkerPool.create({
-  workerFile: resolveRenderWorkerFile(),
-  workerCount: 2,
-  maxQueuedJobs: 40,
-  queueTimeoutMs: 1_400,
-  renderAbortTimeoutMs: 3_200,
-  requestAbortWorkerGraceMs: 500,
-  renderTimeoutWorkerGraceMs: 500,
-  workerRecoveryInitialBackoffMs: 50,
-  workerRecoveryMaxBackoffMs: 500,
-  workerRecoveryMaxAttempts: 5,
-  workerRecoveryCooldownMs: 2_000,
-  metrics: runtimeMetrics.ssrWorkerPool,
-})
+const renderWorkerPoolPromise = RenderWorkerPool.create(resolveRenderWorkerPoolConfig())
+
+function resolveRenderWorkerPoolConfig(): RenderWorkerPoolConfig {
+  const baseRenderWorkerPoolConfig = {
+    workerFile: resolveRenderWorkerFile(),
+    metrics: runtimeMetrics.ssrWorkerPool,
+  } satisfies Partial<RenderWorkerPoolConfig>
+
+  function resolveRenderWorkerFile(): URL {
+    const renderWorkerFileName =
+      process.env['SWAPI_SSR_WORKER_VARIANT'] === 'jit'
+        ? 'render-worker.jit.js'
+        : 'render-worker.js'
+
+    return new URL(`./ssr/${renderWorkerFileName}`, import.meta.url)
+  }
+
+  if (DCE_SWAPI_LOCAL_E2E) {
+    const cores = availableParallelism()
+    const coresMaxPercent = 0.4
+    const coresMax = Math.max(Math.floor(cores * coresMaxPercent), 1)
+
+    const devE2eWorkerPoolConfig = {
+      ...baseRenderWorkerPoolConfig,
+      workerCount: coresMax,
+      maxQueuedJobs: 20 * coresMax,
+      // Settings below are copied from the fly settings and could be improved by a benchmark.
+      queueTimeoutMs: 1_400,
+      renderAbortTimeoutMs: 3_200,
+      requestAbortWorkerGraceMs: 500,
+      renderTimeoutWorkerGraceMs: 500,
+      workerRecoveryInitialBackoffMs: 50,
+      workerRecoveryMaxBackoffMs: 500,
+      workerRecoveryMaxAttempts: 5,
+      workerRecoveryCooldownMs: 2_000,
+    } satisfies RenderWorkerPoolConfig
+
+    console.info('Using SSR worker pool config that is optimized for E2E testing.')
+    return devE2eWorkerPoolConfig
+  }
+
+  /**
+   * Benchmark setup:
+   * - Docker server start via `go-task docker:start` with Taskfile CPU/RAM throttling profile.
+   * - Synthetic request load via curl (`-L`) against SSR routes: `/movies` and `/movie/1`.
+   * - load_80: 80 requests per route at concurrency 8.
+   * - load_200: 200 requests per route at concurrency 20.
+   * - Artificial constant SSR latency: 65ms delay before worker-pool render call.
+   * - Mock data for SWAPI with artificial delay range.
+   * - Metrics recorded: 2xx rate, success_rps, p95 latency, plus 503 and transport failures (000).
+   *
+   * Benchmark winners:
+   * 1 CPU / 256MB (Profile C):
+   * - workerCount=1, maxQueuedJobs=40, queueTimeoutMs=1400, renderAbortTimeoutMs=3200,
+   *   TIMEOUT_GLOBAL=5000
+   * - aggregated (/movies + /movie/1, load_80 + load_200): 23.75% 2xx, success_rps=2.02, p95=1.897s
+   * - fly concurrency (requests): soft_limit=5, hard_limit=8
+   *
+   * 1 CPU / 512MB (Profile C):
+   * - workerCount=2, maxQueuedJobs=40, queueTimeoutMs=1400, renderAbortTimeoutMs=3200,
+   *   TIMEOUT_GLOBAL=5000
+   * - aggregated (/movies + /movie/1, load_80 + load_200): 46.79% 2xx, success_rps=3.98, p95=1.959s
+   * - fly concurrency (requests): soft_limit=8, hard_limit=12
+   *
+   * 2 CPU / 512MB (Profile C):
+   * - workerCount=2, maxQueuedJobs=40, queueTimeoutMs=1400, renderAbortTimeoutMs=3200,
+   *   TIMEOUT_GLOBAL=5000
+   * - aggregated (/movies + /movie/1, load_80 + load_200): 47.32% 2xx, success_rps=4.04, p95=1.935s
+   * - fly concurrency (requests): soft_limit=10, hard_limit=16
+   *
+   * Fly costs:
+   * - https://fly.io/docs/about/pricing/#started-fly-machines
+   */
+  const flyRenderWorkerPoolConfig = {
+    ...baseRenderWorkerPoolConfig,
+    workerCount: 2,
+    maxQueuedJobs: 40,
+    queueTimeoutMs: 1_400,
+    renderAbortTimeoutMs: 3_200,
+    requestAbortWorkerGraceMs: 500,
+    renderTimeoutWorkerGraceMs: 500,
+    workerRecoveryInitialBackoffMs: 50,
+    workerRecoveryMaxBackoffMs: 500,
+    workerRecoveryMaxAttempts: 5,
+    workerRecoveryCooldownMs: 2_000,
+  } satisfies RenderWorkerPoolConfig
+
+  return flyRenderWorkerPoolConfig
+}
 
 const runtimeServicesPromise: Promise<HonoRuntimeOptions['runtimeServices']> =
-  renderPoolPromise.then((renderPool) => ({
+  renderWorkerPoolPromise.then((renderPool) => ({
     ssr: {
       renderPool,
     },
@@ -132,7 +178,7 @@ process.on('uncaughtException', (error) => {
     fs.writeSync(process.stderr.fd, logHeading('run context'))
     fs.writeSync(process.stderr.fd, objectToString(runtimeMetrics))
 
-    if (GLOBAL_SWAPI_TARGET !== 'production') {
+    if (DCE_SWAPI_TARGET_ENVIRONMENT !== 'production') {
       fs.writeSync(process.stderr.fd, logHeading('env'))
       fs.writeSync(process.stderr.fd, objectToString(env))
 
@@ -165,7 +211,7 @@ async function startServer(): Promise<Bun.Server<undefined>> {
       port: env.SWAPI_SERVER_PORT,
       fetch: hono.fetch,
     })
-    console.log(`Server running at: ${server.url}`)
+    console.log(`Server running at: ${server.url.toString()}`)
 
     runtimeMetrics.server.ssrReady = true
     runtimeMetrics.server.ready = true
@@ -228,13 +274,4 @@ async function closeRenderPool(): Promise<void> {
 
 function signalExitCode(signal: NodeJS.Signals) {
   return 128 + constants.signals[signal]
-}
-
-function resolveRenderWorkerFile(): URL {
-  const renderWorkerFileName =
-    process.env['SWAPI_SSR_WORKER_VARIANT'] === 'jit'
-      ? 'render-worker.jit.js'
-      : 'render-worker.js'
-
-  return new URL(`./ssr/${renderWorkerFileName}`, import.meta.url)
 }
