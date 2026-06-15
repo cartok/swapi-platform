@@ -29,7 +29,8 @@
   },
   "dependencies": {
     "@sinclair/typebox": "catalog:validation",
-    "tslib": "catalog:"
+    "tslib": "catalog:",
+    "xxhash-wasm": "catalog:"
   },
   "devDependencies": {
     "@go-task/cli": "catalog:tooling",

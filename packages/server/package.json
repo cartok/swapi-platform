@@ -21,12 +21,12 @@
     "@swapi/hono": "workspace:*",
     "@swapi/shared": "workspace:*",
     "hono": "catalog:",
-    "tslib": "catalog:",
-    "xxhash-wasm": "^1.1.0"
+    "tslib": "catalog:"
   },
   "devDependencies": {
     "@angular/compiler-cli": "catalog:angular",
     "@go-task/cli": "catalog:tooling",
+    "@swapi/tsconfig": "workspace:*",
     "@types/babel__core": "^7.20.5",
     "@types/bun": "catalog:",
     "@types/node": "catalog:",
