@@ -1,33 +1,36 @@
 {
-  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=827846
   "recommendations": [
     "Angular.ng-template",
-    "segerdekort.angular-cli",
+    "dbaeumer.vscode-eslint",
+    "docker.docker",
+    "EditorConfig.EditorConfig",
+    "esbenp.prettier-vscode",
     "infinity1207.angular2-switcher",
     "ionutvmi.path-autocomplete",
     "pucelle.vscode-css-navigation",
-    "EditorConfig.EditorConfig",
-    "dbaeumer.vscode-eslint",
-    "esbenp.prettier-vscode",
-    "YoavBls.pretty-ts-errors",
     "redhat.vscode-yaml",
+    "segerdekort.angular-cli",
+    "tamasfe.even-better-toml",
     "task.vscode-task",
     "wharflab.tally",
+    "YoavBls.pretty-ts-errors"
   ],
   "unwantedRecommendations": [
     "be5invis.toml",
+    "cab404.vscode-direnv",
+    "cpylua.language-postcss",
+    "csstools.postcss",
     "dprint.dprint",
     "exiasr.hadolint",
     "firsttris.vscode-jest-runner",
+    "iulian-radu-at.taskfile-launcher",
     "kozo.vsc-direnv",
     "mkhl.direnv",
     "Orta.vscode-jest",
-    "vitest.explorer",
-    "vunguyentuan.vscode-postcss",
-    "csstools.postcss",
-    "cpylua.language-postcss",
-    "ricard.PostCSS",
     "paulvarache.vscode-taskfile",
+    "ricard.PostCSS",
     "Rubymaniac.vscode-direnv",
+    "vitest.explorer",
+    "vunguyentuan.vscode-postcss"
   ]
 }
