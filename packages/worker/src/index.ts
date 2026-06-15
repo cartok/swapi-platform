@@ -5,7 +5,7 @@ import { PATHS } from '@swapi/shared/routing/paths'
 import { env } from 'cloudflare:workers'
 import { Hono } from 'hono'
 
-import { addClientHintsHandler } from '#internal/device-context.handler'
+import { addClientHintsHandler } from '#internal/add-client-hints.handler'
 import { addDeviceRedirectHandler } from '#internal/device-redirect.handler'
 import type { WorkerHonoEnv } from '#internal/types'
 

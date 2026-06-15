@@ -6,8 +6,8 @@
   ],
   "compilerOptions": {
     "noEmit": true,
-    "types": ["../worker-configuration.d.ts"],
-    "rootDir": "../src"
+    "rootDir": "../src",
+    "types": ["../worker-configuration.d.ts"]
   },
-  "include": ["../src/**/*.ts", "../worker-configuration.d.ts"]
+  "include": ["../worker-configuration.d.ts", "../src/**/*.ts"]
 }
