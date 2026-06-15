@@ -16,7 +16,6 @@
   "js/ts.suggest.autoImports": true,
   "js/ts.suggest.includeCompletionsForImportStatements": true,
   "js/ts.tsdk.path": "node_modules/typescript/lib",
-  "js/ts.updateImportsOnFileMove.enabled": "always",
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
   },
