@@ -21,6 +21,7 @@ generated/
 .gitignore
 .prettierignore
 .vscode/
+/.local
 Dockerfile
 Dockerfile.*
 docs/

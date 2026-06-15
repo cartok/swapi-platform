@@ -30,3 +30,4 @@ fly.*.toml
 fly.*.yml
 fly.toml
 fly.yml
+/.local
