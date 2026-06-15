@@ -23,5 +23,9 @@
   "dependencies": {
     "@swapi/shared": "workspace:*",
     "hono": "catalog:"
+  },
+  "devDependencies": {
+    "@go-task/cli": "catalog:tooling",
+    "@swapi/tsconfig": "workspace:*"
   }
 }
