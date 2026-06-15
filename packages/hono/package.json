@@ -26,6 +26,7 @@
   },
   "devDependencies": {
     "@go-task/cli": "catalog:tooling",
-    "@swapi/tsconfig": "workspace:*"
+    "@swapi/tsconfig": "workspace:*",
+    "typescript": "catalog:ts5"
   }
 }

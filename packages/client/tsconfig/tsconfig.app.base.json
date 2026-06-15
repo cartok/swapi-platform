@@ -3,7 +3,7 @@
   "extends": [
     "@swapi/tsconfig/tsconfig.base",
     "@swapi/tsconfig/tsconfig.rules",
-    "@swapi/tsconfig/tsconfig.bundler",
+    "@swapi/tsconfig/tsconfig.bundler.ts5",
     "@swapi/tsconfig/tsconfig.angular"
   ],
   "compilerOptions": {

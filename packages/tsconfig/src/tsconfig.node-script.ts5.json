@@ -1,0 +1,6 @@
+{
+  "extends": "./tsconfig.node-script.json",
+  "compilerOptions": {
+    "target": "ES2024"
+  }
+}

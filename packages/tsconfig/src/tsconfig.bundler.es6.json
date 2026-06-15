@@ -1,0 +1,6 @@
+{
+  "extends": "./tsconfig.bundler.json",
+  "compilerOptions": {
+    "target": "ES2025"
+  }
+}

@@ -40,6 +40,6 @@
     "ajv": "catalog:validation",
     "bun": "catalog:",
     "quicktype": "catalog:validation",
-    "typescript": "catalog:"
+    "typescript": "catalog:ts5"
   }
 }

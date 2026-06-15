@@ -53,10 +53,11 @@
     "@axe-core/cli": "catalog:testing",
     "@go-task/cli": "catalog:tooling",
     "@swapi/tsconfig": "workspace:*",
+    "@types/node": "catalog:ts5",
     "bun": "catalog:",
     "jsdom": "catalog:testing",
     "lightningcss": "catalog:tooling",
-    "typescript": "catalog:",
+    "typescript": "catalog:ts5",
     "vite": "catalog:tooling",
     "vitest": "catalog:testing"
   }

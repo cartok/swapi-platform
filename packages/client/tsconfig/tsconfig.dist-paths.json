@@ -2,7 +2,7 @@
   "extends": [
     "@swapi/tsconfig/tsconfig.base",
     "@swapi/tsconfig/tsconfig.rules",
-    "@swapi/tsconfig/tsconfig.node",
+    "@swapi/tsconfig/tsconfig.node.ts5",
     "@swapi/tsconfig/tsconfig.lib"
   ],
   "compilerOptions": {
