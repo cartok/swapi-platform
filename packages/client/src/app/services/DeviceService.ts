@@ -110,6 +110,7 @@ export class DeviceService {
   private setDeviceContextFromUrlPath(urlPath: string): void {
     const deviceContextMatrixParameters =
       this.extractDeviceContextMatrixParameters(urlPath)
+
     const deviceContext = !deviceContextMatrixParameters
       ? null
       : parseDeviceContext(deviceContextMatrixParameters, DeviceContextSchema)

@@ -95,7 +95,7 @@ export class SwipeDirective {
   }
 
   onPointerMove(event: PointerEvent): void {
-    if (!this.tracking || event.pointerId !== this.tracking.pointerId) {
+    if (event.pointerId !== this.tracking?.pointerId) {
       return
     }
 
@@ -104,7 +104,7 @@ export class SwipeDirective {
   }
 
   onPointerUp(event: PointerEvent): void {
-    if (!this.tracking || event.pointerId !== this.tracking.pointerId) {
+    if (event.pointerId !== this.tracking?.pointerId) {
       return
     }
 

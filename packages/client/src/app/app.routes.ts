@@ -3,12 +3,11 @@ import type { DeviceContext } from '@swapi/shared/device/device'
 import {
   DEFAULT_DEVICE_FORMAT,
   DEVICE_CONTEXT_PATH_PARAM_PREFIX,
+  DeviceContextSchema,
   deviceContextToPathSegment,
   findClosestHeightBreakpoint,
   findClosestWidthBreakpoint,
   isDeviceFormatValid,
-  isHeightBreakpointValid,
-  isWidthBreakpointValid,
   LenientDeviceContextSchema,
   parseDeviceContext,
 } from '@swapi/shared/device/device'
@@ -61,26 +60,27 @@ export const routes: Routes = [
       if (!segments.length) {
         return null
       }
+
       const firstSegment = segments[0]
       if (firstSegment.path !== DEVICE_CONTEXT_PATH_PARAM_PREFIX) {
         return null
       }
-      const deviceContext = parseDeviceContext(
+
+      const lenientDeviceContext = parseDeviceContext(
         firstSegment.parameters,
         LenientDeviceContextSchema,
       )
-      if (!deviceContext) {
+
+      if (!lenientDeviceContext) {
         console.error('Detected Device URL with bad or no context data.', firstSegment)
         return null
       }
-      if (
-        !isDeviceFormatValid(deviceContext.format) ||
-        (deviceContext.width && !isWidthBreakpointValid(deviceContext.width)) ||
-        (deviceContext.height && !isHeightBreakpointValid(deviceContext.height))
-      ) {
-        console.warn('Detected invalid width or height in device context.', deviceContext)
+
+      if (!parseDeviceContext(firstSegment.parameters, DeviceContextSchema)) {
+        // Do not consume path segment, to have full URL in redirect handler that does correction.
         return { consumed: [] }
       }
+
       return null
     },
     redirectTo(redirectData) {
@@ -91,10 +91,12 @@ export const routes: Routes = [
       )
 
       if (!deviceContext) {
-        console.error(
-          "Matcher should've already made sure that device context exists, but with invalid data.",
+        throw new Error(
+          [
+            "The route's `matcher()` method must ensure, that there is a usable",
+            'device context matrix parameter.',
+          ].join(' '),
         )
-        return '/error'
       }
 
       const actualPathSegments: UrlSegment[] = redirectData.url.slice(1)

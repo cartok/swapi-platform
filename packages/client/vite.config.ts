@@ -41,8 +41,8 @@ export default defineConfig(({ isSsrBuild }) => {
     },
     define: {
       ...envToOxcDefine(browserEnv),
-      VITE_MODE: JSON.stringify(viteMode),
-      ngServerMode: isSsrBuild,
+      VITE_MODE: `"${viteMode}"`,
+      ngServerMode: `${isSsrBuild}`,
     },
     resolve: {
       conditions: clientResolveConditions,

@@ -2,33 +2,6 @@
   "name": "@swapi/client",
   "private": true,
   "type": "module",
-  "dependencies": {
-    "@angular/aria": "catalog:angular",
-    "@angular/common": "catalog:angular",
-    "@angular/compiler": "catalog:angular",
-    "@angular/core": "catalog:angular",
-    "@angular/forms": "catalog:angular",
-    "@angular/platform-browser": "catalog:angular",
-    "@angular/platform-server": "catalog:angular",
-    "@angular/router": "catalog:angular",
-    "@angular/ssr": "catalog:angular",
-    "@swapi/shared": "workspace:*",
-    "rxjs": "~7.8.2",
-    "tslib": "catalog:"
-  },
-  "devDependencies": {
-    "@analogjs/vite-plugin-angular": "catalog:angular",
-    "@angular/build": "catalog:angular",
-    "@angular/compiler-cli": "catalog:angular",
-    "@axe-core/cli": "catalog:testing",
-    "@go-task/cli": "catalog:tooling",
-    "bun": "catalog:",
-    "jsdom": "catalog:testing",
-    "lightningcss": "catalog:tooling",
-    "typescript": "catalog:",
-    "vite": "catalog:tooling",
-    "vitest": "catalog:testing"
-  },
   "exports": {
     "./main.server": {
       "types": "./src/main.server.d.ts",
@@ -59,5 +32,32 @@
       "@swapi/production/debug": "./dist/production/debug/ssr/main.server.js",
       "@swapi/production/release": "./dist/production/release/ssr/main.server.js"
     }
+  },
+  "dependencies": {
+    "@angular/aria": "catalog:angular",
+    "@angular/common": "catalog:angular",
+    "@angular/compiler": "catalog:angular",
+    "@angular/core": "catalog:angular",
+    "@angular/forms": "catalog:angular",
+    "@angular/platform-browser": "catalog:angular",
+    "@angular/platform-server": "catalog:angular",
+    "@angular/router": "catalog:angular",
+    "@angular/ssr": "catalog:angular",
+    "@swapi/shared": "workspace:*",
+    "rxjs": "~7.8.2",
+    "tslib": "catalog:"
+  },
+  "devDependencies": {
+    "@analogjs/vite-plugin-angular": "catalog:angular",
+    "@angular/compiler-cli": "catalog:angular",
+    "@axe-core/cli": "catalog:testing",
+    "@go-task/cli": "catalog:tooling",
+    "@swapi/tsconfig": "workspace:*",
+    "bun": "catalog:",
+    "jsdom": "catalog:testing",
+    "lightningcss": "catalog:tooling",
+    "typescript": "catalog:",
+    "vite": "catalog:tooling",
+    "vitest": "catalog:testing"
   }
 }

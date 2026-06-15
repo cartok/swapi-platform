@@ -6,7 +6,7 @@
     "@swapi/tsconfig/tsconfig.lib"
   ],
   "compilerOptions": {
-    "types": ["node", "bun"]
+    "types": ["node"]
   },
   "files": ["../src/dist-paths.ts"]
 }

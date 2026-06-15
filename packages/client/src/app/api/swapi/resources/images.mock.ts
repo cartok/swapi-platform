@@ -9,7 +9,7 @@ export function createMockFilmImages(
 ): SwapiImageMock[] {
   return Array.from({ length: amount }).map((_, i) => ({
     url: `https://picsum.photos/seed/swapi-${resourceName}-${resourceId}-${i}/${width}/${height}`,
-    alt: `Mock image no. ${i + 1}`,
+    alt: `Mock image ${i + 1}`,
     width,
     height,
   }))
