@@ -19,3 +19,5 @@
 - [x] CF Worker Proxy with the Device Redirection functionallity
   - [x] Rate limiting by using the free WAF rule
   - [x] Recheck HTML caching afterwards (no more 302 on fly.io)
+
+- [ ] Reassure that Signal timeouts and eventually other Listeners / Subscriptions are canceled when no longer needed

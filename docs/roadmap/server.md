@@ -17,27 +17,26 @@
 - [ ] Unify smoke test code, less repetition & timeouts should be configurable in one place.
 - [x] Environment variables for things like timeouts that are referred to in the code.
   - [ ] Make use of them.
-- [ ] Eventually refactor file cache code in a cohesive class structure.
-- [ ] Is it possible to have the node server use sourcemaps to keep SWAPI_BUILD_MINIFY in server env active so that runtime code is minified but still get good error logs?
+- [ ] Is it possible to have the node server use sourcemaps to keep SWAPI_MINIFY in server env active so that runtime code is minified but still get good error logs?
 
 ## Stability
 
 - [x] At least log out a warning if in-flight request count is reaching configured fly.io soft limit
-- [ ] Test if in-flight requests telemetry behaves correct
-- [ ] Semaphore + FIFO-Queue and logging for SSR rendering
+- [x] Test if in-flight requests telemetry behaves correct
+- [x] SSR Render Worker Pool
 - [ ] Additional rate limiting
 
 ## Performance
 
-- [ ] Try out worker threads SSR rendering for >= 4 Cores or so
-- [ ] Eventually cache the SSG files in memory so that file-system access does not occur every time
-- [ ] Eventually cache the SSR results in volatile memory
-  - [ ] Decide about database
-  - [ ] Implement SWR
-  - [ ] Add cache clean endpoint
-  - [ ] Add automated tests
+- [ ] HTML result caching via Dragonfly (and runtime memory)
+  - [ ] First only feature flaged to speed up E2E testing.
+  - [ ] Right now there is a simple runtime memory based volatile solution in place. A fast NoSQL DB like Dragonfly would allow storing the results. For production though, in order to scale I'd have to properly limit the system. Ultimately caching shouldn't be so important when on production requests go through CF, but it can still be a good thing and at least it can help with E2E tests and exploration is fun.
+    - [ ] non-personal SSR results: Should be worth it, to store/restore those persistently.
+    - [ ] SSG results: Are just files which get loaded by, not sure how I want to do this. I could preload all SSG files on start into memory, if the total size will stay small but here im rather creating scalable solutions - so maybe create a space limited solution. First benchmark bun vs Dragonfly access for SSG files, to see potential benefits for SSG.
 
-  Eventually make use of bun's file API, but first try out CF worker for the whole server
+---
+
+- [ ] Create a good long running load test and analyze GC and compare `large heap` with `small heap` via `--smol` flag
 
 ## Response Caching
 
