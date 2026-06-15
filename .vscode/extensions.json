@@ -12,10 +12,12 @@
     "YoavBls.pretty-ts-errors",
     "redhat.vscode-yaml",
     "task.vscode-task",
-    "tamasfe.even-better-toml"
+    "wharflab.tally",
   ],
   "unwantedRecommendations": [
     "be5invis.toml",
+    "dprint.dprint",
+    "exiasr.hadolint",
     "firsttris.vscode-jest-runner",
     "kozo.vsc-direnv",
     "mkhl.direnv",

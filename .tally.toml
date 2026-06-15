@@ -1,0 +1,22 @@
+[output]
+format = "text"
+path = "stdout"
+show-source = true
+fail-level = "style"
+
+[inline-directives]
+enabled = true
+require-reason = true
+validate-rules = true
+warn-unused = true
+
+[slow-checks]
+timeout = "10s"
+
+[rules.tally.max-lines]
+severity = "warning"
+max = 300
+
+[rules.hadolint.DL3057]
+# Health checks will come form compose.
+severity = "off"

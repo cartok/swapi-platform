@@ -86,6 +86,14 @@
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
+  "[dockerfile]": {
+    "editor.wordBasedSuggestions": "matchingDocuments",
+    "editor.defaultFormatter": "wharflab.tally",
+    "editor.formatOnSave": true,
+    "editor.rulers": [100]
+  },
+  // EXTENSION: wharflab.tally
+  "tally.importStrategy": "useBundled",
   // EXTENSION: EditorConfig.EditorConfig
   "files.trimTrailingWhitespace": false,
   // EXTENSION: Tyriar.sort-lines
@@ -122,6 +130,14 @@
         {
           "when": "**/packages/client/**/*.{css,html}",
           "value": "${workspace}/packages/client/src"
+        }
+      ]
+    },
+    "./": {
+      "conditions": [
+        {
+          "when": "**/{Dockerfile,*.Dockerfile,Dockerfile.*}",
+          "value": "${workspace}"
         }
       ]
     }
