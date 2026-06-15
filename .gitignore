@@ -1,7 +1,13 @@
 # Installed dependencies
 node_modules/
 
-# Tool-generated files and caches
+
+# Playwright
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+playwright/.auth/
 .cache/
 .codex
 .DS_Store/

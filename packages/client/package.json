@@ -50,7 +50,6 @@
   "devDependencies": {
     "@analogjs/vite-plugin-angular": "catalog:angular",
     "@angular/compiler-cli": "catalog:angular",
-    "@axe-core/cli": "catalog:testing",
     "@go-task/cli": "catalog:tooling",
     "@swapi/tsconfig": "workspace:*",
     "@types/node": "catalog:ts5",

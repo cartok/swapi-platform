@@ -6,7 +6,13 @@ node_modules/
 dist/
 generated/
 
-# Cache
+
+# Playwright
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+playwright/.auth/
 .cache/
 .task/
 

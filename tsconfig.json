@@ -3,6 +3,7 @@
   "references": [
     { "path": "./tsconfig/tsconfig.eslint.json" },
     { "path": "./packages/client/tsconfig.json" },
+    { "path": "./packages/e2e/tsconfig.json" },
     { "path": "./packages/hono/tsconfig.json" },
     { "path": "./packages/server/tsconfig.json" },
     { "path": "./packages/shared/tsconfig.json" },

@@ -52,7 +52,6 @@
       "quicktype": "^23.2.6"
     },
     "testing": {
-      "@axe-core/cli": "^4.11.2",
       "jsdom": "^27.4.0",
       "vitest": "^4.0.18"
     }

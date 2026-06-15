@@ -1,0 +1,21 @@
+{
+  "name": "@swapi/e2e",
+  "private": true,
+  "type": "module",
+  "imports": {
+    "#internal/*": "./src/*.ts"
+  },
+  "dependencies": {
+    "@axe-core/playwright": "~4.11.3",
+    "@playwright/test": "~1.60.0",
+    "@swapi/shared": "workspace:*",
+    "@swapi/tsconfig": "workspace:*",
+    "axe-core": "~4.11.4"
+  },
+  "devDependencies": {
+    "@go-task/cli": "catalog:tooling",
+    "@types/node": "catalog:ts6",
+    "bun": "catalog:",
+    "typescript": "catalog:ts6"
+  }
+}
