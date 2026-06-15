@@ -6,7 +6,7 @@
   ],
   "compilerOptions": {
     "noEmit": true,
-    "types": ["node", "bun"]
+    "types": ["node"]
   },
   "include": ["../generators/**/*.ts", "../generators/**/*.json", "../src/**/*.ts"]
 }

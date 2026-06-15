@@ -1,4 +1,4 @@
-import type { FileExtension } from '@swapi/shared/cache/file-extensions'
+import type { FileExtension } from '#internal/cache/file-extensions'
 import {
   AUDIO_FILE_EXTENSION_SET,
   DATA_FILE_EXTENSION_SET,
@@ -8,7 +8,7 @@ import {
   SCRIPT_FILE_EXTENSION_SET,
   STYLE_FILE_EXTENSION_SET,
   VIDEO_FILE_EXTENSION_SET,
-} from '@swapi/shared/cache/file-extensions'
+} from '#internal/cache/file-extensions'
 
 type CacheHeaders = Record<string, string>
 

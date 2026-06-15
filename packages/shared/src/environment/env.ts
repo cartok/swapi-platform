@@ -35,37 +35,31 @@ export const CommonEnvSchema = Type.Object({
 
 export function parseEnv<T extends TSchema>(
   schema: T,
-  raw: Record<keyof Static<T>, unknown>,
+  raw: Record<keyof Required<Static<T>>, unknown>,
   options: { secret?: boolean } = {},
 ): Readonly<Static<T>> {
-  const parsed = Value.Parse(['Default', 'Convert'], schema, raw)
+  const parsed = Value.Parse(['Clone', 'Default', 'Convert'], schema, raw)
 
   if (options.secret) {
     return Object.freeze(parsed)
   } else {
     try {
       Value.Assert(schema, parsed)
-
       return Object.freeze(parsed)
     } catch (error) {
-      if (!(error instanceof AssertError) || !error.error) {
-        console.error('Unexpected error.')
-        throw error
+      if (error instanceof TypeBoxError) {
+        if (error instanceof AssertError) {
+          throw new Error(typeboxAssertErrorToString(error))
+        }
       }
-
-      const variable = error.error.path.replace(/^\//, '')
-      const schema = JSON.stringify(error.error.schema)
-
-      throw new Error(
-        `Invalid or missing environment variable "${variable}" with schema: ${schema}`,
-      )
+      throw error
     }
   }
 }
 
 export function logEnv(env: Record<string, unknown>, title?: string): void {
   if (title) {
-    console.info(title)
+    console.info(`${title}:`)
   }
 
   console.info(env)

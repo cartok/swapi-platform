@@ -1,4 +1,4 @@
-import fs from 'node:fs/promises'
+import { mkdir, writeFile } from 'node:fs/promises'
 
 import Ajv2020 from 'ajv/dist/2020'
 import standaloneCode from 'ajv/dist/standalone'
@@ -29,6 +29,6 @@ const outputDir = new URL('../generated/validators/', import.meta.url)
 const outputFile = new URL(`${BASE_NAME}.js`, outputDir)
 const outputFileDts = new URL(`${BASE_NAME}.d.ts`, outputDir)
 
-await fs.mkdir(outputDir, { recursive: true })
-await fs.writeFile(outputFile, validator)
-await fs.writeFile(outputFileDts, dts)
+await mkdir(outputDir, { recursive: true })
+await writeFile(outputFile, validator)
+await writeFile(outputFileDts, dts)

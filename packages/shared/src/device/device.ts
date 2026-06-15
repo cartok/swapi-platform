@@ -1,6 +1,8 @@
 import type { Static } from '@sinclair/typebox'
 import { Type } from '@sinclair/typebox'
-import { Value } from '@sinclair/typebox/value'
+import { AssertError, Value } from '@sinclair/typebox/value'
+
+import { errorToString } from '#internal/log/log'
 
 export const DEVICE_FORMATS = ['desktop', 'mobile', 'tablet'] as const
 export const DEFAULT_DEVICE_FORMAT: DeviceFormat = 'mobile'
@@ -188,10 +190,15 @@ export function parseDeviceContext(
   schema: typeof DeviceContextSchema | typeof LenientDeviceContextSchema,
 ): Readonly<DeviceContext> | Readonly<LenientDeviceContext> | null {
   try {
-    const parsed = Value.Parse(['Default', 'Convert'], schema, deviceContext)
+    const parsed = Value.Parse(['Clone', 'Default', 'Convert'], schema, deviceContext)
     Value.Assert(schema, parsed)
+
     return Object.freeze(parsed)
-  } catch {
+  } catch (error) {
+    if (!(error instanceof AssertError)) {
+      console.warn(errorToString(error))
+    }
+
     return null
   }
 }

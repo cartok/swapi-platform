@@ -8,7 +8,8 @@
       "@swapi/shared/source": "./src/*.ts",
       "@swapi/debug": "./dist/debug/*.js",
       "@swapi/release": "./dist/release/*.js",
-      "workerd": "./dist/release/*.js"
+      "workerd": "./dist/release/*.js",
+      "default": "./src/*.ts"
     }
   },
   "exports": {
@@ -34,6 +35,8 @@
   },
   "devDependencies": {
     "@go-task/cli": "catalog:tooling",
+    "@swapi/tsconfig": "workspace:*",
+    "@types/node": "catalog:ts5",
     "ajv": "catalog:validation",
     "bun": "catalog:",
     "quicktype": "catalog:validation",

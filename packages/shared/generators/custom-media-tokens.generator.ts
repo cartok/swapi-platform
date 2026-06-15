@@ -1,4 +1,4 @@
-import fs from 'node:fs/promises'
+import { mkdir, writeFile } from 'node:fs/promises'
 
 import { BREAKPOINTS } from '#internal/device/device'
 
@@ -13,5 +13,5 @@ const css = `${[...widthTokenLines, ...heightTokensLines].join('\n')}\n`
 const outputDir = new URL('../generated/css/', import.meta.url)
 const outputFile = new URL('media.css', outputDir)
 
-await fs.mkdir(outputDir, { recursive: true })
-await fs.writeFile(outputFile, css)
+await mkdir(outputDir, { recursive: true })
+await writeFile(outputFile, css)
