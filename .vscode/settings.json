@@ -124,6 +124,13 @@
     "{"
   ],
   "path-autocomplete.triggerOutsideStrings": true,
+  // EXTENSION: task.vscode-task
+  "taskfile": {
+    "path": "bunx --no-install task",
+    "tree": {
+      "nesting": false
+    }
+  },
   // EXTENSION: redhat.vscode-yaml and task.vscode-task
   "yaml.schemaStore.enable": true,
   "yaml.schemas": {
@@ -140,6 +147,7 @@
   },
   // EXTENSION: tamasfe.even-better-toml
   "evenBetterToml.schema.associations": {
-    "fly.toml": "https://www.schemastore.org/fly.json"
+    "fly.toml": "https://www.schemastore.org/fly.json",
+    "bunfig.toml": "https://www.schemastore.org/bunfig.json"
   }
 }

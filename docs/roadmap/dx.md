@@ -1,7 +1,12 @@
 # Developer Experience (DX) Roadmap
 
 - [ ] Update the VS Code launch configuration for debugging.
-- [ ] Eventually add VS Code tasks that compose `Taskfile` tasks for advanced workflows.
+
+## Direnv
+
+- [ ] Make `swapi-workspaces` script run in any directory, currently path resolution issue on package.json
+- [ ] Handle situation where user has alias for `task`
+- [ ] Finish configuration in general
 
 ---
 

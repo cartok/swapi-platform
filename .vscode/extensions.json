@@ -15,7 +15,10 @@
     "tamasfe.even-better-toml"
   ],
   "unwantedRecommendations": [
+    "be5invis.toml",
     "firsttris.vscode-jest-runner",
+    "kozo.vsc-direnv",
+    "mkhl.direnv",
     "Orta.vscode-jest",
     "vitest.explorer",
     "vunguyentuan.vscode-postcss",
@@ -23,7 +26,6 @@
     "cpylua.language-postcss",
     "ricard.PostCSS",
     "paulvarache.vscode-taskfile",
-    "iulian-radu-at.taskfile-launcher",
-    "be5invis.toml"
+    "Rubymaniac.vscode-direnv",
   ]
 }

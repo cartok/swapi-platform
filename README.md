@@ -104,6 +104,8 @@ This is a temporary fallback until the app is switched to its own backend.
 
   Only necessary to install the dependencies. The bun binary that is to be used for in the project will be installed via `package.json` and is used throughout the tasks via `bunx bun` in order to align the bun version for every developer and with the production runtime environment _(a fixed version of oven/bun docker image is used)_.
 
+- **direnv**
+
 - **Taskfile**
 
   It's recommended to install Taskfile on the system plus setting up shell completion.
