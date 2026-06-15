@@ -1,0 +1,42 @@
+name: swapi-platform
+
+services:
+  app-server:
+    build:
+      context: ..
+      dockerfile: ./packages/server/Dockerfile.app-server
+    ports:
+      - '51000:51000'
+    healthcheck:
+      test: ['CMD', 'curl', '--fail', '--head', 'http://localhost:51000/health/ready']
+      start_period: 15s
+      start_interval: 3s
+      timeout: 2s
+      interval: 1m
+      retries: 1
+
+  app-worker:
+    build:
+      context: ..
+      dockerfile: ./packages/worker/Dockerfile.app-worker
+    ports:
+      - '52000:52000'
+    depends_on:
+      - app-server
+    healthcheck:
+      test: ['CMD', 'curl', '--fail', '--head', 'http://localhost:52000/health/ready']
+      start_period: 10s
+      start_interval: 1s
+      timeout: 500ms
+      interval: 1m
+      retries: 1
+
+  e2e:
+    build:
+      context: ..
+      dockerfile: ./packages/e2e/Dockerfile.e2e
+    depends_on:
+      - app-server
+      - app-worker
+    env_file:
+      - './.env/.env.local'

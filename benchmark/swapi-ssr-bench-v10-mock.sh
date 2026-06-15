@@ -33,7 +33,7 @@ cp "$SSR_HANDLER_FILE" "$SSR_HANDLER_BAK"
 cp "$ABORT_HANDLER_FILE" "$ABORT_HANDLER_BAK"
 
 stop_server() {
-  docker rm -f swapi-angular >/dev/null 2>&1 || true
+  docker rm -f swapi-platform-app-server >/dev/null 2>&1 || true
 
   if [[ -n "$TASK_PID" ]]; then
     kill "$TASK_PID" >/dev/null 2>&1 || true
@@ -92,7 +92,7 @@ start_server() {
 
   (
     cd "$CURRENT_WD"
-    go-task docker:start PROFILE=release TARGET=local THROTTLED=true
+    go-task server:docker:start T_BUILD_LEVEL=release T_TARGET_ENVIRONMENT=local T_THROTTLED=true
   ) >"$log_file" 2>&1 &
   TASK_PID=$!
 

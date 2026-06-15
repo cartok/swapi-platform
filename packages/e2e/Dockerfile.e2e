@@ -1,0 +1,78 @@
+# syntax=docker/dockerfile:1.23
+
+ARG BUN_VERSION=
+ARG NODE_VERSION=24.16
+ARG TARGETARCH
+ARG DISTRO=debian-trixie
+ARG CID_APT_CACHE=${TARGETARCH}-${DISTRO}-apt-cache
+ARG CID_APT_LIB=${TARGETARCH}-${DISTRO}-apt-lib
+ARG CID_BUN_CACHE=bun
+ARG CID_NPM_CACHE=npm
+ARG CID_PLAYWRIGHT_CACHE=${TARGETARCH}-${DISTRO}-playwright
+
+FROM node:${NODE_VERSION}-trixie-slim AS base
+
+ENTRYPOINT ["dash"]
+
+SHELL ["/bin/dash", "-euo", "pipefail", "-c"]
+
+ARG BUN_VERSION
+ARG CID_NPM_CACHE
+
+ENV DO_NOT_TRACK=1
+ENV BUN_FEATURE_FLAG_NO_ORPHANS=1
+
+RUN --mount=type=cache,target=/root/.npm,id=${CID_NPM_CACHE} <<EOF
+npm install --global bun@${BUN_VERSION}
+EOF
+
+FROM base AS deps
+
+ARG CID_BUN_CACHE
+
+WORKDIR /app
+
+COPY --parents ./.npmrc ./
+COPY --parents ./.node-version ./
+COPY --parents ./.bun-version ./
+COPY --parents ./bun.lock ./
+COPY --parents ./package.json ./
+COPY --parents ./packages/*/package.json ./
+
+RUN --mount=type=cache,target=/root/.bun/install/cache,id=${CID_BUN_CACHE} <<EOF
+bun install --frozen-lockfile --link-native-bins --no-progress --filter=@swapi/e2e --production
+EOF
+
+FROM deps AS browsers
+
+ARG CID_APT_CACHE
+ARG CID_APT_LIB
+ARG CID_PLAYWRIGHT_CACHE
+
+RUN <<EOF
+rm -f /etc/apt/apt.conf.d/docker-clean
+echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' >/etc/apt/apt.conf.d/keep-cache
+EOF
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=${CID_APT_CACHE} \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked,id=${CID_APT_LIB} \
+    --mount=type=cache,target=/root/.cache/ms-playwright,id=${CID_PLAYWRIGHT_CACHE} \
+<<EOF
+bunx --no-install playwright install --with-deps chromium webkit firefox
+EOF
+
+FROM browsers AS code
+
+COPY --parents ./tsconfig.json ./
+COPY --parents ./packages/*/tsconfig/*.json ./
+COPY --parents ./packages/tsconfig/ ./
+COPY --parents ./packages/shared/src/ ./
+COPY --parents ./packages/e2e/.env/.env.ci ./
+COPY --parents ./packages/e2e/playwright.config.ts ./
+COPY --parents ./packages/e2e/src/ ./
+
+FROM code AS runtime
+
+ENV CI=true
+ENV BUN_FEATURE_FLAG_NO_ORPHANS=0
+
+ENTRYPOINT ["bunx", "--no-install", "playwright"]

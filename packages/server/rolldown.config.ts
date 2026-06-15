@@ -4,18 +4,15 @@ import type { TransformOptions } from '@babel/core'
 import { transformAsync } from '@babel/core'
 import { logEnv } from '@swapi/shared/environment/env'
 import { envToOxcDefine } from '@swapi/shared/environment/globals'
-import type { OutputOptions } from 'rolldown'
 import { defineConfig } from 'rolldown'
 
 // This import had to be relative.
 import { env } from './src/env.js'
 
-logEnv(env, 'App Server Environment Variables')
+logEnv(env, 'App Server Build Environment Variables')
 
-const buildVariantPath = `${env.SWAPI_TARGET}/${env.SWAPI_PROFILE}`
-const isMinifyEnabled = env.SWAPI_BUILD_MINIFY
-const rolldownSourcemap = toRolldownSourcemap(env.SWAPI_BUILD_SOURCEMAP)
-const babelSourcemap = toBabelSourcemap(env.SWAPI_BUILD_SOURCEMAP)
+const buildVariantPath = `${env.SWAPI_TARGET_ENVIRONMENT}/${env.SWAPI_BUILD_LEVEL}`
+const isMinifyEnabled = env.SWAPI_MINIFY
 const externalDependencies = new Set(['@swapi/client/dist-paths'])
 
 const serverBundleConfig = defineConfig({
@@ -25,11 +22,15 @@ const serverBundleConfig = defineConfig({
   },
   tsconfig: './tsconfig/tsconfig.server.bundler.json',
   platform: 'node',
-  plugins: [createAngularLinkerAotPlugin({ sourceMaps: babelSourcemap })],
+  plugins: [
+    createAngularLinkerAotPlugin({
+      sourceMaps: fromRolldownSourceMapsToBabelSourceMaps(env.SWAPI_ROLLDOWN_SOURCE_MAPS),
+    }),
+  ],
   resolve: {
     conditionNames: [
       `@swapi/${buildVariantPath}`,
-      `@swapi/${env.SWAPI_PROFILE}`,
+      `@swapi/${env.SWAPI_BUILD_LEVEL}`,
       'node',
       'default',
     ],
@@ -46,34 +47,23 @@ const serverBundleConfig = defineConfig({
     cleanDir: true,
     minify: isMinifyEnabled,
     comments: !isMinifyEnabled,
-    sourcemap: rolldownSourcemap,
+    sourcemap: env.SWAPI_ROLLDOWN_SOURCE_MAPS,
   },
 })
 
 export default defineConfig([serverBundleConfig])
 
-function toRolldownSourcemap(
-  sourceMap: typeof env.SWAPI_BUILD_SOURCEMAP,
-): OutputOptions['sourcemap'] {
-  switch (sourceMap) {
-    case 'external':
-      return true
-    case 'hidden':
-      return 'hidden'
-    case 'inline':
-      return 'inline'
-    case 'none':
-      return false
-  }
-}
-
-function toBabelSourcemap(
-  sourceMap: typeof env.SWAPI_BUILD_SOURCEMAP,
+function fromRolldownSourceMapsToBabelSourceMaps(
+  sourceMaps: typeof env.SWAPI_ROLLDOWN_SOURCE_MAPS,
 ): TransformOptions['sourceMaps'] {
-  if (sourceMap !== 'none') {
-    return true
-  } else {
-    return false
+  if (typeof sourceMaps === 'boolean') {
+    return sourceMaps
+  }
+  switch (sourceMaps) {
+    case 'hidden':
+      return true
+    case 'inline':
+      return true
   }
 }
 

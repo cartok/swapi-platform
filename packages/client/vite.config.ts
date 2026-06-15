@@ -14,17 +14,14 @@ import {
 import { logEnv } from '../shared/src/environment/env'
 import { envToOxcDefine } from '../shared/src/environment/globals'
 import { browserEnv, buildEnv } from './src/env'
-import type { AppBuildEnv } from './src/env.schema'
+import type { AppBuildEnv, ViteMode } from './src/env.schema'
 
 logEnv(browserEnv, 'Vite App Environment Variables (Browser)')
 logEnv(buildEnv, 'Vite App Environment Variables (Build)')
 
 const clientResolveConditions: string[] = createResolveConditions(defaultClientConditions)
 const serverResolveConditions: string[] = createResolveConditions(defaultServerConditions)
-const viteMode: UserConfig['mode'] = toViteMode(buildEnv.SWAPI_PROFILE)
-const buildSourcemap: boolean | 'inline' | 'hidden' = toViteSourcemap(
-  buildEnv.SWAPI_BUILD_SOURCEMAP,
-)
+const viteMode: ViteMode = fromBuildVariantToViteMode(buildEnv.SWAPI_BUILD_LEVEL)
 
 export default defineConfig(({ isSsrBuild }) => {
   const config: UserConfig = {
@@ -36,8 +33,8 @@ export default defineConfig(({ isSsrBuild }) => {
       manifest: true,
       ssrManifest: true,
       emptyOutDir: true,
-      minify: buildEnv.SWAPI_BUILD_MINIFY,
-      sourcemap: buildSourcemap,
+      minify: buildEnv.SWAPI_MINIFY,
+      sourcemap: buildEnv.SWAPI_VITE_SOURCE_MAPS,
     },
     define: {
       ...envToOxcDefine(browserEnv),
@@ -120,7 +117,7 @@ export default defineConfig(({ isSsrBuild }) => {
     ],
   }
 
-  if (buildEnv.SWAPI_TARGET === 'local') {
+  if (buildEnv.SWAPI_TARGET_ENVIRONMENT === 'local') {
     const developmentServerConfig: UserConfig = {
       server: {
         host: 'localhost',
@@ -140,37 +137,24 @@ export default defineConfig(({ isSsrBuild }) => {
   return config
 })
 
+function fromBuildVariantToViteMode(
+  buildVariant: AppBuildEnv['SWAPI_BUILD_LEVEL'],
+): ViteMode {
+  switch (buildVariant) {
+    case 'development':
+      return 'development'
+    case 'release':
+      return 'production'
+  }
+}
+
 function createResolveConditions(
   defaultConditions: string[] | readonly string[],
 ): string[] {
   const sharedCondition =
-    buildEnv.SWAPI_RUN_MODE === 'source'
+    buildEnv.SWAPI_SOURCE_MODE === 'source'
       ? '@swapi/shared/source'
-      : `@swapi/${buildEnv.SWAPI_PROFILE}`
+      : `@swapi/${buildEnv.SWAPI_BUILD_LEVEL}`
 
   return [sharedCondition, ...defaultConditions]
-}
-
-function toViteMode(profile: AppBuildEnv['SWAPI_PROFILE']): 'development' | 'production' {
-  switch (profile) {
-    case 'release':
-      return 'production'
-    case 'debug':
-      return 'development'
-  }
-}
-
-function toViteSourcemap(
-  sourceMap: AppBuildEnv['SWAPI_BUILD_SOURCEMAP'],
-): boolean | 'inline' | 'hidden' {
-  switch (sourceMap) {
-    case 'external':
-      return true
-    case 'hidden':
-      return 'hidden'
-    case 'inline':
-      return 'inline'
-    case 'none':
-      return false
-  }
 }

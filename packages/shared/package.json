@@ -6,7 +6,7 @@
     "#internal/*": {
       "types": "./src/*.ts",
       "@swapi/shared/source": "./src/*.ts",
-      "@swapi/debug": "./dist/debug/*.js",
+      "@swapi/development": "./dist/development/*.js",
       "@swapi/release": "./dist/release/*.js",
       "workerd": "./dist/release/*.js",
       "default": "./src/*.ts"
@@ -23,7 +23,7 @@
     "./*": {
       "types": "./src/*.ts",
       "@swapi/shared/source": "./src/*.ts",
-      "@swapi/debug": "./dist/debug/*.js",
+      "@swapi/development": "./dist/development/*.js",
       "@swapi/release": "./dist/release/*.js",
       "workerd": "./dist/release/*.js"
     }

@@ -9,76 +9,61 @@ tasks:
       - rm -rf ./dist || true
       - rm -rf ./generated || true
 
-  lint:
-    vars:
-      PROFILE:
-        ref: .PROFILE | default "debug"
-    requires:
-      vars:
-        - name: PROFILE
-          enum: [debug, release]
+  lint:tsc:
     deps:
-      - task: lint:generators
-        vars:
-          PROFILE: '{{.PROFILE}}'
-      - task: lint:src
-        vars:
-          PROFILE: '{{.PROFILE}}'
+      - task: lint:tsc:generators
+      - task: lint:tsc:src
 
-  lint:generators:
-    vars:
-      PROFILE:
-        ref: .PROFILE | default "debug"
-      TSCONFIG: './tsconfig/tsconfig.generators{{if eq .PROFILE "release"}}.release{{end}}.json'
-    requires:
-      vars:
-        - name: PROFILE
-          enum: [debug, release]
+  lint:tsc:generators:
     sources:
-      - '{{.TSCONFIG}}'
-      - ./{generators,src}/**/*
-      - ../../bun.lock
+      - './package.json'
+      - './generators/**/*.{ts,json}'
+      - './src/**/*.ts'
+      - './tsconfig/**/*.json'
+      - '{{.T_SOURCES.tsconfigPackage}}'
+      - '{{.T_SOURCES.tsconfigs}}'
+      - '{{.T_SOURCES.lockfile}}'
     cmds:
-      - bunx --no-install tsc --noEmit --project '{{.TSCONFIG}}'
+      - bunx --no-install tsc --noEmit --project ./tsconfig/tsconfig.generators.json
 
-  lint:src:
-    vars:
-      PROFILE:
-        ref: .PROFILE | default "debug"
-      TSCONFIG: './tsconfig/tsconfig.shared{{if eq .PROFILE "release"}}.release{{end}}.json'
-    requires:
-      vars:
-        - name: PROFILE
-          enum: [debug, release]
+  lint:tsc:src:
     sources:
-      - ./package.json
-      - '{{.TSCONFIG}}'
-      - ./src/**/*
-      - ../../bun.lock
+      - './package.json'
+      - './src/**/*.ts'
+      - './tsconfig/**/*.json'
+      - '{{.T_SOURCES.tsconfigPackage}}'
+      - '{{.T_SOURCES.tsconfigs}}'
+      - '{{.T_SOURCES.lockfile}}'
     cmds:
-      - bunx --no-install tsc --noEmit --project '{{.TSCONFIG}}'
+      - bunx --no-install tsc --noEmit --project ./tsconfig/tsconfig.shared.json
 
   build:
-    vars:
-      PROFILE:
-        ref: .PROFILE | default "debug"
-      DIST_DIR: './dist/{{.PROFILE}}'
-      TSCONFIG: './tsconfig/tsconfig.shared{{if eq .PROFILE "release"}}.release{{end}}.json'
+    label: '{{.TASK}}:{{.T_BUILD_LEVEL}}'
     requires:
       vars:
-        - name: PROFILE
-          enum: [debug, release]
+        - name: T_BUILD_LEVEL
+          enum: [development, release]
+    vars:
+      T_BUILD_LEVEL:
+        ref: coalesce (env "SWAPI_BUILD_LEVEL") .T_BUILD_LEVEL "development"
+      T_DIST_DIR: './dist/{{.T_BUILD_LEVEL}}'
+      T_TSCONFIGS:
+        map:
+          development: ./tsconfig/tsconfig.shared.json
+          release: ./tsconfig/tsconfig.shared.release.json
+      T_TSCONFIG:
+        ref: get .T_TSCONFIGS .T_BUILD_LEVEL
+    sources:
+      - './package.json'
+      - './src/**/*'
+      - './tsconfig/**/*.json'
+      - '{{.T_SOURCES.lockfile}}'
+    generates:
+      - '{{.T_DIST_DIR}}/**/*'
     deps:
       - task: generate
-    sources:
-      - ./package.json
-      - '{{.TSCONFIG}}'
-      - ./src/**/*
-      - ../../bun.lock
-    generates:
-      - '{{.DIST_DIR}}/**/*'
     cmds:
-      - bunx --no-install tsc --project '{{.TSCONFIG}}' --outDir '{{.DIST_DIR}}'
+      - bunx --no-install tsc --project {{.T_TSCONFIG | q}} --outDir {{.T_DIST_DIR | q}}
 
   generate:
     deps:
@@ -88,10 +73,10 @@ tasks:
 
   generate:device-cookie:types:
     sources:
-      - ./generators/device-cookie.schema.json
-      - ../../bun.lock
+      - './generators/device-cookie.schema.json'
+      - '{{.T_SOURCES.lockfile}}'
     generates:
-      - ./generated/types/device-cookie.types.d.ts
+      - './generated/types/device-cookie.types.d.ts'
     cmds:
       - mkdir -p ./generated/types || true
       - >
@@ -107,11 +92,11 @@ tasks:
 
   generate:device-cookie:validator:
     sources:
-      - ./generators/device-cookie.schema.json
-      - ./generators/device-cookie.validator.*
-      - ../../bun.lock
+      - './generators/device-cookie.schema.json'
+      - './generators/device-cookie.validator.*'
+      - '{{.T_SOURCES.lockfile}}'
     generates:
-      - ./generated/validators/device-cookie.*
+      - './generated/validators/device-cookie.*'
     cmds:
       - >
         bunx --no-install bun
@@ -120,11 +105,11 @@ tasks:
 
   generate:custom-media-tokens:
     sources:
-      - ./generators/custom-media-tokens.*
-      - ./src/device/device.ts
-      - ../../bun.lock
+      - './generators/custom-media-tokens.*'
+      - './src/device/device.ts'
+      - '{{.T_SOURCES.lockfile}}'
     generates:
-      - ./generated/css/media.css
+      - './generated/css/media.css'
     cmds:
       - >
         bunx --no-install bun

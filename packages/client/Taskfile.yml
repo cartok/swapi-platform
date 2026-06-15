@@ -6,223 +6,242 @@ tasks:
     - rm -rf ./.task || true
     - rm -rf ./dist || true
 
-  lint:
-    vars:
-      PROFILE:
-        ref: .PROFILE | default "debug"
-      TSCONFIG: './tsconfig/tsconfig.vite{{if eq .PROFILE "release"}}.release{{end}}.json'
-    requires:
-      vars:
-        - name: PROFILE
-          enum: [debug, release]
+  lint:tsc:
     sources:
-      - ./index.html
-      - ./package.json
-      - ./vite.config.ts
-      - ./tsconfig/**/*.json
-      - ./src/**/*.{ts,json}
-      - ../../bun.lock
-      - ../../../packages/shared/src/**/*.ts
+      - './package.json'
+      - './vite.config.ts'
+      - './src/**/*.ts'
+      - './tsconfig/**/*.json'
+      - '{{.ROOT_DIR}}/packages/shared/package.json'
+      - '{{.ROOT_DIR}}/packages/shared/src/**/*.ts'
+      - '{{.T_SOURCES.tsconfigPackage}}'
+      - '{{.T_SOURCES.tsconfigs}}'
+      - '{{.T_SOURCES.lockfile}}'
     cmds:
-      - bunx --no-install tsc --noEmit --project '{{.TSCONFIG}}'
-
-  lint:a11y:
-    sources:
-      - ./index.html
-      - ./package.json
-      - ./vite.config.ts
-      - ./tsconfig/**/*.json
-      - ./src/**/*.{ts,json,html,css}
-      - ../../bun.lock
-      - ../../../packages/shared/src/**/*.ts
-    cmds:
-      - bunx axe http://localhost:4200 --tags wcag2a,wcag2aa,wcag21a,wcag21aa --exit
-
-  dev:
-    deps:
-      - task: :shared:generate
-    dotenv:
-      - ./.env/.env.local.debug
-    env:
-      SWAPI_RUN_MODE: source
-    cmds:
-      - bunx --no-install vite dev --configLoader runner
+      - bunx --no-install tsc --noEmit --project ./tsconfig/tsconfig.vite.json
 
   build:
-    vars:
-      PROFILE:
-        ref: .PROFILE | default "release"
-      TARGET:
-        ref: .TARGET | default "local"
-      TSCONFIG: './tsconfig/tsconfig.vite{{if eq .PROFILE "release"}}.release{{end}}.json'
+    label: '{{.TASK}}:{{.T_TARGET_ENVIRONMENT}}:{{.T_BUILD_LEVEL}}'
     requires:
       vars:
-        - name: PROFILE
-          enum: [debug, release]
-        - name: TARGET
+        - name: T_BUILD_LEVEL
+          enum: [development, release]
+        - name: T_TARGET_ENVIRONMENT
           enum: [local, testing, production]
+    vars:
+      T_BUILD_LEVEL:
+        ref: coalesce (env "SWAPI_BUILD_LEVEL") .T_BUILD_LEVEL "release"
+      T_TARGET_ENVIRONMENT:
+        ref: coalesce (env "SWAPI_TARGET_ENVIRONMENT") .T_TARGET_ENVIRONMENT "local"
+      T_ENV_FILE: './.env/.env.{{.T_TARGET_ENVIRONMENT}}.{{.T_BUILD_LEVEL}}'
+    sources: &app-sources
+      - './index.html'
+      - './package.json'
+      - './vite.config.ts'
+      - '{{.T_ENV_FILE}}'
+      - './public/**/*'
+      - './src/**/*'
+      - './tsconfig/**/*.json'
+      - '{{.T_SOURCES.lockfile}}'
     deps:
       - task: build:browser
         vars:
-          PROFILE: '{{.PROFILE}}'
-          TARGET: '{{.TARGET}}'
+          T_BUILD_LEVEL:
+            ref: .T_BUILD_LEVEL
+          T_TARGET_ENVIRONMENT:
+            ref: .T_TARGET_ENVIRONMENT
       - task: build:ssr
         vars:
-          PROFILE: '{{.PROFILE}}'
-          TARGET: '{{.TARGET}}'
-    sources: &app-sources
-      - ./index.html
-      - ./package.json
-      - ./vite.config.ts
-      - ./.env/.env.{{.TARGET}}.{{.PROFILE}}
-      - ./tsconfig/tsconfig.app.json
-      - ./tsconfig/tsconfig.app.base.json
-      - '{{.TSCONFIG}}'
-      - ./{src,public}/**/*
-      - ../../bun.lock
-
-  build:browser:
-    vars:
-      PROFILE:
-        ref: .PROFILE | default "release"
-      TARGET:
-        ref: .TARGET | default "local"
-      VARIANT_PATH: '{{.TARGET}}/{{.PROFILE}}'
-      DIST_DIR: './dist/{{.VARIANT_PATH}}/browser'
-    requires:
-      vars:
-        - name: PROFILE
-          enum: [debug, release]
-        - name: TARGET
-          enum: [local, pages, testing, production]
-    deps:
-      - task: build:dist-paths
-        vars:
-          PROFILE: '{{.PROFILE}}'
-          TARGET: '{{.TARGET}}'
-      - task: :shared:build
-        vars:
-          PROFILE: '{{.PROFILE}}'
-    dotenv:
-      - ./.env/.env.{{.TARGET}}.{{.PROFILE}}
-    env:
-      SWAPI_RUN_MODE: build
-    sources: *app-sources
-    generates:
-      - '{{.DIST_DIR}}/**/*'
-    cmds:
-      - >
-        bunx --no-install vite build
-        --outDir '{{.DIST_DIR}}'
-
-  build:ssr:
-    vars:
-      PROFILE:
-        ref: .PROFILE | default "release"
-      TARGET:
-        ref: .TARGET | default "local"
-      VARIANT_PATH: '{{.TARGET}}/{{.PROFILE}}'
-      DIST_DIR: './dist/{{.VARIANT_PATH}}/ssr'
-    requires:
-      vars:
-        - name: PROFILE
-          enum: [debug, release]
-        - name: TARGET
-          enum: [local, testing, production]
-    deps:
-      - task: build:dist-paths
-        vars:
-          PROFILE: '{{.PROFILE}}'
-          TARGET: '{{.TARGET}}'
-      - task: :shared:build
-        vars:
-          PROFILE: '{{.PROFILE}}'
-    dotenv:
-      - ./.env/.env.{{.TARGET}}.{{.PROFILE}}
-    env:
-      SWAPI_RUN_MODE: build
-    sources: *app-sources
-    generates:
-      - '{{.DIST_DIR}}/**/*'
-    cmds:
-      - >
-        bunx --no-install vite build
-        --ssr ./src/main.server.ts
-        --outDir '{{.DIST_DIR}}'
+          T_BUILD_LEVEL:
+            ref: .T_BUILD_LEVEL
+          T_TARGET_ENVIRONMENT:
+            ref: .T_TARGET_ENVIRONMENT
 
   build:dist-paths:
-    vars:
-      PROFILE:
-        ref: .PROFILE | default "release"
-      TARGET:
-        ref: .TARGET | default "local"
-      VARIANT_PATH: '{{.TARGET}}/{{.PROFILE}}'
-      DIST_PATH: './dist/{{.VARIANT_PATH}}'
+    label: '{{.TASK}}:{{.T_TARGET_ENVIRONMENT}}:{{.T_BUILD_LEVEL}}'
     requires:
       vars:
-        - name: PROFILE
-          enum: [debug, release]
-        - name: TARGET
-          enum: [local, pages, testing, production]
+        - name: T_BUILD_LEVEL
+          enum: [development, release]
+        - name: T_TARGET_ENVIRONMENT
+          enum: [local, testing, production]
+    vars:
+      T_BUILD_LEVEL:
+        ref: coalesce (env "SWAPI_BUILD_LEVEL") .T_BUILD_LEVEL "release"
+      T_TARGET_ENVIRONMENT:
+        ref: coalesce (env "SWAPI_TARGET_ENVIRONMENT") .T_TARGET_ENVIRONMENT "local"
+      T_DIST_ROOT: './dist/{{.T_TARGET_ENVIRONMENT}}/{{.T_BUILD_LEVEL}}'
+      T_DIST_DIR: '{{.T_DIST_ROOT}}'
     sources:
-      - ./tsconfig/tsconfig.dist-paths.json
-      - ./src/dist-paths.ts
-      - ../../bun.lock
+      - './tsconfig/**/*.json'
+      - './src/dist-paths.ts'
+      - '{{.T_SOURCES.lockfile}}'
     generates:
-      - '{{.DIST_PATH}}/dist-paths.js'
+      - '{{.T_DIST_DIR}}/dist-paths.js'
     cmds:
       - >
         bunx --no-install tsc
         --project ./tsconfig/tsconfig.dist-paths.json
-        --outDir '{{.DIST_PATH}}'
+        --outDir {{.T_DIST_DIR}}
 
-  start:
-    vars:
-      PROFILE:
-        ref: .PROFILE | default "release"
-      TARGET:
-        ref: .TARGET | default "local"
-      VARIANT_PATH: '{{.TARGET}}/{{.PROFILE}}'
-      DIST_DIR: './dist/{{.VARIANT_PATH}}/browser'
+  build:browser:
+    label: '{{.TASK}}:{{.T_TARGET_ENVIRONMENT}}:{{.T_BUILD_LEVEL}}'
     requires:
       vars:
-        - name: PROFILE
-          enum: [debug, release]
-        - name: TARGET
+        - name: T_BUILD_LEVEL
+          enum: [development, release]
+        - name: T_TARGET_ENVIRONMENT
           enum: [local, testing, production]
+    vars:
+      T_BUILD_LEVEL:
+        ref: coalesce (env "SWAPI_BUILD_LEVEL") .T_BUILD_LEVEL "release"
+      T_TARGET_ENVIRONMENT:
+        ref: coalesce (env "SWAPI_TARGET_ENVIRONMENT") .T_TARGET_ENVIRONMENT "local"
+      T_ENV_FILE: './.env/.env.{{.T_TARGET_ENVIRONMENT}}.{{.T_BUILD_LEVEL}}'
+      T_DIST_ROOT: './dist/{{.T_TARGET_ENVIRONMENT}}/{{.T_BUILD_LEVEL}}'
+      T_DIST_DIR: '{{.T_DIST_ROOT}}/browser'
+    dotenv:
+      - '{{.T_ENV_FILE}}'
+    env:
+      SWAPI_SOURCE_MODE: dist
+      SWAPI_TARGET_ENVIRONMENT:
+        ref: .T_TARGET_ENVIRONMENT
+      SWAPI_BUILD_LEVEL:
+        ref: .T_BUILD_LEVEL
+    sources: *app-sources
+    generates:
+      - '{{.T_DIST_DIR}}/**/*'
+    deps:
+      - task: build:dist-paths
+        vars:
+          T_BUILD_LEVEL:
+            ref: .T_BUILD_LEVEL
+          T_TARGET_ENVIRONMENT:
+            ref: .T_TARGET_ENVIRONMENT
+      - task: :shared:build
+        vars:
+          T_BUILD_LEVEL:
+            ref: .T_BUILD_LEVEL
+    cmds:
+      - >
+        bunx --no-install vite build
+        --outDir {{.T_DIST_DIR}}
+
+  build:ssr:
+    label: '{{.TASK}}:{{.T_TARGET_ENVIRONMENT}}:{{.T_BUILD_LEVEL}}'
+    requires:
+      vars:
+        - name: T_BUILD_LEVEL
+          enum: [development, release]
+        - name: T_TARGET_ENVIRONMENT
+          enum: [local, testing, production]
+    vars:
+      T_BUILD_LEVEL:
+        ref: coalesce (env "SWAPI_BUILD_LEVEL") .T_BUILD_LEVEL "release"
+      T_TARGET_ENVIRONMENT:
+        ref: coalesce (env "SWAPI_TARGET_ENVIRONMENT") .T_TARGET_ENVIRONMENT "local"
+      T_ENV_FILE: './.env/.env.{{.T_TARGET_ENVIRONMENT}}.{{.T_BUILD_LEVEL}}'
+      T_DIST_ROOT: './dist/{{.T_TARGET_ENVIRONMENT}}/{{.T_BUILD_LEVEL}}'
+      T_DIST_DIR: '{{.T_DIST_ROOT}}/ssr'
+    dotenv:
+      - '{{.T_ENV_FILE}}'
+    env:
+      SWAPI_SOURCE_MODE: dist
+      SWAPI_TARGET_ENVIRONMENT:
+        ref: .T_TARGET_ENVIRONMENT
+      SWAPI_BUILD_LEVEL:
+        ref: .T_BUILD_LEVEL
+    sources: *app-sources
+    generates:
+      - '{{.T_DIST_DIR}}/**/*'
+    deps:
+      - task: build:dist-paths
+        vars:
+          T_BUILD_LEVEL:
+            ref: .T_BUILD_LEVEL
+          T_TARGET_ENVIRONMENT:
+            ref: .T_TARGET_ENVIRONMENT
+      - task: :shared:build
+        vars:
+          T_BUILD_LEVEL:
+            ref: .T_BUILD_LEVEL
+    cmds:
+      - >
+        bunx --no-install vite build
+        --ssr ./src/main.server.ts
+        --outDir {{.T_DIST_DIR}}
+
+  start:dev:
+    dotenv:
+      - './.env/.env.local.development'
+    env:
+      SWAPI_SOURCE_MODE: source
+      SWAPI_TARGET_ENVIRONMENT: local
+      SWAPI_BUILD_LEVEL: development
+    deps:
+      - task: :shared:generate
+    cmds:
+      - bunx --no-install vite dev --configLoader runner
+
+  start:
+    label: '{{.TASK}}:{{.T_TARGET_ENVIRONMENT}}:{{.T_BUILD_LEVEL}}'
+    requires:
+      vars:
+        - name: T_BUILD_LEVEL
+          enum: [development, release]
+        - name: T_TARGET_ENVIRONMENT
+          enum: [local, testing, production]
+    vars:
+      T_BUILD_LEVEL:
+        ref: coalesce (env "SWAPI_BUILD_LEVEL") .T_BUILD_LEVEL "release"
+      T_TARGET_ENVIRONMENT:
+        ref: coalesce (env "SWAPI_TARGET_ENVIRONMENT") .T_TARGET_ENVIRONMENT "local"
+      T_ENV_FILE: './.env/.env.{{.T_TARGET_ENVIRONMENT}}.{{.T_BUILD_LEVEL}}'
+      T_DIST_ROOT: './dist/{{.T_TARGET_ENVIRONMENT}}/{{.T_BUILD_LEVEL}}'
+      T_DIST_DIR: '{{.T_DIST_ROOT}}/browser'
+    dotenv:
+      - '{{.T_ENV_FILE}}'
+    env:
+      SWAPI_SOURCE_MODE: dist
+      SWAPI_TARGET_ENVIRONMENT:
+        ref: .T_TARGET_ENVIRONMENT
+      SWAPI_BUILD_LEVEL:
+        ref: .T_BUILD_LEVEL
     deps:
       - task: build:browser
         vars:
-          PROFILE: '{{.PROFILE}}'
-          TARGET: '{{.TARGET}}'
-    dotenv:
-      - ./.env/.env.{{.TARGET}}.{{.PROFILE}}
-    env:
-      SWAPI_RUN_MODE: build
+          T_BUILD_LEVEL:
+            ref: .T_BUILD_LEVEL
+          T_TARGET_ENVIRONMENT:
+            ref: .T_TARGET_ENVIRONMENT
     cmds:
-      - bunx --no-install vite preview --outDir '{{.DIST_DIR}}'
+      - bunx --no-install vite preview --outDir {{.T_DIST_DIR}}
 
   test:
+    dotenv:
+      - './.env/.env.local.development'
+    env:
+      SWAPI_SOURCE_MODE: source
+      SWAPI_TARGET_ENVIRONMENT: local
+      SWAPI_BUILD_LEVEL: development
     deps:
       - task: :shared:build
         vars:
-          PROFILE: debug
-    dotenv:
-      - ./.env/.env.local.debug
-    env:
-      SWAPI_RUN_MODE: source
+          T_BUILD_LEVEL: development
     cmds:
       - bunx --no-install vitest --configLoader runner run
 
   test:watch:
+    interactive: true
+    dotenv:
+      - './.env/.env.local.development'
+    env:
+      SWAPI_SOURCE_MODE: source
+      SWAPI_TARGET_ENVIRONMENT: local
+      SWAPI_BUILD_LEVEL: development
     deps:
       - task: :shared:build
         vars:
-          PROFILE: debug
-    dotenv:
-      - ./.env/.env.local.debug
-    env:
-      SWAPI_RUN_MODE: source
-    interactive: true
+          T_BUILD_LEVEL: development
     cmds:
       - bunx --no-install vitest --configLoader runner

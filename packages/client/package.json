@@ -6,30 +6,30 @@
     "./main.server": {
       "types": "./src/main.server.d.ts",
       "@swapi/client/source": "./src/main.server.ts",
-      "@swapi/local/debug": "./dist/local/debug/ssr/main.server.js",
+      "@swapi/local/development": "./dist/local/development/ssr/main.server.js",
       "@swapi/local/release": "./dist/local/release/ssr/main.server.js",
-      "@swapi/testing/debug": "./dist/testing/debug/ssr/main.server.js",
+      "@swapi/testing/development": "./dist/testing/development/ssr/main.server.js",
       "@swapi/testing/release": "./dist/testing/release/ssr/main.server.js",
-      "@swapi/production/debug": "./dist/production/debug/ssr/main.server.js",
+      "@swapi/production/development": "./dist/production/development/ssr/main.server.js",
       "@swapi/production/release": "./dist/production/release/ssr/main.server.js"
     },
     "./dist-paths": {
       "types": "./src/dist-paths.ts",
-      "@swapi/local/debug": "./dist/local/debug/dist-paths.js",
+      "@swapi/local/development": "./dist/local/development/dist-paths.js",
       "@swapi/local/release": "./dist/local/release/dist-paths.js",
-      "@swapi/testing/debug": "./dist/testing/debug/dist-paths.js",
+      "@swapi/testing/development": "./dist/testing/development/dist-paths.js",
       "@swapi/testing/release": "./dist/testing/release/dist-paths.js",
-      "@swapi/production/debug": "./dist/production/debug/dist-paths.js",
+      "@swapi/production/development": "./dist/production/development/dist-paths.js",
       "@swapi/production/release": "./dist/production/release/dist-paths.js"
     },
     "./ssr-abort-signal-token": {
       "types": "./src/app/http/ssr-abort-signal.token.ts",
       "@swapi/client/source": "./src/app/http/ssr-abort-signal.token.ts",
-      "@swapi/local/debug": "./dist/local/debug/ssr/main.server.js",
+      "@swapi/local/development": "./dist/local/development/ssr/main.server.js",
       "@swapi/local/release": "./dist/local/release/ssr/main.server.js",
-      "@swapi/testing/debug": "./dist/testing/debug/ssr/main.server.js",
+      "@swapi/testing/development": "./dist/testing/development/ssr/main.server.js",
       "@swapi/testing/release": "./dist/testing/release/ssr/main.server.js",
-      "@swapi/production/debug": "./dist/production/debug/ssr/main.server.js",
+      "@swapi/production/development": "./dist/production/development/ssr/main.server.js",
       "@swapi/production/release": "./dist/production/release/ssr/main.server.js"
     }
   },

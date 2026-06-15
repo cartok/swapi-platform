@@ -61,10 +61,10 @@ export const addDeviceCookieHandler: HonoHandler<WorkerHonoEnv> = (hono) => {
       // Set new cookie from request body.
       setCookie(c, DEVICE_COOKIE_KEY, JSON.stringify(requestBody), {
         sameSite: 'lax',
-        secure: env.TARGET !== 'local',
+        secure: env.TARGET_ENVIRONMENT !== 'local' && env.TARGET_ENVIRONMENT !== 'ci',
         path: '/',
         maxAge:
-          env.TARGET !== 'local'
+          env.TARGET_ENVIRONMENT !== 'local' && env.TARGET_ENVIRONMENT !== 'ci'
             ? PRODUCTION_DEVICE_COOKIE_MAX_AGE_SECONDS
             : LOCAL_DEVICE_COOKIE_MAX_AGE_SECONDS,
       })

@@ -1,0 +1,125 @@
+version: 3
+
+tasks:
+  generate-secret:
+    silent: true
+    preconditions:
+      - command -v zsh
+      - command -v openssl
+      - command -v wl-copy
+    cmd: |
+      zsh -c '
+        secret="$(openssl rand -base64 32)"
+        wl-copy -- "${secret}" >/dev/null 2>&1
+        result=$?
+        if (( ${result} == 0 )); then
+          print -- "A secret was generated and copied to your clipboard."
+        else
+          exit ${result}
+        fi
+      '
+
+  build-config:
+    silent: true
+    requires:
+      vars:
+        - name: T_BUILD_LEVEL
+          enum: [development, release]
+        - name: T_TARGET_ENVIRONMENT
+          enum: [testing, production]
+        - T_CONFIG_TARGET
+    vars:
+      T_ENV_FILE: './.env/.env.{{.T_TARGET_ENVIRONMENT}}.{{.T_BUILD_LEVEL}}'
+      T_DOCKER_ENV_FILE: '{{.T_ENV_FILE}}.docker'
+      T_CONFIG_TEMPLATE: ./fly.template.yaml
+      T_CONFIG_VARIABLES: ./fly.variables.yaml
+      T_CONFIG_TEMPLATE_COPY:
+        sh: mktemp /tmp/fly.template.copy.XXXXXX.yaml
+      T_CONFIG_VARIABLES_COPY:
+        sh: mktemp /tmp/fly.variables.copy.XXXXXX.yaml
+      T_CONFIG_VARIABLES_COPY_ENV:
+        sh: mktemp /tmp/fly.variables.copy.env.XXXXXX.yaml
+    dotenv:
+      - '{{.ROOT_DIR}}/.env.fly.secret'
+      - '{{.T_DOCKER_ENV_FILE}}'
+      - '{{.T_ENV_FILE}}'
+    preconditions:
+      - sh: command -v yq && yq --version | rg 'mikefarah'
+        msg: 'You need to install `yq` (https://github.com/mikefarah/yq).'
+      - sh: command -v envsubst
+        msg: 'You need to install `gettext` to get the `envsubst` utility.'
+      - sh: command -v shred
+        msg: 'You need to install `coreutils` to get the `shred` utility.'
+      - command -v openssl
+      - command -v fly
+      - test -s {{.T_CONFIG_TEMPLATE}}
+      - test -s {{.T_CONFIG_VARIABLES}}
+      - test -n "${SWAPI_SECRET_HEALTH_CHECK_TOKEN}"
+      - printf '%s' "${SWAPI_SECRET_HEALTH_CHECK_TOKEN}" | openssl base64 -d -A >/dev/null 2>&1
+    cmds:
+      - defer: >
+          shred -u
+          {{.T_CONFIG_VARIABLES_COPY}}
+          {{.T_CONFIG_TEMPLATE_COPY}}
+          {{.T_CONFIG_VARIABLES_COPY_ENV}}
+      - yq '... comments=""' < {{.T_CONFIG_TEMPLATE}} > {{.T_CONFIG_TEMPLATE_COPY}}
+      - yq '... comments=""' < {{.T_CONFIG_VARIABLES}} > {{.T_CONFIG_VARIABLES_COPY}}
+      - envsubst < {{.T_CONFIG_VARIABLES_COPY}} > {{.T_CONFIG_VARIABLES_COPY_ENV}}
+      - >
+        yq --null-input
+        'load("{{.T_CONFIG_TEMPLATE_COPY}}") *d load("{{.T_CONFIG_VARIABLES_COPY_ENV}}")'
+        > '{{.T_CONFIG_TARGET}}'
+      - echo 'Built config {{.T_CONFIG_TARGET}}.'
+      - flyctl config validate --config {{.T_CONFIG_TARGET}}
+
+  deploy:
+    requires:
+      vars:
+        - name: T_BUILD_LEVEL
+          enum: [development, release]
+        - name: T_TARGET_ENVIRONMENT
+          enum: [testing, production]
+        - name: T_TEST_LOCAL_DOCKER_BUILD
+          enum: ['true', 'false']
+    vars:
+      T_ENV_FILE: './.env/.env.{{.T_TARGET_ENVIRONMENT}}.{{.T_BUILD_LEVEL}}'
+      T_DOCKER_ENV_FILE: '{{.T_ENV_FILE}}.docker'
+      T_CONFIG:
+        sh: mktemp /tmp/fly.XXXXXX.yaml
+    dotenv:
+      - '{{.T_DOCKER_ENV_FILE}}'
+      - '{{.T_ENV_FILE}}'
+    preconditions:
+      - command -v fly
+      - sh: command -v shred
+        msg: 'You need to install `coreutils` to get the `shred` utility.'
+    deps:
+      - task: build-config
+        vars:
+          T_BUILD_LEVEL:
+            ref: .T_BUILD_LEVEL
+          T_TARGET_ENVIRONMENT:
+            ref: .T_TARGET_ENVIRONMENT
+          T_CONFIG_TARGET:
+            ref: .T_CONFIG
+    cmds:
+      - defer: shred -u {{.T_CONFIG}}
+      - task: :lint
+      - task: :server:build:docker
+        if: '{{eq .T_TEST_LOCAL_DOCKER_BUILD "true"}}'
+        vars:
+          T_BUILD_LEVEL:
+            ref: .T_BUILD_LEVEL
+          T_TARGET_ENVIRONMENT: local
+          T_DOCKER_TARGET: runtime
+          T_DEV_MODE: 'false'
+      - >
+        fly deploy
+        --config {{.T_CONFIG}}
+        --build-arg NODE_ENV=${NODE_ENV}
+        --build-arg SWAPI_BUILD_LEVEL={{.T_BUILD_LEVEL}}
+        --build-arg SWAPI_TARGET_ENVIRONMENT={{.T_TARGET_ENVIRONMENT}}
+        --build-arg SWAPI_GIT_COMMIT_SHA={{.T_GIT_COMMIT_SHA}}
+        --compression zstd
+        --compression-level 7
+        {{.CLI_ARGS}}

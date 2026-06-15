@@ -1,5 +1,8 @@
 version: 3
 
+vars:
+  T_DIN_APP_WORKER: swapi-platform-app-worker
+
 tasks:
   clean:
     cmds:
@@ -7,13 +10,24 @@ tasks:
       - rm -rf ./.wrangler || true
       - rm -rf ./dist || true
 
-  lint:
+  lint:tsc:
+    sources:
+      - './package.json'
+      - './worker-configuration.d.ts'
+      - './wrangler.jsonc'
+      - './src/**/*.ts'
+      - './tsconfig/**/*.json'
+      - '{{.ROOT_DIR}}/packages/shared/package.json'
+      - '{{.ROOT_DIR}}/packages/shared/generated/**/*.d.ts'
+      - '{{.ROOT_DIR}}/packages/shared/src/**/*.ts'
+      - '{{.ROOT_DIR}}/packages/hono/package.json'
+      - '{{.ROOT_DIR}}/packages/hono/src/**/*.ts'
+      - '{{.T_SOURCES.tsconfigPackage}}'
+      - '{{.T_SOURCES.tsconfigs}}'
+      - '{{.T_SOURCES.lockfile}}'
     deps:
       - task: typegen
-    sources:
-      - ./src/**/*
-      - ./tsconfig/tsconfig.worker.json
-      - ../../bun.lock
+      - task: :shared:generate
     cmds:
       - bunx --no-install tsc --noEmit --project ./tsconfig/tsconfig.worker.json
 
@@ -23,120 +37,175 @@ tasks:
           bunx --no-install wrangler types
           --env-interface CloudflareBindings
         if: >
-          !
-          bunx --no-install wrangler types
+          ! bunx --no-install wrangler types
           --env-interface CloudflareBindings
           --check
 
-  deps:
-    vars:
-      PROFILE:
-        ref: .PROFILE | default "debug"
+  build:deps:
     requires:
       vars:
-        - name: PROFILE
-          enum: [debug, release]
+        - name: T_BUILD_LEVEL
+          enum: [development, release]
     deps:
       - task: typegen
+      - task: :hono:build
+        vars:
+          T_BUILD_LEVEL:
+            ref: .T_BUILD_LEVEL
       - task: :shared:build
         vars:
-          PROFILE: '{{.PROFILE}}'
+          T_BUILD_LEVEL:
+            ref: .T_BUILD_LEVEL
 
-  dev:
-    vars:
-      PROFILE:
-        ref: .PROFILE | default "debug"
+  build:bundle:
+    label: '{{.TASK}}:{{.T_TARGET_ENVIRONMENT}}'
     requires:
       vars:
-        - name: PROFILE
-          enum: [debug, release]
-    desc: 'Start `server:dev` separately'
-    deps:
-      - task: deps
-        vars:
-          PROFILE: '{{.PROFILE}}'
-    cmds:
-      - bunx --no-install wrangler dev --port 52000
-
-  build:
+        - name: T_TARGET_ENVIRONMENT
+          enum: [local, ci]
     vars:
-      PROFILE:
-        ref: .PROFILE | default "debug"
-      CF_TARGET:
-        ref: .CF_TARGET | default "testing"
-    requires:
-      vars:
-        - name: PROFILE
-          enum: [debug, release]
-        - name: CF_TARGET
-          enum: [testing, production]
-    deps:
-      - task: deps
-        vars:
-          PROFILE: '{{.PROFILE}}'
-      - task: lint
+      T_TARGET_ENVIRONMENT:
+        ref: coalesce (env "TARGET_ENVIRONMENT") .T_TARGET_ENVIRONMENT "local"
+      T_DIST_DIR: './dist'
     sources:
-      - ./package.json
-      - ./worker-configuration.d.ts
-      - ./wrangler.jsonc
-      - ./src/**/*
-      - ./tsconfig/**/*
-      - ../shared/dist/release/**/*
-      - ../../bun.lock
+      - './package.json'
+      - './worker-configuration.d.ts'
+      - './wrangler.jsonc'
+      - './src/**/*.ts'
+      - './tsconfig/**/*.json'
+      - '{{.ROOT_DIR}}/packages/shared/dist/release/**/*'
+      - '{{.T_SOURCES.tsconfigPackage}}'
+      - '{{.T_SOURCES.tsconfigs}}'
+      - '{{.T_SOURCES.lockfile}}'
     generates:
-      - ./dist/**/*
+      - '{{.T_DIST_DIR}}/**/*'
+    deps:
+      - task: build:deps
+        vars:
+          T_BUILD_LEVEL: release
     cmds:
-      - rm -rf ./dist || true
       - >
         bunx --no-install wrangler deploy
-        --env {{.CF_TARGET}}
-        --outdir ./dist
-        --metafile ./dist/bundle-meta.json
         --dry-run
+        --env {{.T_TARGET_ENVIRONMENT}}
+        --outdir {{.T_DIST_DIR}}
+        --metafile {{.T_DIST_DIR}}/bundle-meta.json
 
-  start:
-    desc: 'Start `server:dev` separately'
-    vars:
-      PROFILE:
-        ref: .PROFILE | default "debug"
-      CF_TARGET:
-        ref: .CF_TARGET | default "testing"
+  build:docker:
+    label: '{{.TASK}}:{{.T_IMAGE_TAG}}'
     requires:
       vars:
-        - name: PROFILE
-          enum: [debug, release]
-        - name: CF_TARGET
-          enum: [testing, production]
+        - name: T_TARGET_ENVIRONMENT
+          enum: [local, ci]
+        - name: T_DOCKER_TARGET
+          enum: [runtime, base, build-deps, code, bundle, runtime-deps]
+    vars:
+      T_TARGET_ENVIRONMENT:
+        ref: coalesce (env "TARGET_ENVIRONMENT") .T_TARGET_ENVIRONMENT "local"
+      T_IMAGE_TAG: '{{.T_DIN_APP_WORKER}}:local'
+    cmds:
+      - >
+        docker buildx build
+        --load
+        --file ./Dockerfile.app-worker
+        --build-arg TARGET_ENVIRONMENT={{.T_TARGET_ENVIRONMENT}}
+        {{if ne .T_DOCKER_TARGET "runtime"}}
+        --target {{.T_DOCKER_TARGET}}
+        {{end}}
+        --tag {{.T_IMAGE_TAG}}
+        {{.ROOT_DIR}}
+
+  start:dev:
+    vars:
+      T_ENV:
+        sh: yq '.env.local.vars' ./wrangler.jsonc
+      T_ENV_MAP:
+        ref: .T_ENV | fromJson
     deps:
-      - task: build
+      - task: build:deps
         vars:
-          PROFILE: '{{.PROFILE}}'
-          CF_TARGET: '{{.CF_TARGET}}'
+          T_BUILD_LEVEL: development
     cmds:
       - >
         bunx --no-install wrangler dev
-        --env {{.CF_TARGET}}
+        --env local
+        --port {{.T_ENV_MAP.PORT}}
+
+  start:bundle:
+    vars:
+      T_ENV:
+        sh: yq '.env.local.vars' ./wrangler.jsonc
+      T_ENV_MAP:
+        ref: .T_ENV | fromJson
+    cmds:
+      - task: build:bundle
+        vars:
+          T_TARGET_ENVIRONMENT: local
+      - >
+        bunx --no-install wrangler dev
+        --env local
         --no-bundle
-        --port 53000
+        --port {{.T_ENV_MAP.PORT}}
         ./dist/index.js
 
-  deploy:
-    vars:
-      PROFILE:
-        ref: .PROFILE | default "debug"
-      CF_TARGET:
-        ref: .CF_TARGET | default "production"
+  start:docker:
+    desc: Start with `--output interleaved` for dev mode.
     requires:
       vars:
-        - name: PROFILE
-          enum: [debug, release]
-        - name: CF_TARGET
-          enum: [testing, production]
-    deps:
-      - task: build
-        vars:
-          PROFILE: '{{.PROFILE}}'
-          CF_TARGET: 'production'
+        - name: T_TARGET_ENVIRONMENT
+          enum: [local, ci]
+        - name: T_DEV_MODE
+          enum: ['true', 'false']
+    vars:
+      T_TARGET_ENVIRONMENT:
+        ref: coalesce (env "TARGET_ENVIRONMENT") .T_TARGET_ENVIRONMENT "local"
+      T_IMAGE_TAG: '{{.T_DIN_APP_WORKER}}:local'
+      T_ENV:
+        sh: yq '.env["{{.T_TARGET_ENVIRONMENT}}"].vars' ./wrangler.jsonc
+      T_ENV_MAP:
+        ref: .T_ENV | fromJson
     cmds:
-      - bunx --no-install wrangler deploy --env {{.CF_TARGET}} --minify
-      - bunx --no-install wrangler deployments list --env {{.CF_TARGET}}
+      - task: build:docker
+        vars:
+          T_TARGET_ENVIRONMENT:
+            ref: .T_TARGET_ENVIRONMENT
+      - >
+        docker run
+        {{if ne .T_DEV_MODE "true"}}
+        --detach
+        {{end}}
+        {{if eq .T_DEV_MODE "true"}}
+        --interactive
+        --tty
+        --entrypoint bash
+        {{end}}
+        --rm
+        --init
+        --ipc=host
+        --publish {{.T_ENV_MAP.PORT}}:{{.T_ENV_MAP.PORT}}
+        --ulimit nofile=65536:65536
+        --ulimit core=0:0
+        --ulimit memlock=-1:-1
+        --name={{.T_DIN_APP_WORKER}}
+        {{.T_IMAGE_TAG}}
+        {{if ne .T_DEV_MODE "true"}}
+        dev
+        --env {{.T_TARGET_ENVIRONMENT}}
+        --no-bundle
+        --ip 0.0.0.0
+        --port {{.T_ENV_MAP.PORT}}
+        ./index.js
+        {{end}}
+
+  deploy:
+    label: '{{.TASK}}:{{.T_TARGET_ENVIRONMENT}}'
+    requires:
+      vars:
+        - name: T_TARGET_ENVIRONMENT
+          enum: [testing, production]
+    vars:
+      T_TARGET_ENVIRONMENT:
+        ref: coalesce (env "TARGET_ENVIRONMENT") .T_TARGET_ENVIRONMENT "testing"
+    cmds:
+      - bunx --no-install wrangler deploy --env {{.T_TARGET_ENVIRONMENT}} --minify
+      - bunx --no-install wrangler deployments list --env {{.T_TARGET_ENVIRONMENT}}

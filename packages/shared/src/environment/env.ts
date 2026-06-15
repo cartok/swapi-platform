@@ -1,6 +1,8 @@
 import type { Static, TSchema } from '@sinclair/typebox'
-import { Type } from '@sinclair/typebox'
+import { Type, TypeBoxError } from '@sinclair/typebox'
 import { AssertError, Value } from '@sinclair/typebox/value'
+
+import { typeboxAssertErrorToString } from '#internal/errors/typebox'
 
 const LogLevelSchema = Type.Union([
   Type.Literal('debug'),
@@ -9,28 +11,28 @@ const LogLevelSchema = Type.Union([
   Type.Literal('error'),
 ])
 
-export const ProfileSchema = Type.Union([Type.Literal('debug'), Type.Literal('release')])
-
-export const RunModeSchema = Type.Union([Type.Literal('source'), Type.Literal('build')])
-
-export const BuildSourcemapSchema = Type.Union([
-  Type.Literal('none'),
-  Type.Literal('external'),
-  Type.Literal('hidden'),
-  Type.Literal('inline'),
+const BuildLevelSchema = Type.Union([
+  Type.Literal('development'),
+  Type.Literal('release'),
 ])
 
-const TargetSchema = Type.Union([
+export const SourceModeSchema = Type.Union([Type.Literal('source'), Type.Literal('dist')])
+
+const TargetEnvironmentSchema = Type.Union([
   Type.Literal('local'),
-  Type.Literal('pages'),
+  Type.Literal('ci'),
   Type.Literal('testing'),
   Type.Literal('production'),
 ])
 
 export const CommonEnvSchema = Type.Object({
+  SWAPI_LOCAL_E2E: Type.Readonly(Type.Boolean({ default: false })),
+})
+
+export const CommonAppEnvSchema = Type.Object({
+  SWAPI_BUILD_LEVEL: Type.Readonly(BuildLevelSchema),
   SWAPI_LOG_LEVEL: Type.Readonly(LogLevelSchema),
-  SWAPI_PROFILE: Type.Readonly(ProfileSchema),
-  SWAPI_TARGET: Type.Readonly(TargetSchema),
+  SWAPI_TARGET_ENVIRONMENT: Type.Readonly(TargetEnvironmentSchema),
 })
 
 export function parseEnv<T extends TSchema>(
@@ -64,3 +66,9 @@ export function logEnv(env: Record<string, unknown>, title?: string): void {
 
   console.info(env)
 }
+
+export const BaseUrlWithPortSchema = Type.RegExp(
+  new RegExp(String.raw`^https?://[^:]+:\d+$`),
+)
+
+export const DynamicPortSchema = Type.Integer({ minimum: 49152, maximum: 65535 })

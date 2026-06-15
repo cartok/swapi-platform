@@ -10,9 +10,13 @@ import { routes } from '@/app.routes'
 import { serverRoutes } from '@/app.routes.server'
 import { ssrAbortInterceptor } from '@/http/ssr-abort.interceptor'
 
+// TODO: to be fixed, maybe after update to angular 22 + analogjs update
+// import { ɵSERVER_CONTEXT } from '@angular/platform-server'
+
 const config: ApplicationConfig = {
   providers: [
     provideServerRendering(withRoutes(serverRoutes)),
+    // { provide: ɵSERVER_CONTEXT, useValue: 'ssg' },
     provideRouter(
       routes,
       withRouterConfig({

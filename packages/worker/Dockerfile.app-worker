@@ -27,11 +27,7 @@ COPY --parents ./package.json ./
 COPY --parents ./packages/*/package.json ./
 
 RUN --mount=type=cache,target=/root/.bun/install/cache,id=${CID_BUN_CACHE} <<EOF
-bun install --frozen-lockfile --link-native-bins --no-progress \
-	--filter=@swapi/hono \
-	--filter=@swapi/shared \
-	--filter=@swapi/tsconfig \
-	--filter=@swapi/worker
+bun install --frozen-lockfile --link-native-bins --no-progress --filter=@swapi/worker
 EOF
 
 FROM build-deps AS code
@@ -76,9 +72,7 @@ COPY --parents ./package.json ./
 COPY --parents ./packages/*/package.json ./
 
 RUN --mount=type=cache,target=/root/.bun/install/cache,id=${CID_BUN_CACHE} <<EOF
-bun install --frozen-lockfile --link-native-bins --no-progress \
-	--filter=@swapi/worker \
-	--production
+bun install --frozen-lockfile --link-native-bins --no-progress --filter=@swapi/worker --production
 EOF
 
 FROM runtime-deps AS runtime

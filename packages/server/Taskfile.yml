@@ -1,5 +1,8 @@
 version: 3
 
+vars:
+  T_DIN_APP_SERVER: swapi-platform-app-server
+
 tasks:
   clean:
     cmds:
@@ -8,268 +11,486 @@ tasks:
       - rm -rf ./.task || true
       - rm -rf ./dist || true
 
-  lint:
-    vars:
-      PROFILE:
-        ref: .PROFILE | default "debug"
-      TSCONFIG: './tsconfig/tsconfig.server{{if eq .PROFILE "release"}}.release{{end}}.json'
-    requires:
-      vars:
-        - name: PROFILE
-          enum: [debug, release]
+  lint:tsc:
+    sources:
+      - './package.json'
+      - './src/**/*.ts'
+      - './tsconfig/**/*.json'
+      - '{{.ROOT_DIR}}/packages/client/package.json'
+      - '{{.ROOT_DIR}}/packages/client/src/dist-paths.ts'
+      - '{{.ROOT_DIR}}/packages/client/src/main.server.d.ts'
+      - '{{.ROOT_DIR}}/packages/shared/package.json'
+      - '{{.ROOT_DIR}}/packages/shared/src/**/*.ts'
+      - '{{.ROOT_DIR}}/packages/hono/package.json'
+      - '{{.ROOT_DIR}}/packages/hono/src/**/*.ts'
+      - '{{.T_SOURCES.tsconfigPackage}}'
+      - '{{.T_SOURCES.tsconfigs}}'
+      - '{{.T_SOURCES.lockfile}}'
     deps:
       - task: :shared:generate
-    sources:
-      - '{{.TSCONFIG}}'
-      - ./src/**/*
-      - ../../bun.lock
     cmds:
-      - bunx --no-install tsc --noEmit --project '{{.TSCONFIG}}'
+      - bunx --no-install tsc --noEmit --project ./tsconfig/tsconfig.server.json
 
-  dev:
-    vars:
-      PROFILE:
-        ref: .PROFILE | default "debug"
+  watch:
+    internal: true
     requires:
       vars:
-        - name: PROFILE
-          enum: [debug, release]
+        - name: T_BUILD_LEVEL
+          enum: [development, release]
+        - T_TASK
+    preconditions:
+      - command -v watchexec
+    dir: '{{.ROOT_DIR}}'
+    cmds:
+      - >
+        watchexec --restart --quiet
+        --watch {{.T_SOURCES.lockfile}}
+        --watch ./packages/client/index.html
+        --watch ./packages/client/public
+        --watch ./packages/client/src
+        --watch ./packages/client/vite.config.ts
+        --watch ./packages/hono/src
+        --watch ./packages/server/rolldown.config.ts
+        --watch ./packages/server/src
+        --watch ./packages/shared/generated
+        --watch ./packages/shared/src
+        --watch ./packages/tsconfig
+        {{range .T_WATCHEXEC_ARGS}}{{. | q}}{{end}}
+        -- task {{.T_TASK}}
+        T_BUILD_LEVEL={{.T_BUILD_LEVEL}}
+        T_TARGET_ENVIRONMENT=local
+        {{.CLI_ARGS}}
+
+  build:compile:
+    label: '{{.TASK}}:{{.T_TARGET_ENVIRONMENT}}:{{.T_BUILD_LEVEL}}'
+    requires:
+      vars:
+        - name: T_BUILD_LEVEL
+          enum: [development, release]
+        - name: T_TARGET_ENVIRONMENT
+          enum: [local, testing, production]
+    vars:
+      T_BUILD_LEVEL:
+        ref: coalesce (env "SWAPI_BUILD_LEVEL") .T_BUILD_LEVEL "release"
+      T_TARGET_ENVIRONMENT:
+        ref: coalesce (env "SWAPI_TARGET_ENVIRONMENT") .T_TARGET_ENVIRONMENT "local"
+      T_ENV_FILE: './.env/.env.{{.T_TARGET_ENVIRONMENT}}.{{.T_BUILD_LEVEL}}'
+      T_DIST_ROOT: './dist/{{.T_TARGET_ENVIRONMENT}}/{{.T_BUILD_LEVEL}}'
+      T_BUILD_DIST_DIR: '{{.T_DIST_ROOT}}/build'
+      T_TSCONFIGS:
+        map:
+          development: ./tsconfig/tsconfig.server.json
+          release: ./tsconfig/tsconfig.server.release.json
+      T_TSCONFIG:
+        ref: get .T_TSCONFIGS .T_BUILD_LEVEL
+    dotenv:
+      - '{{.T_ENV_FILE}}'
+    env:
+      SWAPI_BUILD_LEVEL:
+        ref: .T_BUILD_LEVEL
+      SWAPI_TARGET_ENVIRONMENT:
+        ref: .T_TARGET_ENVIRONMENT
+    sources:
+      - '{{.T_ENV_FILE}}'
+      - './package.json'
+      - './src/**/*'
+      - './tsconfig/**/*.json'
+      - '{{.T_SOURCES.lockfile}}'
+    generates:
+      - '{{.T_BUILD_DIST_DIR}}/**/*'
+    deps:
+      - task: :shared:build
+        vars:
+          T_BUILD_LEVEL:
+            ref: .T_BUILD_LEVEL
+      - task: :hono:build
+        vars:
+          T_BUILD_LEVEL:
+            ref: .T_BUILD_LEVEL
+    cmds:
+      - >
+        bunx --no-install tsc
+        --project {{.T_TSCONFIG | q}}
+        --outDir {{.T_BUILD_DIST_DIR | q}}
+
+  build:
+    label: '{{.TASK}}:{{.T_TARGET_ENVIRONMENT}}:{{.T_BUILD_LEVEL}}'
+    requires:
+      vars:
+        - name: T_BUILD_LEVEL
+          enum: [development, release]
+        - name: T_TARGET_ENVIRONMENT
+          enum: [local, testing, production]
+    vars:
+      T_BUILD_LEVEL:
+        ref: coalesce (env "SWAPI_BUILD_LEVEL") .T_BUILD_LEVEL "release"
+      T_TARGET_ENVIRONMENT:
+        ref: coalesce (env "SWAPI_TARGET_ENVIRONMENT") .T_TARGET_ENVIRONMENT "local"
+    deps:
+      - task: build:compile
+        vars:
+          T_BUILD_LEVEL:
+            ref: .T_BUILD_LEVEL
+          T_TARGET_ENVIRONMENT:
+            ref: .T_TARGET_ENVIRONMENT
+      - task: :client:build
+        vars:
+          T_BUILD_LEVEL:
+            ref: .T_BUILD_LEVEL
+          T_TARGET_ENVIRONMENT:
+            ref: .T_TARGET_ENVIRONMENT
+
+  build:with-ssg:
+    label: '{{.TASK}}:{{.T_TARGET_ENVIRONMENT}}:{{.T_BUILD_LEVEL}}'
+    requires:
+      vars:
+        - name: T_BUILD_LEVEL
+          enum: [development, release]
+        - name: T_TARGET_ENVIRONMENT
+          enum: [local, testing, production]
+    vars:
+      T_BUILD_LEVEL:
+        ref: coalesce (env "SWAPI_BUILD_LEVEL") .T_BUILD_LEVEL "release"
+      T_TARGET_ENVIRONMENT:
+        ref: coalesce (env "SWAPI_TARGET_ENVIRONMENT") .T_TARGET_ENVIRONMENT "local"
+      T_ENV_FILE: './.env/.env.{{.T_TARGET_ENVIRONMENT}}.{{.T_BUILD_LEVEL}}'
+      T_DIST_ROOT: './dist/{{.T_TARGET_ENVIRONMENT}}/{{.T_BUILD_LEVEL}}'
+      T_BUILD_DIST_DIR: '{{.T_DIST_ROOT}}/build'
+      T_TARGET_AND_PROFILE_CONDITION: '@swapi/{{.T_TARGET_ENVIRONMENT}}/{{.T_BUILD_LEVEL}}'
+      T_PROFILE_CONDITION: '@swapi/{{.T_BUILD_LEVEL}}'
+      T_CLIENT_DIST_ROOT: '../client/dist/{{.T_TARGET_ENVIRONMENT}}/{{.T_BUILD_LEVEL}}'
+      T_CLIENT_SSG_DIST_DIR: '{{.T_CLIENT_DIST_ROOT}}/ssg'
+    dotenv:
+      - '{{.T_ENV_FILE}}'
+    env:
+      SWAPI_BUILD_LEVEL:
+        ref: .T_BUILD_LEVEL
+      SWAPI_TARGET_ENVIRONMENT:
+        ref: .T_TARGET_ENVIRONMENT
+    sources:
+      - '{{.T_ENV_FILE}}'
+      - './package.json'
+      - './tsconfig/**/*.json'
+      - '{{.T_BUILD_DIST_DIR}}/ssg/render.js'
+      - '{{.T_CLIENT_DIST_ROOT}}/browser/**/*'
+      - '{{.T_CLIENT_DIST_ROOT}}/ssr/**/*'
+      - '{{.T_CLIENT_DIST_ROOT}}/dist-paths.*'
+      - '{{.T_SOURCES.lockfile}}'
+    generates:
+      - '{{.T_CLIENT_SSG_DIST_DIR}}/index.html'
+      - '{{.T_CLIENT_SSG_DIST_DIR}}/**/*/index.html'
+    deps:
+      - task: build
+        vars:
+          T_BUILD_LEVEL:
+            ref: .T_BUILD_LEVEL
+          T_TARGET_ENVIRONMENT:
+            ref: .T_TARGET_ENVIRONMENT
+    cmds:
+      - >
+        bunx --no-install bun
+        --conditions {{.T_TARGET_AND_PROFILE_CONDITION}}
+        --conditions {{.T_PROFILE_CONDITION}}
+        {{.T_BUILD_DIST_DIR}}/ssg/render.js
+
+  build:bundle:
+    label: '{{.TASK}}:{{.T_TARGET_ENVIRONMENT}}:{{.T_BUILD_LEVEL}}'
+    requires:
+      vars:
+        - name: T_BUILD_LEVEL
+          enum: [development, release]
+        - name: T_TARGET_ENVIRONMENT
+          enum: [local, testing, production]
+    vars:
+      T_BUILD_LEVEL:
+        ref: coalesce (env "SWAPI_BUILD_LEVEL") .T_BUILD_LEVEL "release"
+      T_TARGET_ENVIRONMENT:
+        ref: coalesce (env "SWAPI_TARGET_ENVIRONMENT") .T_TARGET_ENVIRONMENT "local"
+      T_ENV_FILE: './.env/.env.{{.T_TARGET_ENVIRONMENT}}.{{.T_BUILD_LEVEL}}'
+      T_DIST_ROOT: './dist/{{.T_TARGET_ENVIRONMENT}}/{{.T_BUILD_LEVEL}}'
+      T_BUILD_DIST_DIR: '{{.T_DIST_ROOT}}/build'
+      T_BUNDLE_DIST_DIR: '{{.T_DIST_ROOT}}/bundle'
+      T_CLIENT_DIST_ROOT: '{{.ROOT_DIR}}/packages/client/dist/{{.T_TARGET_ENVIRONMENT}}/{{.T_BUILD_LEVEL}}'
+      T_TARGET_AND_PROFILE_CONDITION: '@swapi/{{.T_TARGET_ENVIRONMENT}}/{{.T_BUILD_LEVEL}}'
+      T_PROFILE_CONDITION: '@swapi/{{.T_BUILD_LEVEL}}'
+    dotenv:
+      - '{{.T_ENV_FILE}}'
+    env:
+      SWAPI_BUILD_LEVEL:
+        ref: .T_BUILD_LEVEL
+      SWAPI_TARGET_ENVIRONMENT:
+        ref: .T_TARGET_ENVIRONMENT
+    sources:
+      - '{{.T_ENV_FILE}}'
+      - './rolldown.config.ts'
+      - './tsconfig/**/*.json'
+      - '{{.T_BUILD_DIST_DIR}}/**/*'
+      - '{{.T_CLIENT_DIST_ROOT}}/**/*'
+      - '{{.ROOT_DIR}}/packages/client/src/**/*'
+      - '{{.ROOT_DIR}}/packages/hono/src/**/*'
+      - '{{.ROOT_DIR}}/packages/shared/generated/**/*'
+      - '{{.ROOT_DIR}}/packages/shared/src/**/*'
+      - '{{.T_SOURCES.lockfile}}'
+    generates:
+      - '{{.T_BUNDLE_DIST_DIR}}/**/*'
+    deps:
+      - task: build:with-ssg
+        vars:
+          T_BUILD_LEVEL:
+            ref: .T_BUILD_LEVEL
+          T_TARGET_ENVIRONMENT:
+            ref: .T_TARGET_ENVIRONMENT
+    cmds:
+      - >
+        bunx --no-install bun
+        --conditions {{.T_TARGET_AND_PROFILE_CONDITION}}
+        --conditions {{.T_PROFILE_CONDITION}}
+        "$(bunx --no-install bun pm bin)/rolldown"
+        --config
+
+  build:docker:
+    label: '{{.TASK}}:{{.T_IMAGE_TAG}}'
+    requires:
+      vars:
+        - name: T_BUILD_LEVEL
+          enum: [development, release]
+        - name: T_TARGET_ENVIRONMENT
+          enum: [local, ci, testing, production]
+        - name: T_DOCKER_TARGET
+          enum: [runtime, base, deps, code, bundle]
+        - name: T_DEV_MODE
+          enum: ['true', 'false']
+    vars:
+      T_BUILD_LEVEL:
+        ref: coalesce (env "SWAPI_BUILD_LEVEL") .T_BUILD_LEVEL "release"
+      T_TARGET_ENVIRONMENT:
+        ref: coalesce (env "SWAPI_TARGET_ENVIRONMENT") .T_TARGET_ENVIRONMENT "local"
+      T_DEV_MODE:
+        ref: .T_DEV_MODE | default "false"
+      T_RUNTIME_BUN_VARIANT:
+        ref: (eq .T_DEV_MODE "true") | ternary "slim" "distroless"
+      T_ENV_FILE: './.env/.env.{{.T_TARGET_ENVIRONMENT}}.{{.T_BUILD_LEVEL}}'
+      T_DOCKER_ENV_FILE: '{{.T_ENV_FILE}}.docker'
+      T_IMAGE_TAG: '{{.T_DIN_APP_SERVER}}:{{.T_DOCKER_TARGET}}-{{.T_TARGET_ENVIRONMENT}}-{{.T_BUILD_LEVEL}}-sha-{{.T_GIT_COMMIT_SHA}}'
+    dotenv:
+      - '{{.T_DOCKER_ENV_FILE}}'
+      - '{{.T_ENV_FILE}}'
+    env:
+      SWAPI_BUILD_LEVEL:
+        ref: .T_BUILD_LEVEL
+      SWAPI_TARGET_ENVIRONMENT:
+        ref: .T_TARGET_ENVIRONMENT
+    cmds:
+      - >
+        docker buildx build
+        --load
+        --file ./Dockerfile.app-server
+        --build-arg NODE_ENV=${NODE_ENV}
+        --build-arg SWAPI_BUILD_LEVEL={{.T_BUILD_LEVEL}}
+        --build-arg SWAPI_TARGET_ENVIRONMENT={{.T_TARGET_ENVIRONMENT}}
+        --build-arg SWAPI_GIT_COMMIT_SHA={{.T_GIT_COMMIT_SHA}}
+        --build-arg RUNTIME_BUN_VARIANT={{.T_RUNTIME_BUN_VARIANT}}
+        {{if ne .T_DOCKER_TARGET "runtime"}}
+        --target {{.T_DOCKER_TARGET}}
+        {{end}}
+        --tag {{.T_IMAGE_TAG}}
+        {{.ROOT_DIR}}
+
+  start:
+    label: '{{.TASK}}:{{.T_TARGET_ENVIRONMENT}}:{{.T_BUILD_LEVEL}}'
+    requires:
+      vars:
+        - name: T_BUILD_LEVEL
+          enum: [development, release]
+        - name: T_TARGET_ENVIRONMENT
+          enum: [local, testing, production]
+        - name: T_DOCKER_TARGET
+          enum: [runtime, base, deps, code, bundle]
+    vars:
+      T_BUILD_LEVEL:
+        ref: coalesce (env "SWAPI_BUILD_LEVEL") .T_BUILD_LEVEL "development"
+      T_TARGET_ENVIRONMENT:
+        ref: coalesce (env "SWAPI_TARGET_ENVIRONMENT") .T_TARGET_ENVIRONMENT "local"
+      T_ENV_FILE: './.env/.env.{{.T_TARGET_ENVIRONMENT}}.{{.T_BUILD_LEVEL}}'
+      T_DIST_ROOT: './dist/{{.T_TARGET_ENVIRONMENT}}/{{.T_BUILD_LEVEL}}'
+      T_BUILD_DIST_DIR: '{{.T_DIST_ROOT}}/build'
+      T_TARGET_AND_PROFILE_CONDITION: '@swapi/{{.T_TARGET_ENVIRONMENT}}/{{.T_BUILD_LEVEL}}'
+      T_PROFILE_CONDITION: '@swapi/{{.T_BUILD_LEVEL}}'
+    dotenv:
+      - '{{.T_ENV_FILE}}'
+    env:
+      SWAPI_BUILD_LEVEL:
+        ref: .T_BUILD_LEVEL
+      SWAPI_TARGET_ENVIRONMENT:
+        ref: .T_TARGET_ENVIRONMENT
+    deps:
+      - task: build:with-ssg
+        vars:
+          T_BUILD_LEVEL:
+            ref: .T_BUILD_LEVEL
+          T_TARGET_ENVIRONMENT:
+            ref: .T_TARGET_ENVIRONMENT
+    cmds:
+      - >
+        bunx --no-install bun
+        --conditions {{.T_TARGET_AND_PROFILE_CONDITION}}
+        --conditions {{.T_PROFILE_CONDITION}}
+        {{.T_BUILD_DIST_DIR}}/server.jit.js
+
+  start:dev:
+    summary: |
+      This task does not SSG. You will get SSR for those pages if you haven no SSG results
+      in your dist.
+    requires:
+      vars:
+        - name: T_BUILD_LEVEL
+          enum: [development, release]
+    vars:
+      T_BUILD_LEVEL:
+        ref: coalesce (env "SWAPI_BUILD_LEVEL") .T_BUILD_LEVEL "development"
+      T_TARGET_ENVIRONMENT: local
+    dotenv:
+      - './.env/.env.local.{{.T_BUILD_LEVEL}}'
+    env:
+      SWAPI_BUILD_LEVEL:
+        ref: .T_BUILD_LEVEL
+      SWAPI_TARGET_ENVIRONMENT:
+        ref: .T_TARGET_ENVIRONMENT
     deps:
       - task: :client:build
         vars:
-          PROFILE: '{{.PROFILE}}'
-          TARGET: local
-    dotenv:
-      - ./.env/.env.local.{{.PROFILE}}
-    env:
-      SWAPI_RUN_MODE: source
-    # TODO: Can not add node condition for @swapi/hono/source, due to a bun bug with more than 3 node conditions: https://github.com/oven-sh/bun/issues/30619
-    # Because of this this task is currently broken.
+          T_BUILD_LEVEL:
+            ref: .T_BUILD_LEVEL
+          T_TARGET_ENVIRONMENT:
+            ref: .T_TARGET_ENVIRONMENT
+    preconditions:
+      - command -v gum
     cmds:
-      - 'echo "Hint: This task does not do SSG automatically and will fallback to SSR."'
       - >
         bunx --no-install bun
         --conditions @swapi/server/source
         --conditions @swapi/shared/source
-        --conditions @swapi/local/{{.PROFILE}}
+        --conditions @swapi/local/{{.T_BUILD_LEVEL}}
         --hot
         ./src/server.jit.ts
 
-  build:with-ssg:
-    vars:
-      PROFILE:
-        ref: .PROFILE | default "release"
-      TARGET:
-        ref: .TARGET | default "local"
-      VARIANT_PATH: '{{.TARGET}}/{{.PROFILE}}'
-      BUILD_DIST_DIR: './dist/{{.VARIANT_PATH}}/build'
-      TARGET_AND_PROFILE_CONDITION: '@swapi/{{.VARIANT_PATH}}'
-      PROFILE_CONDITION: '@swapi/{{.PROFILE}}'
-      TSCONFIG: './tsconfig/tsconfig.server{{if eq .PROFILE "release"}}.release{{end}}.json'
-      CLIENT_DIST_ROOT: '../client/dist/{{.VARIANT_PATH}}'
-      CLIENT_SSG_DIST_DIR: '{{.CLIENT_DIST_ROOT}}/ssg'
-      CLIENT_SSR_ENTRY: '{{.CLIENT_DIST_ROOT}}/ssr/main.server.js'
-    requires:
+  start:dev:watch:
+    - task: watch
       vars:
-        - name: PROFILE
-          enum: [debug, release]
-        - name: TARGET
-          enum: [local, testing, production]
-    deps:
-      - task: build
-        vars:
-          PROFILE: '{{.PROFILE}}'
-          TARGET: '{{.TARGET}}'
-    dotenv:
-      - &env-file ./.env/.env.{{.TARGET}}.{{.PROFILE}}
-    env:
-      SWAPI_RUN_MODE: build
-    sources:
-      - *env-file
-      - '{{.TSCONFIG}}'
-      - ./package.json
-      - '{{.BUILD_DIST_DIR}}/ssg/render.js'
-      - '{{.CLIENT_DIST_ROOT}}/browser/**/*'
-      - '{{.CLIENT_DIST_ROOT}}/ssr/**/*'
-      - '{{.CLIENT_DIST_ROOT}}/dist-paths.*'
-      - ../../bun.lock
-    generates:
-      - '{{.CLIENT_SSG_DIST_DIR}}/index.html'
-      - '{{.CLIENT_SSG_DIST_DIR}}/**/*/index.html'
-    cmds:
-      - >
-        bunx --no-install bun
-        --conditions {{.TARGET_AND_PROFILE_CONDITION}}
-        --conditions {{.PROFILE_CONDITION}}
-        {{.BUILD_DIST_DIR}}/ssg/render.js
-
-  build:
-    vars:
-      PROFILE:
-        ref: .PROFILE | default "release"
-      TARGET:
-        ref: .TARGET | default "local"
-    requires:
-      vars:
-        - name: PROFILE
-          enum: [debug, release]
-        - name: TARGET
-          enum: [local, testing, production]
-    deps:
-      - task: build:compile
-        vars:
-          PROFILE: '{{.PROFILE}}'
-          TARGET: '{{.TARGET}}'
-      - task: :client:build
-        vars:
-          PROFILE: '{{.PROFILE}}'
-          TARGET: '{{.TARGET}}'
-
-  build:compile:
-    vars:
-      PROFILE:
-        ref: .PROFILE | default "release"
-      TARGET:
-        ref: .TARGET | default "local"
-      VARIANT_PATH: '{{.TARGET}}/{{.PROFILE}}'
-      BUILD_DIST_DIR: './dist/{{.VARIANT_PATH}}/build'
-      TSCONFIG: './tsconfig/tsconfig.server{{if eq .PROFILE "release"}}.release{{end}}.json'
-    requires:
-      vars:
-        - name: PROFILE
-          enum: [debug, release]
-        - name: TARGET
-          enum: [local, testing, production]
-    deps:
-      - task: :shared:build
-        vars:
-          PROFILE: '{{.PROFILE}}'
-      - task: :hono:build
-        vars:
-          PROFILE: '{{.PROFILE}}'
-    dotenv:
-      - &env-file ./.env/.env.{{.TARGET}}.{{.PROFILE}}
-    env:
-      SWAPI_RUN_MODE: build
-    sources:
-      - *env-file
-      - '{{.TSCONFIG}}'
-      - ./package.json
-      - ./src/**/*
-      - ../../bun.lock
-    generates:
-      - '{{.BUILD_DIST_DIR}}/**/*'
-    cmds:
-      - >
-        bunx --no-install tsc
-        --project '{{.TSCONFIG}}'
-        --outDir '{{.BUILD_DIST_DIR}}'
-
-  build:bundle:
-    vars:
-      PROFILE:
-        ref: .PROFILE | default "release"
-      TARGET:
-        ref: .TARGET | default "local"
-      VARIANT_PATH: '{{.TARGET}}/{{.PROFILE}}'
-      DIST_ROOT: './dist/{{.VARIANT_PATH}}'
-      BUILD_DIST_DIR: '{{.DIST_ROOT}}/build'
-      BUNDLE_DIST_DIR: '{{.DIST_ROOT}}/bundle'
-      TARGET_AND_PROFILE_CONDITION: '@swapi/{{.VARIANT_PATH}}'
-      PROFILE_CONDITION: '@swapi/{{.PROFILE}}'
-      CLIENT_DIST_ROOT: '../client/dist/{{.VARIANT_PATH}}'
-    requires:
-      vars:
-        - name: PROFILE
-          enum: [debug, release]
-        - name: TARGET
-          enum: [local, testing, production]
-    deps:
-      - task: build:with-ssg
-        vars:
-          PROFILE: '{{.PROFILE}}'
-          TARGET: '{{.TARGET}}'
-    dotenv:
-      - &env-file ./.env/.env.{{.TARGET}}.{{.PROFILE}}
-    env:
-      SWAPI_RUN_MODE: build
-    sources:
-      - *env-file
-      - ./tsconfig/tsconfig.server.bundler.json
-      - ./rolldown.config.ts
-      - '{{.BUILD_DIST_DIR}}/**/*'
-      - '{{.CLIENT_DIST_ROOT}}/**/*'
-      - ../../bun.lock
-    generates:
-      - '{{.BUNDLE_DIST_DIR}}/**/*'
-    cmds:
-      - >
-        bunx --no-install bun
-        --conditions {{.TARGET_AND_PROFILE_CONDITION}}
-        --conditions {{.PROFILE_CONDITION}}
-        "$(bunx --no-install bun pm bin)/rolldown"
-        --config
-
-  start:
-    vars:
-      PROFILE:
-        ref: .PROFILE | default "release"
-      TARGET:
-        ref: .TARGET | default "local"
-      VARIANT_PATH: '{{.TARGET}}/{{.PROFILE}}'
-      BUILD_DIST_DIR: './dist/{{.VARIANT_PATH}}/build'
-      TARGET_AND_PROFILE_CONDITION: '@swapi/{{.VARIANT_PATH}}'
-      PROFILE_CONDITION: '@swapi/{{.PROFILE}}'
-    requires:
-      vars:
-        - name: PROFILE
-          enum: [debug, release]
-        - name: TARGET
-          enum: [local, testing, production]
-    deps:
-      - task: build:with-ssg
-        vars:
-          PROFILE: '{{.PROFILE}}'
-          TARGET: '{{.TARGET}}'
-    dotenv:
-      - ./.env/.env.{{.TARGET}}.{{.PROFILE}}
-    env:
-      SWAPI_RUN_MODE: build
-    cmds:
-      - >
-        bunx --no-install bun
-        --conditions {{.TARGET_AND_PROFILE_CONDITION}}
-        --conditions {{.PROFILE_CONDITION}}
-        {{.BUILD_DIST_DIR}}/server.jit.js
+        T_BUILD_LEVEL: development
+        T_TASK: server:dev
+        T_WATCHEXEC_ARGS: [--debounce="2s"]
 
   start:bundle:
-    vars:
-      PROFILE:
-        ref: .PROFILE | default "release"
-      TARGET:
-        ref: .TARGET | default "local"
-      VARIANT_PATH: '{{.TARGET}}/{{.PROFILE}}'
-      BUNDLE_DIST_DIR: './dist/{{.VARIANT_PATH}}/bundle'
-      TARGET_AND_PROFILE_CONDITION: '@swapi/{{.VARIANT_PATH}}'
-      PROFILE_CONDITION: '@swapi/{{.PROFILE}}'
+    label: '{{.TASK}}:{{.T_TARGET_ENVIRONMENT}}:{{.T_BUILD_LEVEL}}'
     requires:
       vars:
-        - name: PROFILE
-          enum: [debug, release]
-        - name: TARGET
+        - name: T_BUILD_LEVEL
+          enum: [development, release]
+        - name: T_TARGET_ENVIRONMENT
           enum: [local, testing, production]
+    vars:
+      T_BUILD_LEVEL:
+        ref: coalesce (env "SWAPI_BUILD_LEVEL") .T_BUILD_LEVEL "release"
+      T_TARGET_ENVIRONMENT:
+        ref: coalesce (env "SWAPI_TARGET_ENVIRONMENT") .T_TARGET_ENVIRONMENT "local"
+      T_ENV_FILE: './.env/.env.{{.T_TARGET_ENVIRONMENT}}.{{.T_BUILD_LEVEL}}'
+      T_DIST_ROOT: './dist/{{.T_TARGET_ENVIRONMENT}}/{{.T_BUILD_LEVEL}}'
+      T_BUNDLE_DIST_DIR: '{{.T_DIST_ROOT}}/bundle'
+      T_TARGET_AND_PROFILE_CONDITION: '@swapi/{{.T_TARGET_ENVIRONMENT}}/{{.T_BUILD_LEVEL}}'
+      T_PROFILE_CONDITION: '@swapi/{{.T_BUILD_LEVEL}}'
+    dotenv:
+      - '{{.T_ENV_FILE}}'
+    env:
+      SWAPI_BUILD_LEVEL:
+        ref: .T_BUILD_LEVEL
+      SWAPI_TARGET_ENVIRONMENT:
+        ref: .T_TARGET_ENVIRONMENT
     deps:
       - task: build:bundle
         vars:
-          PROFILE: '{{.PROFILE}}'
-          TARGET: '{{.TARGET}}'
-    dotenv:
-      - ./.env/.env.{{.TARGET}}.{{.PROFILE}}
-    env:
-      SWAPI_RUN_MODE: build
+          T_BUILD_LEVEL:
+            ref: .T_BUILD_LEVEL
+          T_TARGET_ENVIRONMENT:
+            ref: .T_TARGET_ENVIRONMENT
     cmds:
       - >
         bunx --no-install bun
-        --conditions {{.TARGET_AND_PROFILE_CONDITION}}
-        --conditions {{.PROFILE_CONDITION}}
-        {{.BUNDLE_DIST_DIR}}/server.js
+        --conditions {{.T_TARGET_AND_PROFILE_CONDITION}}
+        --conditions {{.T_PROFILE_CONDITION}}
+        --expose-gc
+        {{.T_BUNDLE_DIST_DIR}}/server.js
+
+  start:bundle:watch:
+    cmds:
+      - task: watch
+        vars:
+          T_BUILD_LEVEL: release
+          T_TASK: server:start:bundle
+          T_WATCHEXEC_ARGS: [--debounce="3s"]
+
+  start:docker:
+    desc: Start with `--output interleaved` for dev mode.
+    requires:
+      vars:
+        - name: T_BUILD_LEVEL
+          enum: [development, release]
+        - name: T_TARGET_ENVIRONMENT
+          enum: [local, ci]
+        - name: T_DOCKER_TARGET
+          enum: [runtime, base, deps, code, bundle]
+        - name: T_THROTTLED
+          enum: ['true', 'false']
+        - name: T_DEV_MODE
+          enum: ['true', 'false']
+    vars:
+      T_BUILD_LEVEL:
+        ref: coalesce (env "SWAPI_BUILD_LEVEL") .T_BUILD_LEVEL "release"
+      T_TARGET_ENVIRONMENT:
+        ref: coalesce (env "SWAPI_TARGET_ENVIRONMENT") .T_TARGET_ENVIRONMENT "local"
+      T_THROTTLED:
+        ref: .T_THROTTLED | default "false"
+      T_ENV_FILE: './.env/.env.{{.T_TARGET_ENVIRONMENT}}.{{.T_BUILD_LEVEL}}'
+      T_DOCKER_ENV_FILE: '{{.T_ENV_FILE}}.docker'
+      T_IMAGE_TAG: '{{.T_DIN_APP_SERVER}}:{{.T_DOCKER_TARGET}}-{{.T_TARGET_ENVIRONMENT}}-{{.T_BUILD_LEVEL}}-sha-{{.T_GIT_COMMIT_SHA}}'
+    dotenv:
+      - '{{.T_DOCKER_ENV_FILE}}'
+      - '{{.T_ENV_FILE}}'
+    env:
+      SWAPI_BUILD_LEVEL:
+        ref: .T_BUILD_LEVEL
+      SWAPI_TARGET_ENVIRONMENT:
+        ref: .T_TARGET_ENVIRONMENT
+    cmds:
+      - task: build:docker
+        if: '{{eq .T_TARGET_ENVIRONMENT "local"}}'
+        vars:
+          T_BUILD_LEVEL:
+            ref: .T_BUILD_LEVEL
+          T_TARGET_ENVIRONMENT:
+            ref: .T_TARGET_ENVIRONMENT
+          T_DOCKER_TARGET:
+            ref: .T_DOCKER_TARGET
+      - docker rm --force {{.T_DIN_APP_SERVER}} >/dev/null 2>&1 || true
+      - >
+        docker run
+        {{if eq .T_DEV_MODE "true"}}
+        --interactive
+        --tty
+        --entrypoint bash
+        {{end}}
+        --rm
+        --init
+        --ipc=host
+        --publish 127.0.0.1:${SWAPI_SERVER_PORT}:${SWAPI_SERVER_PORT}
+        {{if eq .T_THROTTLED "true"}}
+        --cpus=1.0
+        --memory=512m
+        --memory-swap=512m
+        {{end}}
+        {{if ne .T_THROTTLED "true"}}
+        --ulimit nofile=65536:65536
+        --ulimit core=0:0
+        {{end}}
+        --name={{.T_DIN_APP_SERVER}}
+        {{.T_IMAGE_TAG}}

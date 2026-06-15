@@ -7,10 +7,12 @@ import { Hono } from 'hono'
 
 import { addClientHintsHandler } from '#internal/add-client-hints.handler'
 import { addDeviceRedirectHandler } from '#internal/device-redirect.handler'
+import { addHealthChecksHandler } from '#internal/health-checks.handler'
 import type { WorkerHonoEnv } from '#internal/types'
 
 const hono = new Hono<WorkerHonoEnv>()
 
+addHealthChecksHandler(hono)
 addDocumentRequestContextHandler(hono)
 addClientHintsHandler(hono)
 addDeviceRedirectHandler(hono)

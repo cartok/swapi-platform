@@ -1,0 +1,143 @@
+version: 3
+
+vars:
+  T_DIN_PLAYWRIGHT: swapi-platform-playwright
+
+tasks:
+  clean:
+    dotenv:
+      - ./.env/.env.local
+    env:
+      NODE_OPTIONS: --conditions=@swapi/shared/source
+    cmds:
+      - rm -rf ./.task || true
+      - rm -rf ./test-results || true
+      - rm -rf ./playwright-report || true
+      - bunx --no-install playwright clear-cache
+
+  install:
+    aliases:
+      - i
+    preconditions:
+      - command -v npx
+    cmds:
+      - npx playwright install chromium
+
+  update-screenshots:
+    cmds:
+      - task: test
+        vars:
+          CLI_ARGS: --grep '@screenshot' --update-snapshots --no-deps
+
+  lint:tsc:
+    sources:
+      - './package.json'
+      - './playwright.config.ts'
+      - './src/**/*.ts'
+      - './tsconfig/**/*.json'
+      - '{{.ROOT_DIR}}/packages/shared/package.json'
+      - '{{.ROOT_DIR}}/packages/shared/src/**/*.ts'
+      - '{{.T_SOURCES.tsconfigPackage}}'
+      - '{{.T_SOURCES.tsconfigs}}'
+      - '{{.T_SOURCES.lockfile}}'
+    cmds:
+      - bunx --no-install tsc --noEmit --project ./tsconfig/tsconfig.e2e.json
+
+  build:deps:
+    deps:
+      - task: :shared:build
+
+  server:
+    dotenv:
+      - './.env/.env.local'
+    cmds:
+      - task: :server:start:bundle
+        silent: true
+
+  server:watch:
+    dotenv:
+      - './.env/.env.local'
+    cmds:
+      - task: :server:watch:start:bundle
+        silent: true
+
+  test:
+    dotenv:
+      - './.env/.env.local'
+    env:
+      NODE_OPTIONS: --conditions=@swapi/shared/source
+    deps:
+      - task: build:deps
+    cmds:
+      - >
+        bunx --no-install playwright test
+        --max-failures 1
+        --forbid-only
+        --fail-on-flaky-tests
+        {{.CLI_ARGS}}
+
+  generate:
+    desc: 'Requires server bundle to be ran manually atm.'
+    dotenv:
+      - './.env/.env.local'
+    env:
+      NODE_OPTIONS: --conditions=@swapi/shared/source
+    deps:
+      - task: build:deps
+      - task: :server:build:bundle
+    cmds:
+      - bunx --no-install playwright codegen localhost:51000
+
+  build:docker:
+    label: '{{.TASK}}:{{.T_IMAGE_TAG}}'
+    requires:
+      vars:
+        - name: T_DOCKER_TARGET
+          enum: [runtime, base, deps, browsers, code]
+    vars:
+      T_IMAGE_TAG: '{{.T_DIN_PLAYWRIGHT}}:local'
+    dotenv:
+      - './.env/.env.ci'
+    cmds:
+      - >
+        docker buildx build
+        --load
+        --file ./Dockerfile.e2e
+        {{if ne .T_DOCKER_TARGET "runtime"}}
+        --target {{.T_DOCKER_TARGET}}
+        {{end}}
+        --tag {{.T_IMAGE_TAG}}
+        {{.ROOT_DIR}}
+
+  start:docker:
+    desc: Start with `--output interleaved` for dev mode.
+    requires:
+      vars:
+        - name: T_DEV_MODE
+          enum: ['true', 'false']
+    vars:
+      T_IMAGE_TAG: '{{.T_DIN_PLAYWRIGHT}}:local'
+    dotenv:
+      - './.env/.env.local'
+    cmds:
+      - >
+        docker run
+        {{if ne .T_DEV_MODE "true"}}
+        --detach
+        {{end}}
+        {{if eq .T_DEV_MODE "true"}}
+        --interactive
+        --tty
+        --entrypoint bash
+        {{end}}
+        --rm
+        --init
+        --ipc=host
+        --publish ${SWAPI_E2E_PORT_PLAYWRIGHT}:${SWAPI_E2E_PORT_PLAYWRIGHT}
+        --ulimit nofile=65536:65536
+        --ulimit core=0:0
+        --name={{.T_DIN_PLAYWRIGHT}}
+        {{.T_IMAGE_TAG}}
+        {{if ne .T_DEV_MODE "true"}}
+        test
+        {{end}}

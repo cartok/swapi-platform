@@ -6,34 +6,46 @@ tasks:
       - rm -f ./tsconfig/*.tsbuildinfo || true
       - rm -rf ./dist || true
 
-  lint:
+  lint:tsc:
     sources:
-      - ./src/**/*
-      - ./tsconfig/tsconfig.hono.json
-      - ../../bun.lock
+      - './package.json'
+      - './src/**/*.ts'
+      - './tsconfig/**/*.json'
+      - '{{.ROOT_DIR}}/packages/shared/package.json'
+      - '{{.ROOT_DIR}}/packages/shared/src/**/*.ts'
+      - '{{.T_SOURCES.tsconfigPackage}}'
+      - '{{.T_SOURCES.tsconfigs}}'
+      - '{{.T_SOURCES.lockfile}}'
     cmds:
       - bunx --no-install tsc --noEmit --project ./tsconfig/tsconfig.hono.json
 
   build:
-    vars:
-      PROFILE:
-        ref: .PROFILE | default "debug"
-      DIST_DIR: './dist/{{.PROFILE}}'
-      TSCONFIG: './tsconfig/tsconfig.hono{{if eq .PROFILE "release"}}.release{{end}}.json'
+    label: '{{.TASK}}:{{.T_BUILD_LEVEL}}'
     requires:
       vars:
-        - name: PROFILE
-          enum: [debug, release]
+        - name: T_BUILD_LEVEL
+          enum: [development, release]
+    vars:
+      T_BUILD_LEVEL:
+        ref: coalesce (env "SWAPI_BUILD_LEVEL") .T_BUILD_LEVEL "release"
+      T_TSCONFIGS:
+        map:
+          development: ./tsconfig/tsconfig.hono.json
+          release: ./tsconfig/tsconfig.hono.release.json
+      T_TSCONFIG:
+        ref: get .T_TSCONFIGS .T_BUILD_LEVEL
+      T_DIST_DIR: './dist/{{.T_BUILD_LEVEL}}'
+    sources:
+      - './package.json'
+      - './src/**/*'
+      - './tsconfig/**/*.json'
+      - '{{.T_SOURCES.lockfile}}'
+    generates:
+      - '{{.T_DIST_DIR}}/**/*'
     deps:
       - task: :shared:build
         vars:
-          PROFILE: '{{.PROFILE}}'
-    sources:
-      - ./package.json
-      - '{{.TSCONFIG}}'
-      - ./src/**/*
-      - ../../bun.lock
-    generates:
-      - '{{.DIST_DIR}}/**/*'
+          T_BUILD_LEVEL:
+            ref: .T_BUILD_LEVEL
     cmds:
-      - bunx --no-install tsc --project '{{.TSCONFIG}}' --outDir '{{.DIST_DIR}}'
+      - bunx --no-install tsc --project {{.T_TSCONFIG | q}} --outDir {{.T_DIST_DIR | q}}

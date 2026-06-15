@@ -1,20 +1,47 @@
 version: 3
-run: once
-set: [pipefail]
+
+run: when_changed
+set:
+  - pipefail
+  - errexit
+shopt:
+  - globstar
 output: prefixed
 
 vars:
-  DOCKER_IMAGE_NAME: swapi-angular
+  T_GIT_COMMIT_SHA:
+    sh: |
+      if command -v git >/dev/null 2>&1; then
+        printf "%s" "$(git rev-parse --verify HEAD)"
+      fi
+  T_SOURCES:
+    map:
+      lockfile: '{{.ROOT_DIR}}/bun.lock'
+      tsconfigPackage: '{{.ROOT_DIR}}/packages/tsconfig/package.json'
+      tsconfigs: '{{.ROOT_DIR}}/packages/tsconfig/src/**/*.json'
 
 includes:
+  dev:
+    taskfile: ./Taskfile.local.yml
+    optional: true
+    flatten: true
+  tools:
+    taskfile: ./Taskfile.tools.yml
+    dir: ./
   client:
     taskfile: ./packages/client
     dir: ./packages/client
+  e2e:
+    taskfile: ./packages/e2e
+    dir: ./packages/e2e
   hono:
     taskfile: ./packages/hono
     dir: ./packages/hono
   server:
     taskfile: ./packages/server
+    dir: ./packages/server
+  server:fly:
+    taskfile: ./packages/server/Taskfile.fly.yml
     dir: ./packages/server
   shared:
     taskfile: ./packages/shared
@@ -27,8 +54,11 @@ tasks:
   clean:
     cmds:
       - task: client:clean
-      - task: shared:clean
+      - task: e2e:clean
+      - task: hono:clean
       - task: server:clean
+      - task: shared:clean
+      - task: worker:clean
       - rm -rf ./.cache || true
 
   install:
@@ -38,310 +68,41 @@ tasks:
       - command -v bun
     cmds:
       - bun install --link-native-bins
-      - bunx browser-driver-manager install chrome
-
-  check-deps:
-    interactive: true
-    cmd: ./scripts/deps.zsh
-
-  dev:
-    vars:
-      PROFILE:
-        ref: .PROFILE | default "debug"
-    requires:
-      vars:
-        - name: PROFILE
-          enum: [debug, release]
-    interactive: true
-    preconditions:
-      - command -v watchexec
-    cmds:
-      - >
-        watchexec --restart --quiet
-        --watch ./bun.lock
-        --watch ./packages/client/index.html
-        --watch ./packages/client/public
-        --watch ./packages/client/src
-        --watch ./packages/client/tsconfig
-        --watch ./packages/client/vite.config.ts
-        --watch ./packages/server/src/ssr/render-worker.ts
-        --watch ./packages/server/src/ssr/render-worker.jit.ts
-        --watch ./packages/server/src/ssr/render-worker.types.ts
-        --watch ./packages/shared/generated
-        --watch ./packages/shared/src
-        --watch ./packages/tsconfig
-        -- task server:dev PROFILE={{.PROFILE}}
+      - task: e2e:install
 
   lint:
-    vars:
-      PROFILE:
-        ref: .PROFILE | default "debug"
-    requires:
-      vars:
-        - name: PROFILE
-          enum: [debug, release]
     deps:
-      - task: lint:sequence-collection
-        vars:
-          PROFILE: '{{.PROFILE}}'
-      - task: lint:parallel-collection
+      - task: lint:code
+      - task: lint:docker
+      - task: lint:format
 
-  lint:parallel-collection:
-    internal: true
-    deps: []
-
-  lint:sequence-collection:
-    internal: true
-    vars:
-      PROFILE:
-        ref: .PROFILE | default "debug"
-    requires:
-      vars:
-        - name: PROFILE
-          enum: [debug, release]
+  lint:code:
     cmds:
-      - task: lint:tsc
-        vars:
-          PROFILE: '{{.PROFILE}}'
-      - task: lint:eslint
-      - task: lint:prettier
+      - task: tools:tsc:lint
+      - task: tools:eslint:lint
 
-  lint:tsc:
-    vars:
-      PROFILE:
-        ref: .PROFILE | default "debug"
-    requires:
-      vars:
-        - name: PROFILE
-          enum: [debug, release]
-    deps:
-      - task: client:lint
-        vars:
-          PROFILE: '{{.PROFILE}}'
-      - task: server:lint
-        vars:
-          PROFILE: '{{.PROFILE}}'
-      - task: worker:lint
-
-  lint:eslint:
-    sources:
-      - ./bun.lock
-      - ./eslint.config.mjs
-      - ./package.json
-      - ./packages/**/*.{ts,json}
+  lint:docker:
     cmds:
-      - bunx --no-install eslint ./
+      - task: tools:tally:lint
 
-  lint:prettier:
-    sources:
-      - ./.prettierignore
-      - ./bun.lock
-      - ./package.json
-      - ./prettier.config.mjs
-      - ./packages/**/*.{ts,json}
+  lint:format:
     cmds:
-      - bunx --no-install prettier --check ./
+      - task: tools:prettier:lint
 
   fix:
-    sources:
-      - ./bun.lock
-      - ./eslint.config.mjs
-      - ./package.json
-      - ./packages/**/*.{ts,json}
-    cmds:
-      - bunx --no-install eslint . --fix
-      - task: format
-
-  format:
-    sources:
-      - ./.prettierignore
-      - ./bun.lock
-      - ./package.json
-      - ./prettier.config.mjs
-      - ./packages/**/*.{ts,json}
-    cmds:
-      - bunx --no-install prettier --write --list-different ./
-
-  docker:build:
-    vars:
-      PROFILE:
-        ref: .PROFILE | default "release"
-      TARGET:
-        ref: .TARGET | default "local"
-      DEPLOYED_GIT_SHA:
-        sh: git rev-parse --verify HEAD
-    requires:
-      vars:
-        - name: PROFILE
-          enum: [release]
-        - name: TARGET
-          enum: [local, testing, production]
-    dotenv:
-      - ./packages/server/.env/.env.{{.TARGET}}.{{.PROFILE}}.docker
-      - ./packages/server/.env/.env.{{.TARGET}}.{{.PROFILE}}
     deps:
-      - task: lint
-    cmds:
-      - >
-        docker buildx build --load
-        --build-arg NODE_ENV=${NODE_ENV}
-        --build-arg PROFILE=${SWAPI_PROFILE}
-        --build-arg TARGET=${SWAPI_TARGET}
-        --build-arg DEPLOYED_GIT_SHA={{.DEPLOYED_GIT_SHA}}
-        --tag {{.DOCKER_IMAGE_NAME}}:${SWAPI_TARGET}-${SWAPI_PROFILE}
-        {{.CLI_ARGS}}
-        ./
+      - task: fix:code
+      - task: fix:docker
+      - task: fix:format
 
-  docker:start:
-    vars:
-      PROFILE:
-        ref: .PROFILE | default "release"
-      TARGET:
-        ref: .TARGET | default "local"
-      THROTTLED:
-        ref: .THROTTLED | default "true"
-    requires:
-      vars:
-        - name: PROFILE
-          enum: [release]
-        - name: TARGET
-          enum: [local, testing, production]
-    dotenv:
-      - ./packages/server/.env/.env.{{.TARGET}}.{{.PROFILE}}.docker
-      - ./packages/server/.env/.env.{{.TARGET}}.{{.PROFILE}}
-    deps:
-      - task: docker:build
-        vars:
-          PROFILE: '{{.PROFILE}}'
-          TARGET: '{{.TARGET}}'
+  fix:code:
     cmds:
-      - docker rm --force {{.DOCKER_IMAGE_NAME}} >/dev/null 2>&1 || true
-      - >
-        docker run --rm
-        --name={{.DOCKER_IMAGE_NAME}}
-        --publish 127.0.0.1:${SWAPI_SERVER_PORT}:${SWAPI_SERVER_PORT}
-        {{if eq .THROTTLED "true"}}
-        --cpus=1.0
-        --memory=512m
-        --memory-swap=512m
-        {{end}}
-        {{.DOCKER_IMAGE_NAME}}:{{.TARGET}}-{{.PROFILE}}
+      - task: tools:eslint:fix
 
-  fly:build-config:
-    vars:
-      PROFILE:
-        ref: .PROFILE | default "release"
-      TARGET:
-        ref: .TARGET | default "testing"
-      CONFIG_TEMPLATE: ./fly.template.yaml
-      CONFIG_VARIABLES: ./fly.variables.yaml
-      CONFIG_TEMPLATE_COPY:
-        sh: mktemp /tmp/fly.template.copy.XXXXXX.yaml
-      CONFIG_VARIABLES_COPY:
-        sh: mktemp /tmp/fly.variables.copy.XXXXXX.yaml
-      CONFIG_VARIABLES_COPY_ENV:
-        sh: mktemp /tmp/fly.variables.copy.env.XXXXXX.yaml
-    requires:
-      vars:
-        - CONFIG_TARGET
-    preconditions:
-      - sh: command -v yq && yq --version | rg 'mikefarah'
-        msg: 'You need to install `yq` (https://github.com/mikefarah/yq).'
-      - sh: command -v envsubst
-        msg: 'You need to install `gettext` to get the `envsubst` utility.'
-      - sh: command -v shred
-        msg: 'You need to install `coreutils` to get the `shred` utility.'
-      - command -v openssl
-      - command -v fly
-      - test -s {{.CONFIG_TEMPLATE}}
-      - test -s {{.CONFIG_VARIABLES}}
-      - test -n "${SWAPI_SECRET_HEALTH_CHECK_TOKEN}"
-      - printf '%s' "${SWAPI_SECRET_HEALTH_CHECK_TOKEN}" | openssl base64 -d -A >/dev/null 2>&1
-    dotenv:
-      - ./.env.fly
-      - ./packages/server/.env/.env.{{.TARGET}}.{{.PROFILE}}.docker
-      - ./packages/server/.env/.env.{{.TARGET}}.{{.PROFILE}}
+  fix:docker:
     cmds:
-      - defer: >
-          shred -u
-          {{.CONFIG_VARIABLES_COPY}}
-          {{.CONFIG_TEMPLATE_COPY}}
-          {{.CONFIG_VARIABLES_COPY_ENV}}
-      - yq '... comments=""' < {{.CONFIG_TEMPLATE}} > {{.CONFIG_TEMPLATE_COPY}}
-      - yq '... comments=""' < {{.CONFIG_VARIABLES}} > {{.CONFIG_VARIABLES_COPY}}
-      - envsubst < {{.CONFIG_VARIABLES_COPY}} > {{.CONFIG_VARIABLES_COPY_ENV}}
-      - >
-        yq --null-input
-        'load("{{.CONFIG_TEMPLATE_COPY}}") *d load("{{.CONFIG_VARIABLES_COPY_ENV}}")'
-        > '{{.CONFIG_TARGET}}'
-      - echo 'Built config {{.CONFIG_TARGET}}.'
-      - flyctl config validate --config {{.CONFIG_TARGET}}
+      - task: tools:tally:fix
 
-  fly:deploy:
-    vars:
-      PROFILE:
-        ref: .PROFILE | default "release"
-      TARGET:
-        ref: .TARGET | default "testing"
-      FAST:
-        ref: .FAST | default "false"
-      CONFIG:
-        sh: mktemp /tmp/fly.XXXXXX.yaml
-      DEPLOYED_GIT_SHA:
-        sh: git rev-parse --verify HEAD
-    requires:
-      vars:
-        - name: PROFILE
-          enum: [release]
-        - name: TARGET
-          enum: [testing, production]
-    dotenv:
-      - ./packages/server/.env/.env.{{.TARGET}}.{{.PROFILE}}.docker
-      - ./packages/server/.env/.env.{{.TARGET}}.{{.PROFILE}}
-    preconditions:
-      - command -v fly
-      - sh: command -v shred
-        msg: 'You need to install `coreutils` to get the `shred` utility.'
-    deps:
-      - task: fly:build-config
-        vars:
-          PROFILE: '{{.PROFILE}}'
-          TARGET: '{{.TARGET}}'
-          CONFIG_TARGET: '{{.CONFIG}}'
+  fix:format:
     cmds:
-      - defer: shred -u {{.CONFIG}}
-      - task: docker:build
-        if: '{{eq .FAST "false"}}'
-        vars:
-          PROFILE: release
-          TARGET: local
-      - task: lint
-        if: '{{eq .FAST "true"}}'
-      - >
-        fly deploy
-        --config {{.CONFIG}}
-        --build-arg NODE_ENV=${NODE_ENV}
-        --build-arg PROFILE=${SWAPI_PROFILE}
-        --build-arg TARGET=${SWAPI_TARGET}
-        --build-arg DEPLOYED_GIT_SHA={{.DEPLOYED_GIT_SHA}}
-        --compression zstd
-        --compression-level 7
-        {{.CLI_ARGS}}
-
-  fly:generate-secret:
-    silent: true
-    preconditions:
-      - command -v zsh
-      - command -v openssl
-      - command -v wl-copy
-    cmd: |
-      zsh -c '
-        secret="$(openssl rand -base64 32)"
-        wl-copy -- "${secret}" >/dev/null 2>&1
-        result=$?
-        if (( ${result} == 0 )); then
-          print -- "A secret was generated and copied to your clipboard."
-        else
-          exit ${result}
-        fi
-      '
+      - task: tools:prettier:fix
