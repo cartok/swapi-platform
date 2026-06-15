@@ -25,6 +25,7 @@ Dockerfile
 Dockerfile.*
 docs/
 eslint.config.*
+eslint.config.ts
 fly.*.toml
 fly.*.yml
 fly.toml

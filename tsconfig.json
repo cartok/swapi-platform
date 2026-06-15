@@ -1,6 +1,7 @@
 {
   "files": [],
   "references": [
+    { "path": "./tsconfig/tsconfig.eslint.json" },
     { "path": "./packages/client/tsconfig.json" },
     { "path": "./packages/hono/tsconfig.json" },
     { "path": "./packages/server/tsconfig.json" },
