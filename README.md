@@ -13,8 +13,6 @@ This repository started as a successful job application challenge implementation
 
   The first request can take longer, as the fly.io machine will automatically suspend if there was no traffic for a while.
 
-- [GitHub Pages demo (CSR only)](https://cartok.github.io/swapi-platform/)
-
 ## What This Project Demonstrates
 
 - Modern Angular architecture with standalone components, zoneless change detection, and lazy-loaded routes
