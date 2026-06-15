@@ -1,11 +1,16 @@
-# Packages
+# Installed dependencies
 node_modules/
 
-# Compiled output
-*.tsbuildinfo
+# Project defined dist dirs
 dist/
 generated/
 
+# Editor settings
+/.vscode/*
+/!.vscode/extensions.json
+/!.vscode/launch.json
+/!.vscode/settings.json
+/!.vscode/tasks.json
 
 # Playwright
 test-results/
@@ -13,32 +18,55 @@ playwright-report/
 blob-report/
 playwright/.cache/
 playwright/.auth/
+
+# Tool-generated files, dist, caches
 .cache/
-.task/
-
-# By filetype
-*.md
-
-# Root content
-.editorconfig
-.env.fly
+.codex
+.DS_Store/
+.eslintcache
 .git/
-.github/
+.task/
+.Trash-*/
+.wrangler/
+*.save
+*.tsbuildinfo
+Thumbs.db
+
+# Project root stuff
+.codex
+.dependency-cruiser.mjs
+.dockerignore
+.editorconfig
+.env.*.secret
+.envrc
+.envrc.local
 .gitignore
 .prettierignore
+.tally.toml
+.tsconfig.*.spec.json
+.tsconfig.spec.json
 .vscode/
+*.md
+/.drafts/
+/.github/
 /.local
+/benchmark/
+/bin/
+/compose/
+/scripts/
+/Taskfile.local.yml
+AGENTS.md
 Dockerfile
 Dockerfile.*
 docs/
 eslint.config.*
 eslint.config.ts
 fly.*.toml
+fly.*.yaml
 fly.*.yml
 fly.toml
+fly.yaml
 fly.yml
 prettier.config.*
-
-# Packages content
-.tsconfig.spec.json
-.tsconfig.*.spec.json
+prettier.config.mjs
+README.md

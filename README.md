@@ -1,5 +1,7 @@
 # Angular SSR/SSG web platform for SWAPI
 
+<!-- TODO: update -->
+
 This repository started as a successful job application challenge implementation of a frontend for the Star Wars API (SWAPI) and has been evolved into a production-oriented _(yet not fully production ready)_ Angular monorepo template optimized for responsive server-first rendering and ready for custom APIs and services.
 
 - [UI Mockups / Design given by job application challange](https://xd.adobe.com/view/b3c98134-11a8-44c2-5dd2-477b8550307f-c5f8/)
@@ -15,6 +17,8 @@ This repository started as a successful job application challenge implementation
 
 ## What This Project Demonstrates
 
+<!-- TODO: incomplete -->
+
 - Modern Angular architecture with standalone components, zoneless change detection, and lazy-loaded routes
 - Hybrid rendering setup with CSR, SSR, and SSG in one codebase
 - Device-aware server-first routing using Client Hints + URL device context parameters
@@ -24,7 +28,16 @@ This repository started as a successful job application challenge implementation
 
 ## Architecture At A Glance
 
-### Monorepo packages
+### Monorepo Packages
+
+<!--
+TODO: incomplete
+TODO: split workspace packages:
+- ./packages/app/*: e2e
+- ./packages/lib/*: app (client), app-server (server), app-worker
+- ./packages/bin/*: hono, shared, tsconfig
+- ./packages/test/*: maintainance (has swapi-workspaces.zsh)
+-->
 
 <!-- prettier-ignore -->
 | Package | Responsibility |
@@ -32,9 +45,8 @@ This repository started as a successful job application challenge implementation
 | `packages/client` | Angular app (browser + server entry, routes, pages, UI blocks/components) |
 | `packages/server` | Hono host for security checks, device context handling, redirects, SSG file serving, SSR fallback |
 | `packages/shared` | Shared runtime/types, routing constants, device context schema, code generators |
-| `scripts` | Helper scripts for build/runtime tasks |
 
-### Request and rendering flow
+### Request And Rendering Flow
 
 1. Validate host/protocol (`SWAPI_ALLOWED_HOSTS`, target-aware HTTP/HTTPS checks).
 2. Read device context from Client Hints headers (`Sec-CH-UA-*`, viewport hints).
@@ -43,7 +55,7 @@ This repository started as a successful job application challenge implementation
 5. Serve prerendered HTML (SSG) when a matching file exists.
 6. Fall back to Angular SSR for all non-prerendered HTML routes.
 
-### Current SSG scope
+### Current SSG Scope
 
 - Static prerendered paths are generated from `@swapi/shared/routing/ssg-paths`.
 - Currently includes:
@@ -92,15 +104,17 @@ This is a temporary fallback until the app is switched to its own backend.
 
 ### Prerequisites
 
+<!-- TODO: incomplete list and bad structure -->
+
 - **Node.js**
 
-  Version: 24.14.1
+  Version: see [.node-version](./.node-version)
 
   It's recommended to have a node version manager compatible with .node-version set up for automatic installation and update of the Node.js version used in the project.
 
 - **Bun**
 
-  Version: 1.x
+  Version: see [.bun-version](./.bun-version) but any works, as it is installed and only run from project dependencies.
 
   Only necessary to install the dependencies. The bun binary that is to be used for in the project will be installed via `package.json` and is used throughout the tasks via `bunx bun` in order to align the bun version for every developer and with the production runtime environment _(a fixed version of oven/bun docker image is used)_.
 
@@ -110,90 +124,51 @@ This is a temporary fallback until the app is switched to its own backend.
 
   It's recommended to install Taskfile on the system plus setting up shell completion.
 
-  Otherwise you could run: `bunx [--no-install] task`
-
 - **Fly.io CLI**
 
-  For deployment.
+  Only if you intend to deploy from your local environment instead of CI.
 
 ### Install
 
 ```bash
+cp ./Taskfile.template.yml ./Taskfile.yml
 task i
-```
-
-### Run
-
-```bash
-# Start `vite` dev server (only CSR, hot reload).
-task client:dev
-
-# ~ Build and start with `release` profile.
-task client:start
-
-# Start `bun` + `hono` server with SSG and SSR in dev mode.
-# Notice: It's not yet fully direct code execution, no client hot reload.
-task server:dev
-
-# ~ Build and start with `release` profile.
-task server:start
-
-# ~ Add bundling.
-task server:bundle
-
-# ~ Build and run in Docker.
-task docker:start
 ```
 
 Local URLs:
 
 - App's vite server in development mode: `http://localhost:4200`
 - App's vite server in production mode: `http://localhost:4300`
-- App's bun + hono Server in development mode: `http://localhost:50000`
-- App's bun + hono Server in production mode: `http://localhost:51000`
+- App's hono server in development mode: `http://localhost:50000`
+- App's hono server in production mode: `http://localhost:51000`
+- App's cloudflare worker: `http://localhost:52000`
 
-## Build, Bundle, and Quality
+### Build Matrix
 
-### Linting and formatting
+Use `T_BUILD_LEVEL` and `T_TARGET_ENVIRONMENT` explicitly when needed:
 
-```bash
-task lint
-task fix
-```
+- `T_BUILD_LEVEL`: `development`, `release`
+- `T_TARGET_ENVIRONMENT`: `local`, `ci`, `testing`, `production`
 
-### Tests
+#### Environment Variables
 
-```bash
-task client:test
-```
+Taskfiles derive the app environment variables from the Build Matrix variables:
 
-### Build matrix
+- `T_BUILD_LEVEL`: `SWAPI_BUILD_LEVEL`
+- `T_TARGET_ENVIRONMENT`: `SWAPI_TARGET_ENVIRONMENT`
 
-Use `PROFILE` and `TARGET` explicitly when needed:
+Taskfiles load the remaining environment variables via dotenv from `.env` files like:
 
-- `PROFILE`: `debug` or `release`
-- `TARGET`:
-  - server: `local`, `testing`, `production`
-  - client browser build also supports `pages`
+- `packages/client/.env/.env.<T_TARGET_ENVIRONMENT>.<T_BUILD_LEVEL>`
+- `packages/server/.env/.env.<T_TARGET_ENVIRONMENT>.<T_BUILD_LEVEL>`
+- Docker runtime variants additionally use `packages/server/.env/.env.<T_TARGET_ENVIRONMENT>.<T_BUILD_LEVEL>.docker`
 
-## Environment Configuration
+## Documentation
 
-Taskfiles load environment values from checked-in `.env` files:
-
-- `packages/client/.env/.env.<target>.<profile>`
-- `packages/server/.env/.env.<target>.<profile>`
-- Docker runtime variants additionally use `packages/server/.env/.env.<target>.<profile>.docker`
-
-Main runtime variables:
-
-- `SWAPI_TARGET` (`local|testing|production`)
-- `SWAPI_PROFILE` (`debug|release`)
-- `SWAPI_RUN_MODE` (`source|build`)
-- `SWAPI_USE_MOCK` (`true|false`, client runtime flag for SWAPI mock responses)
-- `SWAPI_SERVER_PORT`
-- `SWAPI_SERVER_HOST`
-- `SWAPI_ALLOWED_HOSTS`
+See the project documentation in the [`docs`](docs/) folder.
 
 ## Roadmap
+
+<!-- TODO: describe -->
 
 See the project roadmap documents in the [`docs/roadmap`](docs/roadmap/) folder.

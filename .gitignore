@@ -1,6 +1,16 @@
 # Installed dependencies
 node_modules/
 
+# Project defined dist dirs
+dist/
+generated/
+
+# Editor settings
+/.vscode/*
+/!.vscode/extensions.json
+/!.vscode/launch.json
+/!.vscode/settings.json
+/!.vscode/tasks.json
 
 # Playwright
 test-results/
@@ -8,6 +18,8 @@ playwright-report/
 blob-report/
 playwright/.cache/
 playwright/.auth/
+
+# Tool-generated files, dist, caches
 .cache/
 .codex
 .DS_Store/
@@ -18,22 +30,15 @@ playwright/.auth/
 *.tsbuildinfo
 Thumbs.db
 
-# Compiled outputs
-dist/
-generated/
-
-# Editor settings
-.vscode/*
-!.vscode/extensions.json
-!.vscode/launch.json
-!.vscode/settings.json
-!.vscode/tasks.json
-
-# Everything else
-.env.cf
-.env.fly
+# Do not use .toml or .yml extension for fly configs in this project
 fly.*.toml
 fly.*.yml
 fly.toml
 fly.yml
+
+# User stuff
+.env.*.secret
+.envrc.local
+/.drafts/
 /.local
+/Taskfile.local.yml
