@@ -6,7 +6,7 @@
     "#internal/*": {
       "types": "./src/*.ts",
       "@swapi/hono/source": "./src/*.ts",
-      "@swapi/debug": "./dist/debug/*.js",
+      "@swapi/server/source": "./src/*.ts",
       "@swapi/release": "./dist/release/*.js",
       "workerd": "./dist/release/*.js"
     }
@@ -15,7 +15,7 @@
     "./*": {
       "types": "./src/*.ts",
       "@swapi/hono/source": "./src/*.ts",
-      "@swapi/debug": "./dist/debug/*.js",
+      "@swapi/server/source": "./src/*.ts",
       "@swapi/release": "./dist/release/*.js",
       "workerd": "./dist/release/*.js"
     }
