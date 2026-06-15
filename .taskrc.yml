@@ -1,2 +1,6 @@
 failfast: true
 disable-fuzzy: true
+interactive: true
+experiments:
+  ENV_PRECEDENCE: 0
+  GENTLE_FORCE: 1
