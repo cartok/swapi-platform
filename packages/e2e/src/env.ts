@@ -14,7 +14,7 @@ const E2EEnvSchema = Type.Intersect([
     SWAPI_E2E_HOST_APP_WORKER: Type.Readonly(Type.String({ minLength: 1 })),
     SWAPI_E2E_PORT_APP_SERVER: Type.Readonly(DynamicPortSchema),
     SWAPI_E2E_PORT_APP_WORKER: Type.Readonly(DynamicPortSchema),
-    SWAPI_SERVER_PORT: Type.Readonly(Type.Optional(DynamicPortSchema)),
+    SWAPI_APP_SERVER_PORT: Type.Readonly(Type.Optional(DynamicPortSchema)),
     TEST_WORKER_INDEX: Type.Readonly(Type.Optional(Type.Number())),
   }),
 ])
@@ -28,6 +28,6 @@ export const env = parseEnv(E2EEnvSchema, {
   SWAPI_E2E_PORT_APP_SERVER: process.env['SWAPI_E2E_PORT_APP_SERVER'],
   SWAPI_E2E_PORT_APP_WORKER: process.env['SWAPI_E2E_PORT_APP_WORKER'],
   SWAPI_LOCAL_E2E: process.env['SWAPI_LOCAL_E2E'],
-  SWAPI_SERVER_PORT: process.env['SWAPI_SERVER_PORT'],
+  SWAPI_APP_SERVER_PORT: process.env['SWAPI_APP_SERVER_PORT'],
   TEST_WORKER_INDEX: process.env['TEST_WORKER_INDEX'],
 }) satisfies E2EEnv

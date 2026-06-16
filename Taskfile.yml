@@ -28,6 +28,26 @@ vars:
     map:
       development: development
       release: production
+  T_DOCKER_HOST:
+  T_DOCKER_PORT:
+  T_DOCKER_REGISTRY_PARTS:
+    - '{{.T_DOCKER_HOST}}'
+    - '{{.T_DOCKER_PORT}}'
+  T_DOCKER_REGISTRY:
+    ref: .T_DOCKER_REGISTRY_PARTS | compact | join ":"
+  T_DOCKER_NAMESPACE: cartok
+  T_DOCKER_REPOSITORY: swapi-platform
+  T_DOCKER_REPOSITORY_PATH_PARTS:
+    - '{{.T_DOCKER_NAMESPACE}}'
+    - '{{.T_DOCKER_REPOSITORY}}'
+  T_DOCKER_REPOSITORY_PATH:
+    ref: .T_DOCKER_REPOSITORY_PATH_PARTS | compact | join "/"
+  T_DOCKER_IMAGE_BASE_NAME_PARTS:
+    - '{{.T_DOCKER_REGISTRY}}'
+    - '{{.T_DOCKER_REPOSITORY_PATH}}'
+  T_DOCKER_IMAGE_BASE_NAME:
+    ref: .T_DOCKER_IMAGE_BASE_NAME_PARTS | compact | join "/"
+  T_DOCKER_IMAGE_LOCAL_TAG: 'local'
 
 includes:
   dev:

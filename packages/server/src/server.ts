@@ -208,7 +208,7 @@ async function startServer(): Promise<Bun.Server<undefined>> {
     })
     const server = Bun.serve({
       hostname: env.SWAPI_SERVER_HOST_INTERNAL,
-      port: env.SWAPI_SERVER_PORT,
+      port: env.SWAPI_APP_SERVER_PORT,
       fetch: hono.fetch,
     })
     console.log(`Server running at: ${server.url.toString()}`)

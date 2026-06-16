@@ -38,7 +38,7 @@ const AppServerEnvSchema = Type.Intersect(
       SWAPI_ROLLDOWN_SOURCE_MAPS: Type.Readonly(RolldownSourceMapsSchema),
       SWAPI_SERVER_HOST_INTERNAL: Type.Readonly(Type.String({ minLength: 1 })),
       SWAPI_SERVER_HOST: Type.Readonly(Type.String({ minLength: 1 })),
-      SWAPI_SERVER_PORT: Type.Readonly(DynamicPortSchema),
+      SWAPI_APP_SERVER_PORT: Type.Readonly(DynamicPortSchema),
     }),
   ],
   {
@@ -78,7 +78,7 @@ export const env = parseEnv(AppServerEnvSchema, {
   SWAPI_ROLLDOWN_SOURCE_MAPS: process.env['SWAPI_ROLLDOWN_SOURCE_MAPS'],
   SWAPI_SERVER_HOST_INTERNAL: process.env['SWAPI_SERVER_HOST_INTERNAL'],
   SWAPI_SERVER_HOST: process.env['SWAPI_SERVER_HOST'],
-  SWAPI_SERVER_PORT: process.env['SWAPI_SERVER_PORT'],
+  SWAPI_APP_SERVER_PORT: process.env['SWAPI_APP_SERVER_PORT'],
   SWAPI_TARGET_ENVIRONMENT: process.env['SWAPI_TARGET_ENVIRONMENT'],
 })
 

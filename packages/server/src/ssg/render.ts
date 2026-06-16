@@ -29,7 +29,7 @@ const angular = new CommonEngine({
 await rm(ssgDistPath, { force: true, recursive: true })
 
 // Render SSG pages.
-const origin = `http://${env.SWAPI_SERVER_HOST}:${env.SWAPI_SERVER_PORT}`
+const origin = `http://${env.SWAPI_SERVER_HOST}:${env.SWAPI_APP_SERVER_PORT}`
 for (const path of SSG_PATHS) {
   const html = await angular.render({
     url: new URL(`/${path}`, origin).toString(),

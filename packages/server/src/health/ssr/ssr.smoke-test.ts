@@ -4,7 +4,7 @@ import { DCE_SWAPI_TARGET_ENVIRONMENT, env } from '#internal/env'
 
 // The timeout should be lower than the one defined in fly config for that health check.
 const SSR_SMOKE_TEST_TIMEOUT_MS = 2000
-const SSR_SMOKE_TEST_URL = new URL(`http://127.0.0.1:${env.SWAPI_SERVER_PORT}`)
+const SSR_SMOKE_TEST_URL = new URL(`http://127.0.0.1:${env.SWAPI_APP_SERVER_PORT}`)
 
 export async function runSsrSmokeTest(): Promise<void> {
   console.log('Running SSR Smoke Test.')

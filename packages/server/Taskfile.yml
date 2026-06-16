@@ -1,7 +1,23 @@
 version: 3
 
 vars:
-  T_APP_SERVER_CONTAINER_NAME: swapi-platform-app-server
+  T_APP_SERVER_SERVICE_NAME: app-server
+  T_APP_SERVER_BUILD_ENV_FILE: '{{.TASK_DIR}}/.env.build'
+  T_APP_SERVER_DOCKER_CONTAINER_NAME_PARTS:
+    - '{{.T_DOCKER_REPOSITORY}}'
+    - '{{.T_APP_SERVER_SERVICE_NAME}}'
+  T_APP_SERVER_DOCKER_CONTAINER_NAME:
+    ref: .T_APP_SERVER_DOCKER_CONTAINER_NAME_PARTS | compact | join "-"
+  T_APP_SERVER_DOCKER_IMAGE_NAME_PARTS:
+    - '{{.T_DOCKER_IMAGE_BASE_NAME}}'
+    - '{{.T_APP_SERVER_SERVICE_NAME}}'
+  T_APP_SERVER_DOCKER_IMAGE_NAME:
+    ref: .T_APP_SERVER_DOCKER_IMAGE_NAME_PARTS | compact | join "/"
+  T_APP_SERVER_DOCKER_IMAGE_REFERENCE_LOCAL_PARTS:
+    - '{{.T_APP_SERVER_DOCKER_IMAGE_NAME}}'
+    - '{{.T_DOCKER_IMAGE_LOCAL_TAG}}'
+  T_APP_SERVER_DOCKER_IMAGE_REFERENCE_LOCAL:
+    ref: .T_APP_SERVER_DOCKER_IMAGE_REFERENCE_LOCAL_PARTS | compact | join ":"
 
 tasks:
   clean:
@@ -267,54 +283,73 @@ tasks:
           name: T_DEV_MODE
           enum: ['false', 'true']
     vars:
-      T_BUILD_ENV_FILE: '{{.ROOT_DIR}}/.env'
-      T_APP_SERVER_ENV_FILE: '{{.TASK_DIR}}/.env/.env.{{.T_TARGET_ENVIRONMENT}}.{{.T_BUILD_LEVEL}}'
-      T_DOCKER_RUNTIME_IMAGE_VARIANT:
+      # TODO: style
+      T_APP_SERVER_RUN_ENV_FILE: '{{.TASK_DIR}}/.env/.env.{{.T_TARGET_ENVIRONMENT}}.{{.T_BUILD_LEVEL}}'
+      T_APP_SERVER_DOCKER_RUNTIME_IMAGE_VARIANT:
         ref: (eq .T_DEV_MODE "true") | ternary "slim" "distroless"
-      T_IMAGE_TAG: >-
-        {{.T_APP_SERVER_CONTAINER_NAME}}:{{.T_DOCKER_TARGET}}-{{.T_TARGET_ENVIRONMENT}}-{{.T_BUILD_LEVEL}}{{.T_IMAGE_TAG_END}}
-      T_IMAGE_TAG_END:
-        ref: >-
-          any (eq .T_TARGET_ENVIRONMENT "local") (eq .T_TARGET_ENVIRONMENT "ci")
-          | ternary "" (cat "-sha-" .T_GIT_COMMIT_SHA_SHORT)
+      T_APP_SERVER_DOCKER_IMAGE_TAG_PARTS:
+        - '{{.T_GIT_COMMIT_SHA_SHORT}}'
+        - '{{.T_DOCKER_TARGET}}'
+        - '{{.T_BUILD_LEVEL}}'
+        - '{{.T_TARGET_ENVIRONMENT}}'
+      T_APP_SERVER_DOCKER_IMAGE_TAG:
+        ref: .T_APP_SERVER_DOCKER_IMAGE_TAG_PARTS | compact | join "-"
+      T_APP_SERVER_DOCKER_IMAGE_REFERENCE_PARTS:
+        - '{{.T_APP_SERVER_DOCKER_IMAGE_NAME}}'
+        - '{{.T_APP_SERVER_DOCKER_IMAGE_TAG}}'
+      T_APP_SERVER_DOCKER_IMAGE_REFERENCE:
+        ref: .T_APP_SERVER_DOCKER_IMAGE_REFERENCE_PARTS | compact | join ":"
     dotenv:
-      - '{{.T_APP_SERVER_ENV_FILE}}'
+      - '{{.T_APP_SERVER_RUN_ENV_FILE}}'
     cmds:
       - |-
-          cat <<- EOF > {{.T_BUILD_ENV_FILE}}
+          cat <<- EOF > {{.T_APP_SERVER_BUILD_ENV_FILE}}
           # This file was genereated by \`task build:docker:config\`.
 
           # --- BUILD TIME
-          APP_SERVER_CONTAINER_NAME={{.T_APP_SERVER_CONTAINER_NAME}}
-          IMAGE_TAG={{.T_IMAGE_TAG}}
-          DOCKER_TARGET={{.T_DOCKER_TARGET}}
-          DOCKER_RUNTIME_IMAGE_VARIANT={{.T_DOCKER_RUNTIME_IMAGE_VARIANT}}
-          NODE_ENV={{get .T_BUILD_LEVEL_TO_NODE_ENV .T_BUILD_LEVEL}}
-          SWAPI_BUILD_LEVEL={{.T_BUILD_LEVEL}}
-          SWAPI_TARGET_ENVIRONMENT={{.T_TARGET_ENVIRONMENT}}
-          SWAPI_GIT_COMMIT_SHA={{.T_GIT_COMMIT_SHA}}
+          APP_SERVER_CONTAINER_NAME={{.T_APP_SERVER_DOCKER_CONTAINER_NAME}}
+          # TODO: style
+          APP_SERVER_DOCKER_IMAGE_REFERENCE={{eq .T_TARGET_ENVIRONMENT "local" | ternary .T_APP_SERVER_DOCKER_IMAGE_REFERENCE_LOCAL .T_APP_SERVER_DOCKER_IMAGE_REFERENCE}}
+          APP_SERVER_DOCKER_TARGET={{.T_DOCKER_TARGET}}
+          APP_SERVER_DOCKER_RUNTIME_IMAGE_VARIANT={{.T_APP_SERVER_DOCKER_RUNTIME_IMAGE_VARIANT}}
+          APP_SERVER_NODE_ENV={{get .T_BUILD_LEVEL_TO_NODE_ENV .T_BUILD_LEVEL}}
+          APP_SERVER_BUILD_LEVEL={{.T_BUILD_LEVEL}}
+          APP_SERVER_TARGET_ENVIRONMENT={{.T_TARGET_ENVIRONMENT}}
+          GIT_COMMIT_SHA={{.T_GIT_COMMIT_SHA}}
 
           # --- RUNTIME
-          APP_SERVER_ENV_FILE={{.T_APP_SERVER_ENV_FILE}}
+          APP_SERVER_RUN_ENV_FILE={{.T_APP_SERVER_RUN_ENV_FILE}}
 
-          # Variables below come from \`$APP_SERVER_ENV_FILE\`.
-          SWAPI_SERVER_PORT=${SWAPI_SERVER_PORT}
+          # Variables below come from runtime dotenv.
+          APP_SERVER_PORT=${SWAPI_APP_SERVER_PORT}
           EOF
-      - echo "Generated {{.T_BUILD_ENV_FILE}}"
+      - echo "Generated {{.T_APP_SERVER_BUILD_ENV_FILE}}"
       - echo "Compose .env file is:"
       - >-
-        cat {{.T_BUILD_ENV_FILE}}
+        cat {{.T_APP_SERVER_BUILD_ENV_FILE}}
         | bat --no-paging --style=auto --language=env
       - echo "Compose config is:"
       - >-
-        docker compose config
+        docker compose --env-file {{.T_APP_SERVER_BUILD_ENV_FILE}} config
         | bat --no-paging --style=auto --language=yml
       - echo ""
       - |
-        gum spin --title "Checking compose config..." \
-        -- docker compose build --quiet --check app-server
+        gum spin --title "Checking compose config..." -- \
+          docker compose --env-file {{.T_APP_SERVER_BUILD_ENV_FILE}} \
+            build --quiet --check \
+            app-server
         echo "Config is valid."
       - echo ""
+
+  build:docker:config:if-need:
+    internal: true
+    requires:
+      <<: *config-requires
+    status:
+      - test -s {{.T_APP_SERVER_BUILD_ENV_FILE}}
+      - test -r {{.T_APP_SERVER_BUILD_ENV_FILE}}
+    cmds:
+      - task: build:docker:config
 
   build:docker:
     interactive: true
@@ -322,10 +357,10 @@ tasks:
     requires:
       <<: *config-requires
     cmds:
-      - task: build:docker:config
+      - task: build:docker:config:if-need
       - |
         if gum confirm "Build?"; then
-          docker compose build app-server
+          docker compose --env-file {{.T_APP_SERVER_BUILD_ENV_FILE}} build --quiet app-server
         fi
 
   start:
@@ -475,9 +510,9 @@ tasks:
       T_THROTTLED:
         ref: .T_THROTTLED | default "false"
     cmds:
-      - docker rm --force {{.T_APP_SERVER_CONTAINER_NAME}} >/dev/null 2>&1 || true
-      - task: build:docker:config
-      - docker compose up app-server
+      - docker rm --force {{.T_APP_SERVER_DOCKER_CONTAINER_NAME}} >/dev/null 2>&1 || true
+      - task: build:docker:config:if-need
+      - docker compose --env-file {{.T_APP_SERVER_BUILD_ENV_FILE}} up app-server
       # TODO: not fully implemented
       # - >
       #   docker run
@@ -489,7 +524,7 @@ tasks:
       #   --rm
       #   --init
       #   --ipc=host
-      #   --publish 127.0.0.1:${SWAPI_SERVER_PORT}:${SWAPI_SERVER_PORT}
+      #   --publish 127.0.0.1:${SWAPI_APP_SERVER_PORT}:${SWAPI_APP_SERVER_PORT}
       #   {{if eq .T_THROTTLED "true"}}
       #   --cpus=1.0
       #   --memory=512m
@@ -499,5 +534,5 @@ tasks:
       #   --ulimit nofile=65536:65536
       #   --ulimit core=0:0
       #   {{end}}
-      #   --name={{.T_APP_SERVER_CONTAINER_NAME}}
+      #   --name={{.T_APP_SERVER_DOCKER_CONTAINER_NAME}}
       #   {{.T_IMAGE_TAG}}

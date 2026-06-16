@@ -2,25 +2,25 @@ kill_timeout: ${SWAPI_FLY_KILL_TIMEOUT}s
 
 checks:
   alife:
-    port: ${SWAPI_SERVER_PORT}
+    port: ${SWAPI_APP_SERVER_PORT}
     timeout: ${SWAPI_FLY_CHECK_ALIFE_TIMEOUT}s
     headers:
       X-Secret-Health-Check-Token: ${SWAPI_SECRET_HEALTH_CHECK_TOKEN}
 
   errors:
-    port: ${SWAPI_SERVER_PORT}
+    port: ${SWAPI_APP_SERVER_PORT}
     timeout: ${SWAPI_FLY_CHECK_ERRORS_TIMEOUT}s
     headers:
       X-Secret-Health-Check-Token: ${SWAPI_SECRET_HEALTH_CHECK_TOKEN}
 
   ssr:
-    port: ${SWAPI_SERVER_PORT}
+    port: ${SWAPI_APP_SERVER_PORT}
     timeout: ${SWAPI_FLY_CHECK_SSR_TIMEOUT}s
     headers:
       X-Secret-Health-Check-Token: ${SWAPI_SECRET_HEALTH_CHECK_TOKEN}
 
 http_service:
-  internal_port: ${SWAPI_SERVER_PORT}
+  internal_port: ${SWAPI_APP_SERVER_PORT}
   concurrency:
     soft_limit: ${SWAPI_FLY_REQUEST_SOFT_LIMIT}
     hard_limit: ${SWAPI_FLY_REQUEST_HARD_LIMIT}
