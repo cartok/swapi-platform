@@ -110,7 +110,7 @@ tasks:
         {{.ROOT_DIR}}
 
   start:docker:
-    desc: Start with `--output interleaved` for dev mode.
+    interactive: true
     requires:
       vars:
         - name: T_DEV_MODE

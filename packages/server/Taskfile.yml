@@ -430,7 +430,7 @@ tasks:
           T_WATCHEXEC_ARGS: [--debounce="3s"]
 
   start:docker:
-    desc: Start with `--output interleaved` for dev mode.
+    interactive: true
     requires:
       vars:
         - name: T_BUILD_LEVEL

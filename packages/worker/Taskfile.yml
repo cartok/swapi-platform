@@ -149,7 +149,7 @@ tasks:
         ./dist/index.js
 
   start:docker:
-    desc: Start with `--output interleaved` for dev mode.
+    interactive: true
     requires:
       vars:
         - name: T_TARGET_ENVIRONMENT
