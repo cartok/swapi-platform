@@ -19,7 +19,6 @@
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
   },
-  "editor.rulers": [90],
   "eslint.debug": false,
   "eslint.format.enable": false,
   "eslint.quiet": true,
