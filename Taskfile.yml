@@ -14,11 +14,20 @@ vars:
       if command -v git >/dev/null 2>&1; then
         printf "%s" "$(git rev-parse --verify HEAD)"
       fi
+  T_GIT_COMMIT_SHA_SHORT:
+    sh: |
+      if command -v git >/dev/null 2>&1; then
+        printf "%s" "$(git rev-parse --verify --short=12 HEAD)"
+      fi
   T_SOURCES:
     map:
       lockfile: '{{.ROOT_DIR}}/bun.lock'
       tsconfigPackage: '{{.ROOT_DIR}}/packages/tsconfig/package.json'
       tsconfigs: '{{.ROOT_DIR}}/packages/tsconfig/src/**/*.json'
+  T_BUILD_LEVEL_TO_NODE_ENV:
+    map:
+      development: development
+      release: production
 
 includes:
   dev:

@@ -30,7 +30,6 @@ tasks:
         - T_CONFIG_TARGET
     vars:
       T_ENV_FILE: './.env/.env.{{.T_TARGET_ENVIRONMENT}}.{{.T_BUILD_LEVEL}}'
-      T_DOCKER_ENV_FILE: '{{.T_ENV_FILE}}.docker'
       T_CONFIG_TEMPLATE: ./fly.template.yaml
       T_CONFIG_VARIABLES: ./fly.variables.yaml
       T_CONFIG_TEMPLATE_COPY:
@@ -41,7 +40,6 @@ tasks:
         sh: mktemp /tmp/fly.variables.copy.env.XXXXXX.yaml
     dotenv:
       - '{{.ROOT_DIR}}/.env.fly.secret'
-      - '{{.T_DOCKER_ENV_FILE}}'
       - '{{.T_ENV_FILE}}'
     preconditions:
       - sh: command -v yq && yq --version | rg 'mikefarah'
@@ -83,11 +81,9 @@ tasks:
           enum: ['true', 'false']
     vars:
       T_ENV_FILE: './.env/.env.{{.T_TARGET_ENVIRONMENT}}.{{.T_BUILD_LEVEL}}'
-      T_DOCKER_ENV_FILE: '{{.T_ENV_FILE}}.docker'
       T_CONFIG:
         sh: mktemp /tmp/fly.XXXXXX.yaml
     dotenv:
-      - '{{.T_DOCKER_ENV_FILE}}'
       - '{{.T_ENV_FILE}}'
     preconditions:
       - command -v fly

@@ -161,7 +161,6 @@ Taskfiles load the remaining environment variables via dotenv from `.env` files 
 
 - `packages/client/.env/.env.<T_TARGET_ENVIRONMENT>.<T_BUILD_LEVEL>`
 - `packages/server/.env/.env.<T_TARGET_ENVIRONMENT>.<T_BUILD_LEVEL>`
-- Docker runtime variants additionally use `packages/server/.env/.env.<T_TARGET_ENVIRONMENT>.<T_BUILD_LEVEL>.docker`
 
 ## Documentation
 

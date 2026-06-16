@@ -8,7 +8,7 @@ import { CACHE_TAGS } from '@swapi/shared/cache/cache-tags'
 import { createCommitBasedWeakETagHeader } from '@swapi/shared/cache/etags'
 import { isAbortLikeError } from '@swapi/shared/errors/abort-error'
 
-import { DCE_GIT_COMMIT_SHA, DCE_SWAPI_LOCAL_E2E } from '#internal/env'
+import { DCE_SWAPI_GIT_COMMIT_SHA, DCE_SWAPI_LOCAL_E2E } from '#internal/env'
 import { isErrorCode, SERVER_ERROR_CODES } from '#internal/error/error'
 import { createAbortResponse } from '#internal/request/request-abort.handler'
 import type { ServerHonoEnv } from '#internal/types'
@@ -100,7 +100,7 @@ export const addSsgHandler: HonoHandler<ServerHonoEnv> = (hono) => {
       return c.html(html, 200, {
         ...DOCUMENT_CACHE_HEADERS,
         'Cache-Tag': [CACHE_TAGS.HTML, CACHE_TAGS.SSG],
-        ...createCommitBasedWeakETagHeader(DCE_GIT_COMMIT_SHA),
+        ...createCommitBasedWeakETagHeader(DCE_SWAPI_GIT_COMMIT_SHA),
       })
     } catch (error) {
       if (isAbortLikeError(error)) {

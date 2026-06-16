@@ -26,15 +26,6 @@ const AppServerEnvSchema = Type.Intersect(
       CI: Type.Readonly(Type.Boolean({ default: false })),
       NODE_ENV: Type.Readonly(NodeEnvSchema),
       SWAPI_ALLOWED_HOSTS: Type.Readonly(Type.String({ minLength: 1 })),
-      SWAPI_MINIFY: Type.Readonly(Type.Boolean()),
-      SWAPI_GIT_COMMIT_SHA: Type.Readonly(
-        Type.String({
-          minLength: 40,
-          maxLength: 40,
-          default: '0000000000000000000000000000000000000000',
-        }),
-      ),
-      SWAPI_ROLLDOWN_SOURCE_MAPS: Type.Readonly(RolldownSourceMapsSchema),
       SWAPI_FLY_CHECK_ALIFE_TIMEOUT: Type.Readonly(Type.Integer({ minimum: 1 })),
       SWAPI_FLY_CHECK_ERRORS_TIMEOUT: Type.Readonly(Type.Integer({ minimum: 1 })),
       SWAPI_FLY_CHECK_SSR_TIMEOUT: Type.Readonly(Type.Integer({ minimum: 1 })),
@@ -42,6 +33,9 @@ const AppServerEnvSchema = Type.Intersect(
       SWAPI_FLY_REQUEST_HARD_LIMIT: Type.Readonly(Type.Integer({ minimum: 1 })),
       SWAPI_FLY_REQUEST_SOFT_LIMIT: Type.Readonly(Type.Integer({ minimum: 1 })),
       SWAPI_FLY_SERVICE_CHECK_READY_TIMEOUT: Type.Readonly(Type.Integer({ minimum: 1 })),
+      SWAPI_GIT_COMMIT_SHA: Type.Readonly(Type.String({ minLength: 40, maxLength: 40 })),
+      SWAPI_MINIFY: Type.Readonly(Type.Boolean()),
+      SWAPI_ROLLDOWN_SOURCE_MAPS: Type.Readonly(RolldownSourceMapsSchema),
       SWAPI_SERVER_HOST_INTERNAL: Type.Readonly(Type.String({ minLength: 1 })),
       SWAPI_SERVER_HOST: Type.Readonly(Type.String({ minLength: 1 })),
       SWAPI_SERVER_PORT: Type.Readonly(DynamicPortSchema),
@@ -109,7 +103,7 @@ export const allowedHosts = Object.freeze([...new Set(parsedAllowedHosts)])
  * Therefore any variable listed here must be used instead of the runtime variables in `env`.
  */
 
-export const DCE_GIT_COMMIT_SHA =
+export const DCE_SWAPI_GIT_COMMIT_SHA =
   typeof SWAPI_GIT_COMMIT_SHA === 'undefined'
     ? env.SWAPI_GIT_COMMIT_SHA
     : SWAPI_GIT_COMMIT_SHA

@@ -1,7 +1,7 @@
 version: 3
 
 vars:
-  T_DIN_APP_SERVER: swapi-platform-app-server
+  T_APP_SERVER_CONTAINER_NAME: swapi-platform-app-server
 
 tasks:
   clean:
@@ -248,53 +248,85 @@ tasks:
         "$(bunx --no-install bun pm bin)/rolldown"
         --config
 
-  build:docker:
-    label: '{{.TASK}}:{{.T_IMAGE_TAG}}'
-    requires:
+  # TODO: Für jeden service 1 .env ----> muss ich nicht die variablen nun für die services prefixen wenn ich zb alle services auf einmal mit compose baue... :()
+  build:docker:config:
+    interactive: true
+    silent: true
+    requires: &config-requires
       vars:
-        - name: T_BUILD_LEVEL
-          enum: [development, release]
-        - name: T_TARGET_ENVIRONMENT
+        - &config-requires-build-level
+          name: T_BUILD_LEVEL
+          enum: [release, development]
+        - &config-requires-target-environment
+          name: T_TARGET_ENVIRONMENT
           enum: [local, ci, testing, production]
-        - name: T_DOCKER_TARGET
+        - &config-requires-docker-target
+          name: T_DOCKER_TARGET
           enum: [runtime, base, deps, code, bundle]
-        - name: T_DEV_MODE
-          enum: ['true', 'false']
+        - &config-requires-dev-mode
+          name: T_DEV_MODE
+          enum: ['false', 'true']
     vars:
-      T_BUILD_LEVEL:
-        ref: coalesce (env "SWAPI_BUILD_LEVEL") .T_BUILD_LEVEL "release"
-      T_TARGET_ENVIRONMENT:
-        ref: coalesce (env "SWAPI_TARGET_ENVIRONMENT") .T_TARGET_ENVIRONMENT "local"
-      T_DEV_MODE:
-        ref: .T_DEV_MODE | default "false"
-      T_RUNTIME_BUN_VARIANT:
+      T_BUILD_ENV_FILE: '{{.ROOT_DIR}}/.env'
+      T_APP_SERVER_ENV_FILE: '{{.TASK_DIR}}/.env/.env.{{.T_TARGET_ENVIRONMENT}}.{{.T_BUILD_LEVEL}}'
+      T_DOCKER_RUNTIME_IMAGE_VARIANT:
         ref: (eq .T_DEV_MODE "true") | ternary "slim" "distroless"
-      T_ENV_FILE: './.env/.env.{{.T_TARGET_ENVIRONMENT}}.{{.T_BUILD_LEVEL}}'
-      T_DOCKER_ENV_FILE: '{{.T_ENV_FILE}}.docker'
-      T_IMAGE_TAG: '{{.T_DIN_APP_SERVER}}:{{.T_DOCKER_TARGET}}-{{.T_TARGET_ENVIRONMENT}}-{{.T_BUILD_LEVEL}}-sha-{{.T_GIT_COMMIT_SHA}}'
+      T_IMAGE_TAG: >-
+        {{.T_APP_SERVER_CONTAINER_NAME}}:{{.T_DOCKER_TARGET}}-{{.T_TARGET_ENVIRONMENT}}-{{.T_BUILD_LEVEL}}{{.T_IMAGE_TAG_END}}
+      T_IMAGE_TAG_END:
+        ref: >-
+          any (eq .T_TARGET_ENVIRONMENT "local") (eq .T_TARGET_ENVIRONMENT "ci")
+          | ternary "" (cat "-sha-" .T_GIT_COMMIT_SHA_SHORT)
     dotenv:
-      - '{{.T_DOCKER_ENV_FILE}}'
-      - '{{.T_ENV_FILE}}'
-    env:
-      SWAPI_BUILD_LEVEL:
-        ref: .T_BUILD_LEVEL
-      SWAPI_TARGET_ENVIRONMENT:
-        ref: .T_TARGET_ENVIRONMENT
+      - '{{.T_APP_SERVER_ENV_FILE}}'
     cmds:
-      - >
-        docker buildx build
-        --load
-        --file ./Dockerfile.app-server
-        --build-arg NODE_ENV=${NODE_ENV}
-        --build-arg SWAPI_BUILD_LEVEL={{.T_BUILD_LEVEL}}
-        --build-arg SWAPI_TARGET_ENVIRONMENT={{.T_TARGET_ENVIRONMENT}}
-        --build-arg SWAPI_GIT_COMMIT_SHA={{.T_GIT_COMMIT_SHA}}
-        --build-arg RUNTIME_BUN_VARIANT={{.T_RUNTIME_BUN_VARIANT}}
-        {{if ne .T_DOCKER_TARGET "runtime"}}
-        --target {{.T_DOCKER_TARGET}}
-        {{end}}
-        --tag {{.T_IMAGE_TAG}}
-        {{.ROOT_DIR}}
+      - |-
+          cat <<- EOF > {{.T_BUILD_ENV_FILE}}
+          # This file was genereated by \`task build:docker:config\`.
+
+          # --- BUILD TIME
+          APP_SERVER_CONTAINER_NAME={{.T_APP_SERVER_CONTAINER_NAME}}
+          IMAGE_TAG={{.T_IMAGE_TAG}}
+          DOCKER_TARGET={{.T_DOCKER_TARGET}}
+          DOCKER_RUNTIME_IMAGE_VARIANT={{.T_DOCKER_RUNTIME_IMAGE_VARIANT}}
+          NODE_ENV={{get .T_BUILD_LEVEL_TO_NODE_ENV .T_BUILD_LEVEL}}
+          SWAPI_BUILD_LEVEL={{.T_BUILD_LEVEL}}
+          SWAPI_TARGET_ENVIRONMENT={{.T_TARGET_ENVIRONMENT}}
+          SWAPI_GIT_COMMIT_SHA={{.T_GIT_COMMIT_SHA}}
+
+          # --- RUNTIME
+          APP_SERVER_ENV_FILE={{.T_APP_SERVER_ENV_FILE}}
+
+          # Variables below come from \`$APP_SERVER_ENV_FILE\`.
+          SWAPI_SERVER_PORT=${SWAPI_SERVER_PORT}
+          EOF
+      - echo "Generated {{.T_BUILD_ENV_FILE}}"
+      - echo "Compose .env file is:"
+      - >-
+        cat {{.T_BUILD_ENV_FILE}}
+        | bat --no-paging --style=auto --language=env
+      - echo "Compose config is:"
+      - >-
+        docker compose config
+        | bat --no-paging --style=auto --language=yml
+      - echo ""
+      - |
+        gum spin --title "Checking compose config..." \
+        -- docker compose build --quiet --check app-server
+        echo "Config is valid."
+      - echo ""
+
+  build:docker:
+    interactive: true
+    silent: true
+    requires:
+      <<: *config-requires
+    cmds:
+      - task: build:docker:config
+      - |
+        if gum confirm "Build?"; then
+          docker compose build app-server
+        fi
 
   start:
     label: '{{.TASK}}:{{.T_TARGET_ENVIRONMENT}}:{{.T_BUILD_LEVEL}}'
@@ -433,64 +465,39 @@ tasks:
     interactive: true
     requires:
       vars:
-        - name: T_BUILD_LEVEL
-          enum: [development, release]
-        - name: T_TARGET_ENVIRONMENT
-          enum: [local, ci]
-        - name: T_DOCKER_TARGET
-          enum: [runtime, base, deps, code, bundle]
+        - *config-requires-build-level
+        - *config-requires-target-environment
+        - *config-requires-docker-target
+        - *config-requires-dev-mode
         - name: T_THROTTLED
           enum: ['true', 'false']
-        - name: T_DEV_MODE
-          enum: ['true', 'false']
     vars:
-      T_BUILD_LEVEL:
-        ref: coalesce (env "SWAPI_BUILD_LEVEL") .T_BUILD_LEVEL "release"
-      T_TARGET_ENVIRONMENT:
-        ref: coalesce (env "SWAPI_TARGET_ENVIRONMENT") .T_TARGET_ENVIRONMENT "local"
       T_THROTTLED:
         ref: .T_THROTTLED | default "false"
-      T_ENV_FILE: './.env/.env.{{.T_TARGET_ENVIRONMENT}}.{{.T_BUILD_LEVEL}}'
-      T_DOCKER_ENV_FILE: '{{.T_ENV_FILE}}.docker'
-      T_IMAGE_TAG: '{{.T_DIN_APP_SERVER}}:{{.T_DOCKER_TARGET}}-{{.T_TARGET_ENVIRONMENT}}-{{.T_BUILD_LEVEL}}-sha-{{.T_GIT_COMMIT_SHA}}'
-    dotenv:
-      - '{{.T_DOCKER_ENV_FILE}}'
-      - '{{.T_ENV_FILE}}'
-    env:
-      SWAPI_BUILD_LEVEL:
-        ref: .T_BUILD_LEVEL
-      SWAPI_TARGET_ENVIRONMENT:
-        ref: .T_TARGET_ENVIRONMENT
     cmds:
-      - task: build:docker
-        if: '{{eq .T_TARGET_ENVIRONMENT "local"}}'
-        vars:
-          T_BUILD_LEVEL:
-            ref: .T_BUILD_LEVEL
-          T_TARGET_ENVIRONMENT:
-            ref: .T_TARGET_ENVIRONMENT
-          T_DOCKER_TARGET:
-            ref: .T_DOCKER_TARGET
-      - docker rm --force {{.T_DIN_APP_SERVER}} >/dev/null 2>&1 || true
-      - >
-        docker run
-        {{if eq .T_DEV_MODE "true"}}
-        --interactive
-        --tty
-        --entrypoint bash
-        {{end}}
-        --rm
-        --init
-        --ipc=host
-        --publish 127.0.0.1:${SWAPI_SERVER_PORT}:${SWAPI_SERVER_PORT}
-        {{if eq .T_THROTTLED "true"}}
-        --cpus=1.0
-        --memory=512m
-        --memory-swap=512m
-        {{end}}
-        {{if ne .T_THROTTLED "true"}}
-        --ulimit nofile=65536:65536
-        --ulimit core=0:0
-        {{end}}
-        --name={{.T_DIN_APP_SERVER}}
-        {{.T_IMAGE_TAG}}
+      - docker rm --force {{.T_APP_SERVER_CONTAINER_NAME}} >/dev/null 2>&1 || true
+      - task: build:docker:config
+      - docker compose up app-server
+      # TODO: not fully implemented
+      # - >
+      #   docker run
+      #   {{if eq .T_DEV_MODE "true"}}
+      #   --interactive
+      #   --tty
+      #   --entrypoint bash
+      #   {{end}}
+      #   --rm
+      #   --init
+      #   --ipc=host
+      #   --publish 127.0.0.1:${SWAPI_SERVER_PORT}:${SWAPI_SERVER_PORT}
+      #   {{if eq .T_THROTTLED "true"}}
+      #   --cpus=1.0
+      #   --memory=512m
+      #   --memory-swap=512m
+      #   {{end}}
+      #   {{if ne .T_THROTTLED "true"}}
+      #   --ulimit nofile=65536:65536
+      #   --ulimit core=0:0
+      #   {{end}}
+      #   --name={{.T_APP_SERVER_CONTAINER_NAME}}
+      #   {{.T_IMAGE_TAG}}
