@@ -20,7 +20,6 @@
 
 - [ ] Fixture for screenshot tests: always mask `<app-image>`
 - [ ] `.spec.ts -> .(unit|int|e2e).ts`
-- [ ] Fix issue where Angular sets `app-root[ng-server-context="ssr"]` also during SSG
 - [ ] Further improve test coverage: Feature tests for pages other than home page; Component tests
 
 ---
