@@ -33,7 +33,7 @@ export const swapiMockInterceptor: HttpInterceptorFn = (
   request: HttpRequest<unknown>,
   next: HttpHandlerFn,
 ) => {
-  if (!SWAPI_USE_MOCK || request.method !== 'GET') {
+  if (request.method !== 'GET') {
     return next(request)
   }
 

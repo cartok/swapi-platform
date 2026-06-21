@@ -3,10 +3,16 @@ import type { ApplicationConfig } from '@angular/core'
 import { mergeApplicationConfig } from '@angular/core'
 import { provideRouter, withInMemoryScrolling, withRouterConfig } from '@angular/router'
 
-import { swapiMockInterceptor } from '@/api/swapi/swapi.mock.interceptor'
 import { appConfigBase } from '@/app.config.base'
 import { routes } from '@/app.routes'
 import { httpRetryInterceptor } from '@/http/http-retry.interceptor'
+
+const httpInterceptors = []
+if (SWAPI_USE_MOCK) {
+  const { swapiMockInterceptor } = await import('@/api/swapi/swapi.mock.interceptor')
+  httpInterceptors.push(swapiMockInterceptor)
+}
+httpInterceptors.push(httpRetryInterceptor)
 
 const config: ApplicationConfig = {
   providers: [
@@ -19,10 +25,7 @@ const config: ApplicationConfig = {
         paramsInheritanceStrategy: 'always',
       }),
     ),
-    provideHttpClient(
-      withFetch(),
-      withInterceptors([swapiMockInterceptor, httpRetryInterceptor]),
-    ),
+    provideHttpClient(withFetch(), withInterceptors(httpInterceptors)),
   ],
 }
 
