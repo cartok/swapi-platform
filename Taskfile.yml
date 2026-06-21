@@ -76,6 +76,9 @@ includes:
   tools:
     taskfile: ./Taskfile.tools.yml
     dir: ./
+  cf:
+    taskfile: ./Taskfile.cf.yml
+    dir: ./
   client:
     taskfile: ./packages/client
     dir: ./packages/client

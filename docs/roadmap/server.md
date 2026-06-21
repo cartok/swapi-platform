@@ -19,6 +19,7 @@
   - [ ] Make use of them.
 - [ ] Is it possible to have the node server use sourcemaps to keep MINIFY in server env active so that runtime code is minified but still get good error logs?
 - [x] Create a secret check utility
+- [ ] Create a json payload on deployment which holds the git commit sha and the list of cache tags the app-server was deployed with and once deployment is final commit that file to the repository. Then use the file in [Taskfile.cf.yml](../../Taskfile.cf.yml) to always read the cache tags from the currently deployed version.
 
 ## Stability
 

@@ -14,17 +14,17 @@ type CacheHeaders = Record<string, string>
 
 export const CACHE_TAGS = Object.freeze({
   ASSET: 'asset',
-  AUDIO: 'audio',
-  FONT: 'font',
+  AUDIO: 'asset:media:audio',
+  FONT: 'asset:font',
   HTML: 'html',
-  IMAGE: 'image',
-  MEDIA: 'media',
+  IMAGE: 'asset:media:image',
+  MEDIA: 'asset:media',
+  OTHER: 'other',
   SCRIPT: 'script',
-  SSG: 'ssg',
-  SSR: 'ssr',
+  SSG: 'html:ssg',
+  SSR: 'html:ssr',
   STYLE: 'style',
-  VIDEO: 'video',
-  DATA: 'data',
+  VIDEO: 'asset:media:video',
 } as const)
 
 type CacheTag = (typeof CACHE_TAGS)[keyof typeof CACHE_TAGS]
@@ -69,7 +69,7 @@ for (const fileExtension of FILE_EXTENSION_SET) {
   } else if (DATA_FILE_EXTENSION_SET.has(fileExtension)) {
     fileExtensionCacheTagHeadersMap.set(
       fileExtension,
-      createCacheTagsHeader([CACHE_TAGS.DATA]),
+      createCacheTagsHeader([CACHE_TAGS.OTHER]),
     )
   } else {
     throw new Error(`File extension ${fileExtension} is not assigned.`)

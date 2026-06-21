@@ -1,0 +1,62 @@
+version: 3
+
+vars:
+  GUM_DELIMITER: ' '
+  CACHE_TAGS:
+    sh: |-
+      bunx --no-install bun run - <<'EOF'
+        import { CACHE_TAGS } from './packages/shared/src/cache/cache-tags'
+        const tags = Object.values(CACHE_TAGS)
+          .sort()
+          .join('{{.GUM_DELIMITER}}')
+        await Bun.write(Bun.stdout, tags);
+      EOF
+
+tasks:
+  purge-tags:
+    interactive: true
+    silent: true
+    vars:
+      PAYLOAD_FILE:
+        sh: mktemp
+    dotenv:
+      - ./.env.cf.secret
+    cmds:
+      - defer: rm -f {{.PAYLOAD_FILE | q}}
+      - |
+        selected_tags="$(
+          gum choose --no-limit \
+            --input-delimiter {{.GUM_DELIMITER | q}} \
+            -- {{.CACHE_TAGS}}
+        )"
+
+        if [ -z "$selected_tags" ]; then
+          echo "No cache tags selected." >&2
+          exit 1
+        fi
+
+        printf '%s' "$selected_tags" \
+          | jq --raw-input '.' \
+          | jq --compact-output --slurp '{ tags: . }' > {{.PAYLOAD_FILE | q}}
+
+        selected_tags_string="$(jq --raw-output '.tags | join(", ")' {{.PAYLOAD_FILE | q}})"
+
+        gum confirm --default=0 -- "Purge payload cache for tags: $selected_tags_string"
+      - >
+        curl "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/purge_cache"
+        -H "Authorization: Bearer $CF_TOKEN_CACHE_PURGE"
+        -H 'Content-Type: application/json'
+        -d @{{.PAYLOAD_FILE | q}}
+
+  purge-all:
+    interactive: true
+    silent: true
+    dotenv:
+      - ./.env.cf.secret
+    cmds:
+      - gum confirm --default=0 -- "Purge EVERYTHING from Cloudflare cache?"
+      - >
+        curl "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/purge_cache"
+        -H "Authorization: Bearer $CF_TOKEN_CACHE_PURGE"
+        -H 'Content-Type: application/json'
+        -d '{"purge_everything":true}'
