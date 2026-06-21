@@ -54,7 +54,6 @@
         "lightningcss": "catalog:tooling",
         "typescript": "catalog:ts5",
         "vite": "catalog:tooling",
-        "vitest": "catalog:testing",
       },
     },
     "packages/e2e": {
