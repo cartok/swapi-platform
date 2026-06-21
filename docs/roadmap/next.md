@@ -50,6 +50,8 @@ The (vite) app has no real runtime variables, only those that are statically bui
 
 Generally reminder: For runtime variables fly secrets can be used. But build variables that affect the code logic output, should not get changed! Should create a build manifest for these variables and validate it.
 
+- [x] Done by moving SSG from build process to run/deploy process and other deals
+
 ## Important Angular Update
 
 Angular 22 is out and it supports TS6, so the update would bring more ease to the project as it right now it uses TS5 and TS5.
