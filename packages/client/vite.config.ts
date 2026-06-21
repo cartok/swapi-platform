@@ -15,8 +15,9 @@ import { logEnv } from '../shared/src/environment/env'
 import { envToOxcDefine } from '../shared/src/environment/globals'
 import { browserBuildEnv, buildEnv } from './src/env'
 
-logEnv(buildEnv, 'Vite App Build Environment Variables')
-logEnv(browserBuildEnv, 'Vite App Build Environment Variables (Browser)')
+console.log('App (Vite)')
+logEnv(buildEnv, { type: 'build time' })
+logEnv(browserBuildEnv, { type: 'build time', typeContext: 'visible in browser' })
 
 const clientResolveConditions: string[] = createResolveConditions(defaultClientConditions)
 const serverResolveConditions: string[] = createResolveConditions(defaultServerConditions)

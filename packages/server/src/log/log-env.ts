@@ -4,8 +4,8 @@ import { logEnv } from '@swapi/shared/environment/env'
 import { buildEnv, runEnv, secretEnv } from '../env.js'
 
 export function logServerEnv() {
-  logEnv(buildEnv, 'App Server Environment Variables (build time)')
-  logEnv(runEnv, 'App Server Environment Variables (runtime)')
+  logEnv(buildEnv, { type: 'build time' })
+  logEnv(runEnv, { type: 'runtime' })
 }
 
 export function logSystemEnv() {
@@ -29,5 +29,6 @@ export function logSystemEnv() {
     },
     {} as Record<string, unknown>,
   )
-  logEnv(systemEnv, 'App Server System Environment Variables')
+  logEnv(systemEnv, { type: 'runtime', typeContext: 'of host system' })
 }
+// Environment Variables (build time) - visbile in browser

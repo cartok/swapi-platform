@@ -8,8 +8,10 @@ import { FLAGS } from '#internal/flags'
 import { LABELS } from '#internal/labels'
 import { TAGS } from '#internal/tags'
 
+console.info('Playwright')
 if (runEnv.TEST_WORKER_INDEX === undefined) {
-  logEnv(runEnv, 'Playwright Environment Variables')
+  console.info('Playwright')
+  logEnv(runEnv, { type: 'runtime' })
 }
 
 const serverBaseUrl = `http://${runEnv.APP_SERVER_HOSTNAME}:${runEnv.APP_SERVER_PORT}`

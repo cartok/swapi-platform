@@ -17,7 +17,7 @@ import { RenderWorkerPool } from '#internal/ssr/render-worker-pool'
 import type { RenderWorkerPoolConfig } from '#internal/ssr/render-worker-pool.types'
 import type { HonoRuntimeOptions, ServerRuntimeMetrics } from '#internal/types'
 
-console.info(`Process id is: ${process.pid}`)
+console.info('App-Server')
 if (
   DCE_BUILD_TARGET_ENVIRONMENT !== 'local' &&
   DCE_BUILD_TARGET_ENVIRONMENT !== 'production' &&
@@ -26,6 +26,7 @@ if (
   logSystemEnv()
 }
 logServerEnv()
+console.info(`Process id is: ${process.pid}`)
 
 // The timeout should be lower than the one defined in fly config for that health check.
 const FORCE_EXIT_TIMEOUT = 7_500

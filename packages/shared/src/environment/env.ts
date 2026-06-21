@@ -65,11 +65,21 @@ export function validateRequiredSecretEnv<T extends TObject>(
   throw new Error(`Invalid runtime secret environment (${details.join('; ')}).`)
 }
 
-export function logEnv(env: Record<string, unknown>, title?: string): void {
-  if (title) {
-    console.info(`${title}:`)
-  }
+type EnvironmentVariableTypes = 'build time' | 'runtime' | 'runtime secret'
 
+export function logEnv(
+  env: Record<string, unknown>,
+  options: { type: EnvironmentVariableTypes; typeContext?: string },
+): void {
+  const text = [
+    'Environment Variables',
+    `(${options.type})`,
+    !options.typeContext ? null : `- ${options.typeContext}`,
+  ]
+    .filter(Boolean)
+    .join(' ')
+
+  console.info(`${text}:`)
   console.info(env)
 }
 

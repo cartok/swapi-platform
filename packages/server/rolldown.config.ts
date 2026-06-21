@@ -11,6 +11,7 @@ import { buildEnv } from './src/env'
 import { BUILD_ENV_MANIFEST_FILE_NAME } from './src/env.manifest'
 import { logServerEnv } from './src/log/log-env'
 
+console.log('App-Server (Rolldown)')
 logServerEnv()
 
 const buildVariantPath = `${buildEnv.BUILD_TARGET_ENVIRONMENT}/${buildEnv.BUILD_PROFILE}`
