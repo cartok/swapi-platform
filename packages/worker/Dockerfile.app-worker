@@ -5,6 +5,8 @@ ARG CID_BUN_CACHE=bun
 
 FROM oven/bun:${BUN_VERSION}-slim AS base
 
+WORKDIR /app
+
 ARG CID_BUN_CACHE
 
 ENV DO_NOT_TRACK=1
@@ -14,8 +16,6 @@ ENV BUN_FEATURE_FLAG_NO_ORPHANS=1
 ENTRYPOINT ["dash"]
 
 SHELL ["/bin/dash", "-euo", "pipefail", "-c"]
-
-WORKDIR /app
 
 FROM base AS build-deps
 
@@ -60,9 +60,9 @@ EOF
 
 FROM base AS runtime-deps
 
-ARG CID_BUN_CACHE
-
 WORKDIR /app
+
+ARG CID_BUN_CACHE
 
 COPY --parents ./.npmrc ./
 COPY --parents ./.node-version ./
