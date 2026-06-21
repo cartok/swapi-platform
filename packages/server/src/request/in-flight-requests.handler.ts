@@ -1,6 +1,6 @@
 import type { HonoHandler } from '@swapi/hono/types'
 
-import { env } from '#internal/env'
+import { buildEnv } from '#internal/env'
 import type { HonoRuntimeOptions, ServerHonoEnv } from '#internal/types'
 
 export const addInFlightRequestsHandler: HonoHandler<
@@ -10,11 +10,11 @@ export const addInFlightRequestsHandler: HonoHandler<
   hono.use('*', async (_c, next) => {
     runtimeMetrics.hono.inFlightRequests++
 
-    if (runtimeMetrics.hono.inFlightRequests > env.SWAPI_FLY_REQUEST_SOFT_LIMIT) {
+    if (runtimeMetrics.hono.inFlightRequests > buildEnv.BUILD_FLY_REQUEST_SOFT_LIMIT) {
       console.error(
         [
           `In-flight requests (${runtimeMetrics.hono.inFlightRequests}) exceeded`,
-          `fly's soft-limit (${env.SWAPI_FLY_REQUEST_SOFT_LIMIT}).`,
+          `fly's soft-limit (${buildEnv.BUILD_FLY_REQUEST_SOFT_LIMIT}).`,
         ].join(' '),
       )
     }

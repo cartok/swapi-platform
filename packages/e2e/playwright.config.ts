@@ -2,18 +2,18 @@ import type { PlaywrightTestProject } from '@playwright/test'
 import { defineConfig, devices } from '@playwright/test'
 import { logEnv } from '@swapi/shared/environment/env'
 
-import { env } from '#internal/env'
+import { runEnv } from '#internal/env'
 import { createTestFilesRegex } from '#internal/file-regex'
 import { FLAGS } from '#internal/flags'
 import { LABELS } from '#internal/labels'
 import { TAGS } from '#internal/tags'
 
-if (env.TEST_WORKER_INDEX === undefined) {
-  logEnv(env, 'Playwright Environment Variables')
+if (runEnv.TEST_WORKER_INDEX === undefined) {
+  logEnv(runEnv, 'Playwright Environment Variables')
 }
 
-const serverBaseUrl = `http://${env.SWAPI_E2E_HOST_APP_SERVER}:${env.SWAPI_E2E_PORT_APP_SERVER}`
-const workerBaseUrl = `http://${env.SWAPI_E2E_HOST_APP_WORKER}:${env.SWAPI_E2E_PORT_APP_WORKER}`
+const serverBaseUrl = `http://${runEnv.APP_SERVER_HOSTNAME}:${runEnv.APP_SERVER_PORT}`
+const workerBaseUrl = `http://${runEnv.APP_WORKER_HOSTNAME}:${runEnv.APP_WORKER_PORT}`
 const testDir = './src/tests'
 const browserTestDir = `${testDir}/browser`
 const requestTestDir = `${testDir}/request`
@@ -223,16 +223,16 @@ const screenshotFolder = '__screenshots__'
 const ariaSnapshotFolder = '__aria-snapshots__'
 
 export default defineConfig({
-  forbidOnly: env.CI,
-  retries: env.CI ? 2 : 0,
-  maxFailures: env.CI ? 4 : 0,
+  forbidOnly: runEnv.CI,
+  retries: runEnv.CI ? 2 : 0,
+  maxFailures: runEnv.CI ? 4 : 0,
   fullyParallel: false,
-  workers: env.CI ? 1 : env.SWAPI_LOCAL_E2E ? '65%' : '55%',
-  reporter: env.CI ? [['github'], ['html', { open: 'never' }]] : 'list',
-  timeout: env.CI ? 30 * 1000 : 10 * 1000,
-  globalTimeout: env.CI ? 9 * 60 * 1000 : 3 * 60 * 1000,
+  workers: runEnv.CI ? 1 : runEnv.IS_LOCAL_E2E ? '65%' : '55%',
+  reporter: runEnv.CI ? [['github'], ['html', { open: 'never' }]] : 'list',
+  timeout: runEnv.CI ? 30 * 1000 : 10 * 1000,
+  globalTimeout: runEnv.CI ? 9 * 60 * 1000 : 3 * 60 * 1000,
   expect: {
-    timeout: env.CI ? 30 * 1000 : 15 * 1000,
+    timeout: runEnv.CI ? 30 * 1000 : 15 * 1000,
     toHaveScreenshot: {
       animations: 'disabled',
       pathTemplate: `{testDir}/{testFileDir}/${screenshotFolder}/{projectName}/{arg}{ext}`,
@@ -243,12 +243,12 @@ export default defineConfig({
   },
   use: {
     baseURL: serverBaseUrl,
-    screenshot: env.CI ? 'on-first-failure' : 'off',
-    trace: env.CI ? 'on-first-retry' : 'off',
-    navigationTimeout: env.CI ? 15 * 1000 : 5 * 1000,
-    actionTimeout: env.CI ? 15 * 1000 : 5 * 1000,
+    screenshot: runEnv.CI ? 'on-first-failure' : 'off',
+    trace: runEnv.CI ? 'on-first-retry' : 'off',
+    navigationTimeout: runEnv.CI ? 15 * 1000 : 5 * 1000,
+    actionTimeout: runEnv.CI ? 15 * 1000 : 5 * 1000,
   },
-  projects: env.SWAPI_LOCAL_E2E
+  projects: runEnv.IS_LOCAL_E2E
     ? [
         Projects.use('Chromium (desktop) - smoke'),
         Projects.use('Request (app-server) - smoke'),

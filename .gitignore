@@ -1,7 +1,8 @@
 # Installed dependencies
 node_modules/
 
-# Project defined dist dirs
+# Project-generated things
+.env.compose
 dist/
 generated/
 
@@ -19,7 +20,7 @@ blob-report/
 playwright/.cache/
 playwright/.auth/
 
-# Tool-generated files, dist, caches
+# Tool-generated things
 .cache/
 .codex
 .DS_Store/
@@ -38,7 +39,8 @@ fly.yml
 
 # User stuff
 .env.*.secret
+.env.override
 .envrc.local
-/.drafts/
-/.local
-/Taskfile.local.yml
+fly.yaml
+/.dev/
+/Taskfile.dev.yml

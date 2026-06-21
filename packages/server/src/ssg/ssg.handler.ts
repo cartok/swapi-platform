@@ -9,15 +9,21 @@ import { createCommitBasedWeakETagHeader } from '@swapi/shared/cache/etags'
 import { isAbortLikeError } from '@swapi/shared/errors/abort-error'
 import { errorToString } from '@swapi/shared/log/log'
 
-import { DCE_SWAPI_GIT_COMMIT_SHA, DCE_SWAPI_LOCAL_E2E } from '#internal/env'
+import {
+  DCE_BUILD_GIT_COMMIT_SHA,
+  DCE_BUILD_TARGET_ENVIRONMENT,
+  runEnv,
+} from '#internal/env'
 import { isErrorCode, SERVER_ERROR_CODES } from '#internal/error/error'
 import { createAbortResponse } from '#internal/request/request-abort.handler'
 import type { ServerHonoEnv } from '#internal/types'
 
 let ssgCache: Map<string, string> | null = null
 
-// TODO: extra variable + E2E env union variable
-const useCache = DCE_SWAPI_LOCAL_E2E
+const useCache =
+  DCE_BUILD_TARGET_ENVIRONMENT === 'local' &&
+  runEnv.RUN_IS_LOCAL_E2E &&
+  runEnv.RUN_USE_LOCAL_E2E_CACHE
 
 if (useCache) {
   console.warn('SSG: Will use runtime cache.')
@@ -118,7 +124,7 @@ export const addSsgHandler: HonoHandler<ServerHonoEnv> = (hono) => {
       return c.html(html, 200, {
         ...DOCUMENT_CACHE_HEADERS,
         'Cache-Tag': [CACHE_TAGS.HTML, CACHE_TAGS.SSG],
-        ...createCommitBasedWeakETagHeader(DCE_SWAPI_GIT_COMMIT_SHA),
+        ...createCommitBasedWeakETagHeader(DCE_BUILD_GIT_COMMIT_SHA),
       })
     } catch (error) {
       if (isAbortLikeError(error)) {

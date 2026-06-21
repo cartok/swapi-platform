@@ -1,5 +1,8 @@
 version: 3
 
+vars:
+  APP_SERVER_FLY_CONFIG: '{{.ROOT_DIR}}/fly.yaml'
+
 tasks:
   generate-secret:
     silent: true
@@ -42,24 +45,22 @@ tasks:
     silent: true
     requires:
       vars:
-        - name: T_BUILD_LEVEL
-          enum: [development, release]
-        - name: T_TARGET_ENVIRONMENT
+        - name: BUILD_PROFILE
+          enum: [release, development]
+        - name: TARGET_ENVIRONMENT
           enum: [testing, production]
-        - T_CONFIG_TARGET
     vars:
-      T_ENV_FILE: './.env/.env.{{.T_TARGET_ENVIRONMENT}}.{{.T_BUILD_LEVEL}}'
-      T_CONFIG_TEMPLATE: ./fly.template.yaml
-      T_CONFIG_VARIABLES: ./fly.variables.yaml
-      T_CONFIG_TEMPLATE_COPY:
+      CONFIG_TEMPLATE: ./fly.template.yaml
+      CONFIG_VARIABLES: ./fly.variables.yaml
+      CONFIG_TEMPLATE_COPY:
         sh: mktemp /tmp/fly.template.copy.XXXXXX.yaml
-      T_CONFIG_VARIABLES_COPY:
+      CONFIG_VARIABLES_COPY:
         sh: mktemp /tmp/fly.variables.copy.XXXXXX.yaml
-      T_CONFIG_VARIABLES_COPY_ENV:
+      CONFIG_VARIABLES_COPY_ENV:
         sh: mktemp /tmp/fly.variables.copy.env.XXXXXX.yaml
     dotenv:
       - '{{.ROOT_DIR}}/.env.fly.secret'
-      - '{{.T_ENV_FILE}}'
+      - './.env/.env.{{.TARGET_ENVIRONMENT}}.{{.BUILD_PROFILE}}'
     preconditions:
       - sh: command -v yq && yq --version | rg 'mikefarah'
         msg: 'You need to install `yq` (https://github.com/mikefarah/yq).'
@@ -69,41 +70,40 @@ tasks:
         msg: 'You need to install `coreutils` to get the `shred` utility.'
       - command -v openssl
       - command -v fly
-      - test -s {{.T_CONFIG_TEMPLATE}}
-      - test -s {{.T_CONFIG_VARIABLES}}
-      - test -n "${SWAPI_SECRET_HEALTH_CHECK_TOKEN}"
-      - printf '%s' "${SWAPI_SECRET_HEALTH_CHECK_TOKEN}" | openssl base64 -d -A >/dev/null 2>&1
+      - test -s {{.CONFIG_TEMPLATE}}
+      - test -s {{.CONFIG_VARIABLES}}
+      - test -n "${SECRET_HEALTH_CHECK_TOKEN}"
+      - test -n "${SECRET_SSG_RENDER_TOKEN}"
+      - printf '%s' "${SECRET_HEALTH_CHECK_TOKEN}" | openssl base64 -d -A >/dev/null 2>&1
+      - printf '%s' "${SECRET_SSG_RENDER_TOKEN}" | openssl base64 -d -A >/dev/null 2>&1
     cmds:
       - defer: >
           shred -u
-          {{.T_CONFIG_VARIABLES_COPY}}
-          {{.T_CONFIG_TEMPLATE_COPY}}
-          {{.T_CONFIG_VARIABLES_COPY_ENV}}
-      - yq '... comments=""' < {{.T_CONFIG_TEMPLATE}} > {{.T_CONFIG_TEMPLATE_COPY}}
-      - yq '... comments=""' < {{.T_CONFIG_VARIABLES}} > {{.T_CONFIG_VARIABLES_COPY}}
-      - envsubst < {{.T_CONFIG_VARIABLES_COPY}} > {{.T_CONFIG_VARIABLES_COPY_ENV}}
+          {{.CONFIG_VARIABLES_COPY}}
+          {{.CONFIG_TEMPLATE_COPY}}
+          {{.CONFIG_VARIABLES_COPY_ENV}}
+      - yq '... comments=""' < {{.CONFIG_TEMPLATE}} > {{.CONFIG_TEMPLATE_COPY}}
+      - yq '... comments=""' < {{.CONFIG_VARIABLES}} > {{.CONFIG_VARIABLES_COPY}}
+      - envsubst < {{.CONFIG_VARIABLES_COPY}} > {{.CONFIG_VARIABLES_COPY_ENV}}
       - >
         yq --null-input
-        'load("{{.T_CONFIG_TEMPLATE_COPY}}") *d load("{{.T_CONFIG_VARIABLES_COPY_ENV}}")'
-        > '{{.T_CONFIG_TARGET}}'
-      - echo 'Built config {{.T_CONFIG_TARGET}}.'
-      - flyctl config validate --config {{.T_CONFIG_TARGET}}
+        'load("{{.CONFIG_TEMPLATE_COPY}}") *d load("{{.CONFIG_VARIABLES_COPY_ENV}}")'
+        > '{{.APP_SERVER_FLY_CONFIG}}'
+      - echo 'Built config {{.APP_SERVER_FLY_CONFIG}}.'
+      - flyctl config validate --config {{.APP_SERVER_FLY_CONFIG}}
 
   deploy:
     requires:
       vars:
-        - name: T_BUILD_LEVEL
-          enum: [development, release]
-        - name: T_TARGET_ENVIRONMENT
+        - name: BUILD_PROFILE
+          enum: [release, development]
+        - name: TARGET_ENVIRONMENT
           enum: [testing, production]
-        - name: T_TEST_LOCAL_DOCKER_BUILD
+        - name: TEST_LOCAL_DOCKER_BUILD
           enum: ['true', 'false']
-    vars:
-      T_ENV_FILE: './.env/.env.{{.T_TARGET_ENVIRONMENT}}.{{.T_BUILD_LEVEL}}'
-      T_CONFIG:
-        sh: mktemp /tmp/fly.XXXXXX.yaml
     dotenv:
-      - '{{.T_ENV_FILE}}'
+      - '{{.ROOT_DIR}}/.env.fly.secret'
+      - './.env/.env.{{.TARGET_ENVIRONMENT}}.{{.BUILD_PROFILE}}'
     preconditions:
       - command -v fly
       - sh: command -v shred
@@ -111,30 +111,40 @@ tasks:
     deps:
       - task: build-config
         vars:
-          T_BUILD_LEVEL:
-            ref: .T_BUILD_LEVEL
-          T_TARGET_ENVIRONMENT:
-            ref: .T_TARGET_ENVIRONMENT
-          T_CONFIG_TARGET:
-            ref: .T_CONFIG
+          BUILD_PROFILE: '{{.BUILD_PROFILE}}'
+          TARGET_ENVIRONMENT: '{{.TARGET_ENVIRONMENT}}'
     cmds:
-      - defer: shred -u {{.T_CONFIG}}
+      - task: stage-secrets
       - task: :lint
       - task: :server:build:docker
-        if: '{{eq .T_TEST_LOCAL_DOCKER_BUILD "true"}}'
+        if: '{{eq .TEST_LOCAL_DOCKER_BUILD "true"}}'
         vars:
-          T_BUILD_LEVEL:
-            ref: .T_BUILD_LEVEL
-          T_TARGET_ENVIRONMENT: local
-          T_DOCKER_TARGET: runtime
-          T_DEV_MODE: 'false'
+          BUILD_PROFILE: '{{.BUILD_PROFILE}}'
+          TARGET_ENVIRONMENT: local
+          DOCKER_TARGET: runtime
+          DEV_MODE: 'false'
+      - |
+        # Set max-per-region to 2 to allow `canary` deployment.
+        fly scale --config {{.APP_SERVER_FLY_CONFIG}} count 1 --max-per-region 2
       - >
         fly deploy
-        --config {{.T_CONFIG}}
+        --config {{.APP_SERVER_FLY_CONFIG}}
         --build-arg NODE_ENV=${NODE_ENV}
-        --build-arg SWAPI_BUILD_LEVEL={{.T_BUILD_LEVEL}}
-        --build-arg SWAPI_TARGET_ENVIRONMENT={{.T_TARGET_ENVIRONMENT}}
-        --build-arg SWAPI_GIT_COMMIT_SHA={{.T_GIT_COMMIT_SHA}}
+        --build-arg BUILD_PROFILE={{.BUILD_PROFILE}}
+        --build-arg TARGET_ENVIRONMENT={{.TARGET_ENVIRONMENT}}
+        --build-arg GIT_COMMIT_SHA={{.GIT_COMMIT_SHA}}
         --compression zstd
         --compression-level 7
         {{.CLI_ARGS}}
+      - |
+        sleep 5
+        fly doctor
+        fly status
+        fly checks list
+      - defer: |
+          {{if .EXIT_CODE}}
+          echo "Failed with {{.EXIT_CODE}}."
+          fly logs
+          {{else}}
+          echo "Success!"
+          {{end}}

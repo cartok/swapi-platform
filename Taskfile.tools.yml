@@ -1,7 +1,7 @@
 version: 3
 
 vars:
-  T_TOOLS:
+  TOOLS:
     map:
       eslint:
         cacheLocation: ./.cache/.eslint
@@ -18,14 +18,14 @@ tasks:
       - './.tally.toml'
       - './package.json'
       - './packages/*/Dockerfile*'
-      - '{{.T_SOURCES.lockfile}}'
+      - '{{.SOURCES.lockfile}}'
     cmds:
-      - bunx --no-install tally lint --exclude '.local/**' --slow-checks off
+      - bunx --no-install tally lint --exclude '.dev/**' --slow-checks off
 
   tally:fix:
     sources: *tally-sources
     cmds:
-      - bunx --no-install tally lint --exclude '.local/**' --slow-checks off --fix
+      - bunx --no-install tally lint --exclude '.dev/**' --slow-checks off --fix
 
   tsc:lint:
     deps:
@@ -39,86 +39,82 @@ tasks:
   eslint:lint:
     requires:
       vars:
-        - T_DIR
+        - DIR
     vars:
-      T_DIR:
-        ref: coalesce .T_DIR .CLI_ARGS .ROOT_DIR
+      DIR: '{{coalesce .DIR .CLI_ARGS .ROOT_DIR}}'
     generates:
-      - '{{.T_TOOLS.eslint.cacheLocation}}'
+      - '{{.TOOLS.eslint.cacheLocation}}'
     cmds:
       - >
         bunx --no-install eslint
         --cache
-        --cache-location {{.T_TOOLS.eslint.cacheLocation}}
+        --cache-location {{.TOOLS.eslint.cacheLocation}}
         --concurrency auto
         --exit-on-fatal-error
-        {{.T_DIR | q}}
+        {{.DIR | q}}
 
   eslint:fix:
     requires:
       vars:
-        - T_DIR
+        - DIR
     vars:
-      T_DIR:
-        ref: coalesce .T_DIR .CLI_ARGS .ROOT_DIR
+      DIR: '{{coalesce .DIR .CLI_ARGS .ROOT_DIR}}'
     generates:
-      - '{{.T_TOOLS.eslint.cacheLocation}}'
+      - '{{.TOOLS.eslint.cacheLocation}}'
     cmds:
       - >
         bunx --no-install eslint
         --cache
-        --cache-location {{.T_TOOLS.eslint.cacheLocation}}
+        --cache-location {{.TOOLS.eslint.cacheLocation}}
         --concurrency auto
         --exit-on-fatal-error
         --fix
-        {{.T_DIR | q}}
+        {{.DIR | q}}
 
   prettier:lint:
     requires:
       vars:
-        - T_DIR
+        - DIR
     vars:
-      T_DIR:
-        ref: coalesce .T_DIR .CLI_ARGS .ROOT_DIR
+      DIR: '{{coalesce .DIR .CLI_ARGS .ROOT_DIR}}'
     cmds:
       - >
         bunx --no-install prettier
         --cache
-        --cache-location {{.T_TOOLS.prettier.cacheLocation}}
+        --cache-location {{.TOOLS.prettier.cacheLocation}}
         --check
-        {{.T_DIR | q}}
+        {{.DIR | q}}
 
   prettier:fix:
     requires:
       vars:
-        - T_DIR
+        - DIR
     vars:
-      T_DIR:
-        ref: coalesce .T_DIR .CLI_ARGS .ROOT_DIR
+      DIR: '{{coalesce .DIR .CLI_ARGS .ROOT_DIR}}'
     generates:
-      - '{{.T_TOOLS.prettier.cacheLocation}}'
+      - '{{.TOOLS.prettier.cacheLocation}}'
     cmds:
       - >
         bunx --no-install prettier
         --cache
-        --cache-location {{.T_TOOLS.prettier.cacheLocation}}
+        --cache-location {{.TOOLS.prettier.cacheLocation}}
         --write
         --list-different
-        {{.T_DIR | q}}
+        {{.DIR | q}}
 
   docker:show-targets:
     silent: true
     requires:
       vars:
-        - name: T_DOCKER_FILE
+        - name: DOCKER_FILE
           enum:
             - e2e
             - app-server
             - app-worker
-        - name: T_FORMAT
+        - name: FORMAT
           enum: [text, json]
     vars:
-      T_DOCKER_FILE_MAP:
+      DOCKER_FILE_MAP:
         map:
           e2e: ./packages/e2e/Dockerfile.e2e
           app-server: ./packages/server/Dockerfile.app-server
@@ -127,9 +123,9 @@ tasks:
       - >
         docker buildx build
         --quiet
-        --call=targets,format={{.T_FORMAT}}
-        --file {{get .T_DOCKER_FILE_MAP .T_DOCKER_FILE}}
+        --call=targets,format={{.FORMAT}}
+        --file {{get .DOCKER_FILE_MAP .DOCKER_FILE}}
         {{.ROOT_DIR}}
-        {{if eq .T_FORMAT "text"}}
+        {{if eq .FORMAT "text"}}
         | tail -n +2
         {{end}}

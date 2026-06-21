@@ -1,0 +1,12 @@
+services:
+  e2e:
+    build:
+      context: .
+      dockerfile: ./packages/e2e/Dockerfile.e2e
+    depends_on:
+      app-server:
+        condition: service_healthy
+      app-worker:
+        condition: service_healthy
+    env_file:
+      - './.env/.env.local'

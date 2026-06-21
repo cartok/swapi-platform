@@ -7,28 +7,31 @@
   "env": {
     "local": {
       "vars": {
-        "TARGET_ENVIRONMENT": "local",
-        "PORT": 52000,
-        "ORIGIN_PROTOCOL": "http",
+        "LOG_LEVEL": "debug",
         "ORIGIN_HOST": "localhost",
         "ORIGIN_PORT": 51000,
+        "ORIGIN_PROTOCOL": "http",
+        "PORT": 52000,
+        "TARGET_ENVIRONMENT": "local",
       },
     },
     "ci": {
       "vars": {
-        "TARGET_ENVIRONMENT": "ci",
-        "PORT": 52000,
-        "ORIGIN_PROTOCOL": "http",
+        "LOG_LEVEL": "info",
         "ORIGIN_HOST": "app-server",
         "ORIGIN_PORT": 51000,
+        "ORIGIN_PROTOCOL": "http",
+        "PORT": 52000,
+        "TARGET_ENVIRONMENT": "ci",
       },
     },
     "testing": {
       "vars": {
-        "TARGET_ENVIRONMENT": "testing",
-        "ORIGIN_PROTOCOL": "http",
+        "LOG_LEVEL": "warn",
         "ORIGIN_HOST": "localhost",
         "ORIGIN_PORT": 51000,
+        "ORIGIN_PROTOCOL": "http",
+        "TARGET_ENVIRONMENT": "testing",
       },
       "route": {
         "pattern": "test-swapi-platform.cartok.dev/*",
@@ -37,15 +40,18 @@
     },
     "production": {
       "vars": {
-        "TARGET_ENVIRONMENT": "production",
-        "ORIGIN_PROTOCOL": "https",
+        "LOG_LEVEL": "error",
         "ORIGIN_HOST": "swapi-platform.fly.dev",
         "ORIGIN_PORT": "443",
+        "ORIGIN_PROTOCOL": "https",
+        "TARGET_ENVIRONMENT": "production",
       },
-      "route": {
-        "pattern": "swapi-platform.cartok.dev/*",
-        "zone_name": "cartok.dev",
-      },
+      "routes": [
+        {
+          "pattern": "swapi-platform.cartok.dev/*",
+          "zone_name": "cartok.dev",
+        },
+      ],
     },
   },
 }

@@ -2,7 +2,7 @@ import type { HonoHandler } from '@swapi/hono/types'
 import { NO_STORE_CACHE_HEADERS } from '@swapi/shared/cache/cache-control'
 import type { Context } from 'hono'
 
-import { DCE_SWAPI_TARGET_ENVIRONMENT } from '#internal/env'
+import { DCE_BUILD_TARGET_ENVIRONMENT } from '#internal/env'
 import { MultiSignalAbortController } from '#internal/signal/multi-signal-abort-controller'
 import { toAbortReason } from '#internal/signal/signal'
 import type { ServerHonoEnv } from '#internal/types'
@@ -30,7 +30,7 @@ export function createAbortResponse(
 ): Response {
   const abortController = c.get('abortController')
 
-  if (DCE_SWAPI_TARGET_ENVIRONMENT !== 'production') {
+  if (DCE_BUILD_TARGET_ENVIRONMENT !== 'production') {
     const info = {
       url: c.req.url,
       method: c.req.method,

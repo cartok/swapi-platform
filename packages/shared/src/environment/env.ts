@@ -1,62 +1,68 @@
-import type { Static, TSchema } from '@sinclair/typebox'
-import { Type, TypeBoxError } from '@sinclair/typebox'
+import type { Static, TObject, TSchema } from '@sinclair/typebox'
+import { TypeBoxError } from '@sinclair/typebox'
 import { AssertError, Value } from '@sinclair/typebox/value'
 
 import { typeboxAssertErrorToString } from '#internal/errors/typebox'
 
-const LogLevelSchema = Type.Union([
-  Type.Literal('debug'),
-  Type.Literal('info'),
-  Type.Literal('warn'),
-  Type.Literal('error'),
-])
-
-const BuildLevelSchema = Type.Union([
-  Type.Literal('development'),
-  Type.Literal('release'),
-])
-
-export const SourceModeSchema = Type.Union([Type.Literal('source'), Type.Literal('dist')])
-
-const TargetEnvironmentSchema = Type.Union([
-  Type.Literal('local'),
-  Type.Literal('ci'),
-  Type.Literal('testing'),
-  Type.Literal('production'),
-])
-
-export const CommonEnvSchema = Type.Object({
-  SWAPI_LOCAL_E2E: Type.Readonly(Type.Boolean({ default: false })),
-})
-
-export const CommonAppEnvSchema = Type.Object({
-  SWAPI_BUILD_LEVEL: Type.Readonly(BuildLevelSchema),
-  SWAPI_LOG_LEVEL: Type.Readonly(LogLevelSchema),
-  SWAPI_TARGET_ENVIRONMENT: Type.Readonly(TargetEnvironmentSchema),
-})
+import type { EnvSchemaKey } from './env.schema.js'
 
 export function parseEnv<T extends TSchema>(
   schema: T,
   raw: Record<keyof Required<Static<T>>, unknown>,
-  options: { secret?: boolean } = {},
 ): Readonly<Static<T>> {
   const parsed = Value.Parse(['Clone', 'Default', 'Convert'], schema, raw)
 
-  if (options.secret) {
+  try {
+    Value.Assert(schema, parsed)
     return Object.freeze(parsed)
-  } else {
-    try {
-      Value.Assert(schema, parsed)
-      return Object.freeze(parsed)
-    } catch (error) {
-      if (error instanceof TypeBoxError) {
-        if (error instanceof AssertError) {
-          throw new Error(typeboxAssertErrorToString(error))
-        }
+  } catch (error) {
+    if (error instanceof TypeBoxError) {
+      if (error instanceof AssertError) {
+        throw new Error(typeboxAssertErrorToString(error))
       }
-      throw error
+    }
+    throw error
+  }
+}
+
+export function parseSecretEnv<T extends TSchema>(
+  schema: T,
+  raw: Record<keyof Required<Static<T>>, unknown>,
+): Readonly<Static<T>> {
+  return Object.freeze(Value.Parse(['Clone', 'Default', 'Convert'], schema, raw))
+}
+
+export function validateRequiredSecretEnv<T extends TObject>(
+  schema: T,
+  env: Readonly<Static<T>>,
+): void {
+  const requiredKeys = getEnvSchemaKeys(schema)
+  const missingKeys: EnvSchemaKey<T>[] = []
+
+  for (const key of requiredKeys) {
+    const value = env[key]
+
+    if (value === undefined || value === '') {
+      missingKeys.push(key)
     }
   }
+
+  const invalidKeys = getInvalidSecretEnvKeys(schema, env, requiredKeys)
+
+  for (const key of missingKeys) {
+    invalidKeys.delete(key)
+  }
+
+  if (!missingKeys.length && !invalidKeys.size) {
+    return
+  }
+
+  const details = [
+    missingKeys.length ? `missing: ${missingKeys.join(', ')}` : '',
+    invalidKeys.size ? `invalid: ${[...invalidKeys].join(', ')}` : '',
+  ].filter(Boolean)
+
+  throw new Error(`Invalid runtime secret environment (${details.join('; ')}).`)
 }
 
 export function logEnv(env: Record<string, unknown>, title?: string): void {
@@ -67,8 +73,31 @@ export function logEnv(env: Record<string, unknown>, title?: string): void {
   console.info(env)
 }
 
-export const BaseUrlWithPortSchema = Type.RegExp(
-  new RegExp(String.raw`^https?://[^:]+:\d+$`),
-)
+function getEnvSchemaKeys<T extends TObject>(schema: T): EnvSchemaKey<T>[] {
+  return Object.keys(schema.properties) as EnvSchemaKey<T>[]
+}
 
-export const DynamicPortSchema = Type.Integer({ minimum: 49152, maximum: 65535 })
+function getInvalidSecretEnvKeys<T extends TObject>(
+  schema: T,
+  env: Readonly<Static<T>>,
+  requiredKeys: readonly EnvSchemaKey<T>[],
+): Set<EnvSchemaKey<T>> {
+  const keys = new Set<EnvSchemaKey<T>>()
+
+  for (const error of Value.Errors(schema, env)) {
+    const key = error.path.replace(/^\//, '').split('/')[0] ?? ''
+
+    if (isEnvSchemaKey(key, requiredKeys)) {
+      keys.add(key)
+    }
+  }
+
+  return keys
+}
+
+function isEnvSchemaKey<T extends TObject>(
+  key: string,
+  keys: readonly EnvSchemaKey<T>[],
+): key is EnvSchemaKey<T> {
+  return keys.includes(key as EnvSchemaKey<T>)
+}

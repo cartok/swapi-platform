@@ -20,9 +20,9 @@ tasks:
       - './generators/**/*.{ts,json}'
       - './src/**/*.ts'
       - './tsconfig/**/*.json'
-      - '{{.T_SOURCES.tsconfigPackage}}'
-      - '{{.T_SOURCES.tsconfigs}}'
-      - '{{.T_SOURCES.lockfile}}'
+      - '{{.SOURCES.tsconfigPackage}}'
+      - '{{.SOURCES.tsconfigs}}'
+      - '{{.SOURCES.lockfile}}'
     cmds:
       - bunx --no-install tsc --noEmit --project ./tsconfig/tsconfig.generators.json
 
@@ -31,39 +31,36 @@ tasks:
       - './package.json'
       - './src/**/*.ts'
       - './tsconfig/**/*.json'
-      - '{{.T_SOURCES.tsconfigPackage}}'
-      - '{{.T_SOURCES.tsconfigs}}'
-      - '{{.T_SOURCES.lockfile}}'
+      - '{{.SOURCES.tsconfigPackage}}'
+      - '{{.SOURCES.tsconfigs}}'
+      - '{{.SOURCES.lockfile}}'
     cmds:
       - bunx --no-install tsc --noEmit --project ./tsconfig/tsconfig.shared.json
 
   build:
-    label: '{{.TASK}}:{{.T_BUILD_LEVEL}}'
+    label: '{{.TASK}}:{{.BUILD_PROFILE}}'
     requires:
       vars:
-        - name: T_BUILD_LEVEL
+        - name: BUILD_PROFILE
           enum: [development, release]
     vars:
-      T_BUILD_LEVEL:
-        ref: coalesce (env "SWAPI_BUILD_LEVEL") .T_BUILD_LEVEL "development"
-      T_DIST_DIR: './dist/{{.T_BUILD_LEVEL}}'
-      T_TSCONFIGS:
+      DIST_DIR: './dist/{{.BUILD_PROFILE}}'
+      TSCONFIGS:
         map:
           development: ./tsconfig/tsconfig.shared.json
           release: ./tsconfig/tsconfig.shared.release.json
-      T_TSCONFIG:
-        ref: get .T_TSCONFIGS .T_BUILD_LEVEL
+      TSCONFIG: '{{get .TSCONFIGS .BUILD_PROFILE}}'
     sources:
       - './package.json'
       - './src/**/*'
       - './tsconfig/**/*.json'
-      - '{{.T_SOURCES.lockfile}}'
+      - '{{.SOURCES.lockfile}}'
     generates:
-      - '{{.T_DIST_DIR}}/**/*'
+      - '{{.DIST_DIR}}/**/*'
     deps:
       - task: generate
     cmds:
-      - bunx --no-install tsc --project {{.T_TSCONFIG | q}} --outDir {{.T_DIST_DIR | q}}
+      - bunx --no-install tsc --project {{.TSCONFIG | q}} --outDir {{.DIST_DIR | q}}
 
   generate:
     deps:
@@ -74,7 +71,7 @@ tasks:
   generate:device-cookie:types:
     sources:
       - './generators/device-cookie.schema.json'
-      - '{{.T_SOURCES.lockfile}}'
+      - '{{.SOURCES.lockfile}}'
     generates:
       - './generated/types/device-cookie.types.d.ts'
     cmds:
@@ -94,7 +91,7 @@ tasks:
     sources:
       - './generators/device-cookie.schema.json'
       - './generators/device-cookie.validator.*'
-      - '{{.T_SOURCES.lockfile}}'
+      - '{{.SOURCES.lockfile}}'
     generates:
       - './generated/validators/device-cookie.*'
     cmds:
@@ -107,7 +104,7 @@ tasks:
     sources:
       - './generators/custom-media-tokens.*'
       - './src/device/device.ts'
-      - '{{.T_SOURCES.lockfile}}'
+      - '{{.SOURCES.lockfile}}'
     generates:
       - './generated/css/media.css'
     cmds:

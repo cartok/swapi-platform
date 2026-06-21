@@ -1,33 +1,26 @@
-import type { Static } from '@sinclair/typebox'
 import { Type } from '@sinclair/typebox'
+import { parseEnv } from '@swapi/shared/environment/env'
 import {
-  CommonEnvSchema,
   DynamicPortSchema,
-  parseEnv,
-} from '@swapi/shared/environment/env'
+  IsLocalEndToEndSchema,
+} from '@swapi/shared/environment/env.schema'
 
-const E2EEnvSchema = Type.Intersect([
-  CommonEnvSchema,
-  Type.Object({
-    CI: Type.Readonly(Type.Optional(Type.Boolean())),
-    SWAPI_E2E_HOST_APP_SERVER: Type.Readonly(Type.String({ minLength: 1 })),
-    SWAPI_E2E_HOST_APP_WORKER: Type.Readonly(Type.String({ minLength: 1 })),
-    SWAPI_E2E_PORT_APP_SERVER: Type.Readonly(DynamicPortSchema),
-    SWAPI_E2E_PORT_APP_WORKER: Type.Readonly(DynamicPortSchema),
-    SWAPI_APP_SERVER_PORT: Type.Readonly(Type.Optional(DynamicPortSchema)),
-    TEST_WORKER_INDEX: Type.Readonly(Type.Optional(Type.Number())),
-  }),
-])
+const EndToEndEnvSchema = Type.Object({
+  APP_SERVER_HOSTNAME: Type.Readonly(Type.String({ minLength: 1 })),
+  APP_SERVER_PORT: Type.Readonly(DynamicPortSchema),
+  APP_WORKER_HOSTNAME: Type.Readonly(Type.String({ minLength: 1 })),
+  APP_WORKER_PORT: Type.Readonly(DynamicPortSchema),
+  CI: Type.Readonly(Type.Optional(Type.Boolean())),
+  IS_LOCAL_E2E: Type.Readonly(IsLocalEndToEndSchema),
+  TEST_WORKER_INDEX: Type.Readonly(Type.Optional(Type.Number())),
+})
 
-type E2EEnv = Static<typeof E2EEnvSchema>
-
-export const env = parseEnv(E2EEnvSchema, {
+export const runEnv = parseEnv(EndToEndEnvSchema, {
+  APP_SERVER_HOSTNAME: process.env['APP_SERVER_HOSTNAME'],
+  APP_SERVER_PORT: process.env['APP_SERVER_PORT'],
+  APP_WORKER_HOSTNAME: process.env['APP_WORKER_HOSTNAME'],
+  APP_WORKER_PORT: process.env['APP_WORKER_PORT'],
   CI: process.env['CI'],
-  SWAPI_E2E_HOST_APP_SERVER: process.env['SWAPI_E2E_HOST_APP_SERVER'],
-  SWAPI_E2E_HOST_APP_WORKER: process.env['SWAPI_E2E_HOST_APP_WORKER'],
-  SWAPI_E2E_PORT_APP_SERVER: process.env['SWAPI_E2E_PORT_APP_SERVER'],
-  SWAPI_E2E_PORT_APP_WORKER: process.env['SWAPI_E2E_PORT_APP_WORKER'],
-  SWAPI_LOCAL_E2E: process.env['SWAPI_LOCAL_E2E'],
-  SWAPI_APP_SERVER_PORT: process.env['SWAPI_APP_SERVER_PORT'],
+  IS_LOCAL_E2E: process.env['IS_LOCAL_E2E'],
   TEST_WORKER_INDEX: process.env['TEST_WORKER_INDEX'],
-}) satisfies E2EEnv
+})

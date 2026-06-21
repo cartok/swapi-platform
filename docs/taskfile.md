@@ -1,12 +1,13 @@
 # Taskfile
 
-## Limits
+## Limits (wip)
 
-<!-- TODO: important section -->
+- Reusing enum values for interactive selection is currently not possible but there is an existing github issue. So until then only use YAML anchors to reuse enum definitions (but that sadly does not work accros files).
+- There are referencing issues that limit variable compositions. So for now prefer to reference at max two lavels and in turn keep variables flat, even though it would be cleaner otherwise. Take the `APP_SERVER_SERVICE_NAME`, `APP_SERVER_COMPOSE_ENV_FILE`, `APP_SERVER_DOCKER_CONTAINER_NAME`, `APP_SERVER_DOCKER_IMAGE_NAME`, `APP_SERVER_DOCKER_IMAGE_REFERENCE_LOCAL` variables as a reference example.
 
-## Best practices
+## Best Practices
 
-### Task order
+### Order
 
 - Generally retain the order of the standard [actions](#action)
 - In each section define tasks "bottom-up" (from the smalles to the biggest), so that YAML anchors can be an option in properties where Taskfile variables can't be used.
@@ -22,6 +23,8 @@
     client:test:
   ```
 
+### Maps (wip)
+
 ### Variables
 
 - Define required task variables as `required:` even if a default value is given via `vars:`.
@@ -32,7 +35,7 @@
 
 ### Labels
 
-General format: `<task-name>[:<target-env>][:<build-level>]`
+General format: `<task-name>[:<target-env>][:<profile>]`
 
 - Use `labels:` if a tasks output depends on variables
   - If those build outputs are not for development purpose
@@ -41,7 +44,7 @@ General format: `<task-name>[:<target-env>][:<build-level>]`
 
 ### Caching
 
-- Use `labels:` if a task has run conditions like `sources:` or `status:`. Taskfile will evaluate the conditions for each label. This solves for example the situation, where you run a `lint:` task, that depends on `T_BUILD_LEVEL` in some way, with `T_BUILD_LEVEL: development` that hase some static `sources:` defined first - so it will get cached if it succeeds - but then you run it with `T_BUILD_LEVEL: release` (or some other task runs it like that) and the task would not run.
+- Use `labels:` if a task has run conditions like `sources:` or `status:`. Taskfile will evaluate the conditions for each label. This solves for example the situation, where you run a `lint:` task, that depends on BUILD_PROFILE` in some way, with BUILD_PROFILE: development` that hase some static `sources:` defined first - so it will get cached if it succeeds - but then you run it with BUILD_PROFILE: release` (or some other task runs it like that) and the task would not run.
 - Always Define inclusion lists for `sources:`
 
 ### Commands
@@ -55,23 +58,25 @@ General format: `<task-name>[:<target-env>][:<build-level>]`
 1. meta: `summary`
 1. flags: `internal`
 1. flags: `interactive`
-1. flags: `failfast`
-1. variables: `requires`
-1. variables: `vars`
-1. variables: `dotenv`
-1. variables: `env`
-1. cache-guards: `sources`
-1. cache-guards: `generates`
-1. cache-guards: `status`
+1. flags: `silent`
 1. guards: `preconditions`
 1. guards: `if`
+1. variables: `requires`
+1. variables: `vars`
+1. cache-guards: `status` (overrides/superseeds `sources` and `generates`)
+1. cache-guards: `sources`
+1. cache-guards: `generates`
 1. `deps`
 1. `dir`
+1. shell-variables: `dotenv`
+1. shell-variables: `env`
 1. `cmd`/`cmds`
 
 ## Glossary
 
-Before looking at possible solutions for the task structure read here which terms are defined.
+### Task Names
+
+TBD
 
 ### Task Scope
 
@@ -117,27 +122,38 @@ Tools wrap things like binaries that are commonly used in actions to provide goo
 
 ### Target Environment
 
-`@dotenv-matrix`
+`@dotenv-matrix` (app, app-server)
 
-Defines the target environment a task result is built or configured for. A run level can describe a deployable environment such as local, testing, production, or a verification-only environment such as ci.
+Defines the target environment a task result is built or configured for. Each part of the system should be flexible about defining their own possible target environments, but below are standard values defined which should be preferred if suiting.
 
 - `local`
 - `ci`
 - `testing`
+- `staging`
 - `production`
 
-### Build Level
+### Build Profile
 
-`@dotenv-matrix`
+<!-- TODO: reformat the other glossary sections aswell -->
 
-Defines with which profile builds are created.
+**Variable:** `BUILD_PROFILE`
 
-Often also called "Build Profiles".
+**Tags:** `@dotenv-matrix` (app, app-server)
 
-Relates to `actions` like "build", "start", "deploy" and "lint".
+Defines with which profile builds are created, code is started or linted. Influences selection of dotenv files, which predefine several configurations.
+
+Right now there is only one variable for all parts of the application. This could later get split if neccessary.
+
+**Values:**
 
 - `development`
 - `release`
+
+### Build Variant
+
+**Tags:** `@dotenv-matrix`
+
+Defined by the combination of [Build Profile](#profile) and [Target Environment](#target-environment).
 
 ### Virtualization Level
 
@@ -159,7 +175,7 @@ Defines from which workflow a task ist started.
 
 Defines which kind of sources builds should use.
 
-Passed to the application as `SWAPI_SOURCE_MODE` build environment variable. At the moment it is only used in the Vite build of the Angular App to select the correct Node.js conditions. The goal was to later be able to run the App Server directly without manual pre-compiling to have hot reload working across the boundaries.
+Passed to the application as `BUILD_SOURCE_MODE` build environment variable. At the moment it is only used in the Vite build of the Angular App to select the correct Node.js conditions. The goal was to later be able to run the App Server directly without manual pre-compiling to have hot reload working across the boundaries.
 
 - `source`
 - `dist`
@@ -169,7 +185,7 @@ Passed to the application as `SWAPI_SOURCE_MODE` build environment variable. At 
 ### Table
 
 <!-- prettier-ignore -->
-| Action | Workflow Context | Virtualization Level | Target Environment | Build Level |
+| Action | Workflow Context | Virtualization Level | Target Environment | Build Profile |
 | --- | --- | --- | --- | --- |
 | build | local | native, docker | local | development, release |
 | build | ci | docker | ci, production | release |
@@ -197,20 +213,24 @@ In the "server" `scope` a **"build:bundle"** `action` may be run by the "local",
 
 - In nearly any `scope` a **"lint"** `action` may be run by the "local", "pre-commit", and "ci" `workflow context`s.
   - Linting shall not be executed in docker image builds.
-  - If it runs in the "local" or "pre-commit" `workflow context`, it may make use of caching and execution necessity checks and it may run for the "development" and "release" `build level`.
-    - If it runs in the "development" `build level` it might take less resources but be less strict
-    - If it runs in the "release" `build level` it might take more resources to be more strict
-  - If it runs in the "ci" `workflow context`, it may not make use of any caching or execution necessity checks and may only run in the "release" `build level`.
+  - If it runs in the "local" or "pre-commit" `workflow context`, it may make use of caching and execution necessity checks and it may run for the "development" and "release" `build profile`.
+    - If it runs in the "development" `build profile` it might take less resources but be less strict
+    - If it runs in the "release" `build profile` it might take more resources to be more strict
+  - If it runs in the "ci" `workflow context`, it may not make use of any caching or execution necessity checks and may only run in the "release" `build profile`.
+
+---
 
 ## Task name ideas
 
-Here are several approaches to name and structure tasks.
+Here are some old approaches to name and structure tasks, that were used for finding a good solution and are not implemented like that and are no standard to orientate on.
+
+Names used might differ.
 
 ### 1. By full names
 
 > Likely not the best solution.
 
-**Task name pattern:** `<action|tool>[/<run-level>][/<build-level>][:MISC ...] [VARIABLES ...]`
+**Task name pattern:** `<action|tool>[/<target>][/<profile>][:MISC ...] [VARIABLES ...]`
 
 **Task name examples**
 
@@ -248,7 +268,7 @@ Here are several approaches to name and structure tasks.
 
 ### 2. By variables
 
-**Task name pattern:** `<action|tool>[:<everything-else>: ...]: build_variant=<build-level> build_target<target> [VARIABLES ...]`
+**Task name pattern:** `<action|tool>[:<everything-else>: ...]: PROFILE=<profile> TARGET=<target> [VARIABLES ...]`
 
 **Task name examples**
 
@@ -261,7 +281,7 @@ Here are several approaches to name and structure tasks.
 
 **Execution examples**
 
-- `task deploy build_variant=development build_target=testing`
+- `task deploy PROFILE=development TARGET=testing`
 
 #### Estimation
 

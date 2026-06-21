@@ -13,39 +13,35 @@ tasks:
       - './tsconfig/**/*.json'
       - '{{.ROOT_DIR}}/packages/shared/package.json'
       - '{{.ROOT_DIR}}/packages/shared/src/**/*.ts'
-      - '{{.T_SOURCES.tsconfigPackage}}'
-      - '{{.T_SOURCES.tsconfigs}}'
-      - '{{.T_SOURCES.lockfile}}'
+      - '{{.SOURCES.tsconfigPackage}}'
+      - '{{.SOURCES.tsconfigs}}'
+      - '{{.SOURCES.lockfile}}'
     cmds:
       - bunx --no-install tsc --noEmit --project ./tsconfig/tsconfig.hono.json
 
   build:
-    label: '{{.TASK}}:{{.T_BUILD_LEVEL}}'
+    label: '{{.TASK}}@{{.BUILD_PROFILE}}'
     requires:
       vars:
-        - name: T_BUILD_LEVEL
+        - name: BUILD_PROFILE
           enum: [development, release]
     vars:
-      T_BUILD_LEVEL:
-        ref: coalesce (env "SWAPI_BUILD_LEVEL") .T_BUILD_LEVEL "release"
-      T_TSCONFIGS:
+      TSCONFIGS:
         map:
           development: ./tsconfig/tsconfig.hono.json
           release: ./tsconfig/tsconfig.hono.release.json
-      T_TSCONFIG:
-        ref: get .T_TSCONFIGS .T_BUILD_LEVEL
-      T_DIST_DIR: './dist/{{.T_BUILD_LEVEL}}'
+      TSCONFIG: '{{get .TSCONFIGS .BUILD_PROFILE}}'
+      DIST_DIR: './dist/{{.BUILD_PROFILE}}'
     sources:
       - './package.json'
       - './src/**/*'
       - './tsconfig/**/*.json'
-      - '{{.T_SOURCES.lockfile}}'
+      - '{{.SOURCES.lockfile}}'
     generates:
-      - '{{.T_DIST_DIR}}/**/*'
+      - '{{.DIST_DIR}}/**/*'
     deps:
       - task: :shared:build
         vars:
-          T_BUILD_LEVEL:
-            ref: .T_BUILD_LEVEL
+          BUILD_PROFILE: '{{.BUILD_PROFILE}}'
     cmds:
-      - bunx --no-install tsc --project {{.T_TSCONFIG | q}} --outDir {{.T_DIST_DIR | q}}
+      - bunx --no-install tsc --project {{.TSCONFIG | q}} --outDir {{.DIST_DIR | q}}

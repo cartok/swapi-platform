@@ -1,0 +1,9 @@
+include:
+  - path: ./compose.yml
+
+services:
+  app-server:
+    container_name: ${APP_SERVER_CONTAINER_NAME}
+    environment:
+      RUN_HOST_INTERNAL: 0.0.0.0
+      RUN_ALLOWED_HOSTS: 0.0.0.0

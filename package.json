@@ -57,6 +57,7 @@
     }
   },
   "devDependencies": {
+    "@dotenvx/dotenvx": "^1.73.1",
     "@go-task/cli": "catalog:tooling",
     "@stylistic/eslint-plugin": "^5.10.0",
     "@types/node": "catalog:ts6",

@@ -2,7 +2,7 @@ import type { HonoHandler } from '@swapi/hono/types'
 import { NO_STORE_CACHE_HEADERS } from '@swapi/shared/cache/cache-control'
 import { errorToString } from '@swapi/shared/log/log'
 
-import { DCE_SWAPI_TARGET_ENVIRONMENT, secretEnv } from '#internal/env'
+import { DCE_BUILD_TARGET_ENVIRONMENT, secretEnv } from '#internal/env'
 import { runSwapiApiSmokeTest } from '#internal/health/external/swapi/swapi-api.smoke-test'
 import { runSsrSmokeTest } from '#internal/health/ssr/ssr.smoke-test'
 import type { HonoRuntimeOptions, ServerHonoEnv } from '#internal/types'
@@ -11,11 +11,11 @@ export const addHealthChecksHandler: HonoHandler<ServerHonoEnv, HonoRuntimeOptio
   hono,
   { runtimeMetrics },
 ) => {
-  if (DCE_SWAPI_TARGET_ENVIRONMENT !== 'local') {
+  if (DCE_BUILD_TARGET_ENVIRONMENT !== 'local') {
     hono.get('/status/*', async (c, next) => {
       if (
-        !secretEnv.SWAPI_SECRET_HEALTH_CHECK_TOKEN ||
-        secretEnv.SWAPI_SECRET_HEALTH_CHECK_TOKEN !==
+        !secretEnv.SECRET_HEALTH_CHECK_TOKEN ||
+        secretEnv.SECRET_HEALTH_CHECK_TOKEN !==
           c.req.header('X-Secret-Health-Check-Token')
       ) {
         return c.body(null, 403, NO_STORE_CACHE_HEADERS)

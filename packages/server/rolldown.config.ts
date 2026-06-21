@@ -2,17 +2,17 @@ import { needsLinking } from '@angular/compiler-cli/linker'
 import angularLinkerBabelPlugin from '@angular/compiler-cli/linker/babel'
 import type { TransformOptions } from '@babel/core'
 import { transformAsync } from '@babel/core'
-import { logEnv } from '@swapi/shared/environment/env'
 import { envToOxcDefine } from '@swapi/shared/environment/globals'
 import { defineConfig } from 'rolldown'
 
-// This import had to be relative.
-import { env } from './src/env.js'
+// These imports have to be relative for bundling.
+import { buildEnv } from './src/env'
+import { logServerEnv } from './src/log/log-env'
 
-logEnv(env, 'App Server Build Environment Variables')
+logServerEnv()
 
-const buildVariantPath = `${env.SWAPI_TARGET_ENVIRONMENT}/${env.SWAPI_BUILD_LEVEL}`
-const isMinifyEnabled = env.SWAPI_MINIFY
+const buildVariantPath = `${buildEnv.BUILD_TARGET_ENVIRONMENT}/${buildEnv.BUILD_PROFILE}`
+const isMinifyEnabled = buildEnv.BUILD_MINIFY
 const externalDependencies = new Set(['@swapi/client/dist-paths'])
 
 const serverBundleConfig = defineConfig({
@@ -24,13 +24,13 @@ const serverBundleConfig = defineConfig({
   platform: 'node',
   plugins: [
     createAngularLinkerAotPlugin({
-      sourceMaps: fromRolldownSourceMapsToBabelSourceMaps(env.SWAPI_ROLLDOWN_SOURCE_MAPS),
+      sourceMaps: fromRolldownSourceMapsToBabelSourceMaps(buildEnv.BUILD_SOURCE_MAPS),
     }),
   ],
   resolve: {
     conditionNames: [
       `@swapi/${buildVariantPath}`,
-      `@swapi/${env.SWAPI_BUILD_LEVEL}`,
+      `@swapi/${buildEnv.BUILD_PROFILE}`,
       'node',
       'default',
     ],
@@ -38,8 +38,7 @@ const serverBundleConfig = defineConfig({
   external: (id) => externalDependencies.has(id),
   transform: {
     define: {
-      ...envToOxcDefine(env),
-      ngServerMode: 'true',
+      ...envToOxcDefine({ ...buildEnv, ngServerMode: true }),
     },
   },
   output: {
@@ -47,14 +46,14 @@ const serverBundleConfig = defineConfig({
     cleanDir: true,
     minify: isMinifyEnabled,
     comments: !isMinifyEnabled,
-    sourcemap: env.SWAPI_ROLLDOWN_SOURCE_MAPS,
+    sourcemap: buildEnv.BUILD_SOURCE_MAPS,
   },
 })
 
 export default defineConfig([serverBundleConfig])
 
 function fromRolldownSourceMapsToBabelSourceMaps(
-  sourceMaps: typeof env.SWAPI_ROLLDOWN_SOURCE_MAPS,
+  sourceMaps: typeof buildEnv.BUILD_SOURCE_MAPS,
 ): TransformOptions['sourceMaps'] {
   if (typeof sourceMaps === 'boolean') {
     return sourceMaps

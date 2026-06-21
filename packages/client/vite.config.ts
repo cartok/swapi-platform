@@ -10,36 +10,42 @@ import {
   transformWithOxc,
 } from 'vite'
 
-// Those vite runner related imports had to be relative.
+// These imports have to be relative for bundling.
 import { logEnv } from '../shared/src/environment/env'
 import { envToOxcDefine } from '../shared/src/environment/globals'
-import { browserEnv, buildEnv } from './src/env'
-import type { AppBuildEnv, ViteMode } from './src/env.schema'
+import { browserBuildEnv, buildEnv } from './src/env'
 
-logEnv(browserEnv, 'Vite App Environment Variables (Browser)')
-logEnv(buildEnv, 'Vite App Environment Variables (Build)')
+logEnv(buildEnv, 'Vite App Build Environment Variables')
+logEnv(browserBuildEnv, 'Vite App Build Environment Variables (Browser)')
 
 const clientResolveConditions: string[] = createResolveConditions(defaultClientConditions)
 const serverResolveConditions: string[] = createResolveConditions(defaultServerConditions)
-const viteMode: ViteMode = fromBuildVariantToViteMode(buildEnv.SWAPI_BUILD_LEVEL)
 
 export default defineConfig(({ isSsrBuild }) => {
+  if (typeof isSsrBuild === 'undefined') {
+    throw new Error('SSR parameter must not be undefined')
+  }
+
   const config: UserConfig = {
-    base: buildEnv.SWAPI_CLIENT_PUBLIC_BASE_PATH,
+    base: buildEnv.BUILD_PUBLIC_BASE_PATH,
     clearScreen: false,
     envDir: false,
-    mode: viteMode,
     build: {
       manifest: true,
       ssrManifest: true,
       emptyOutDir: true,
-      minify: buildEnv.SWAPI_MINIFY,
-      sourcemap: buildEnv.SWAPI_VITE_SOURCE_MAPS,
+      minify: buildEnv.BUILD_MINIFY,
+      sourcemap: buildEnv.BUILD_SOURCE_MAPS,
     },
     define: {
-      ...envToOxcDefine(browserEnv),
-      VITE_MODE: `"${viteMode}"`,
-      ngServerMode: `${isSsrBuild}`,
+      ...envToOxcDefine({
+        ...browserBuildEnv,
+        ngServerMode: isSsrBuild,
+        ngDevMode:
+          buildEnv.NODE_ENV === 'production'
+            ? false
+            : (globalThis as unknown as { ngDevMode: boolean }).ngDevMode,
+      }),
     },
     resolve: {
       conditions: clientResolveConditions,
@@ -115,16 +121,16 @@ export default defineConfig(({ isSsrBuild }) => {
     ],
   }
 
-  if (buildEnv.SWAPI_TARGET_ENVIRONMENT === 'local') {
+  if (buildEnv.BUILD_TARGET_ENVIRONMENT === 'local') {
     const developmentServerConfig: UserConfig = {
       server: {
         host: 'localhost',
-        port: buildEnv.SWAPI_CLIENT_SERVER_PORT_DEV,
+        port: buildEnv.BUILD_SERVER_PORT_DEV,
         strictPort: true,
       },
       preview: {
         host: 'localhost',
-        port: buildEnv.SWAPI_CLIENT_SERVER_PORT_PREVIEW,
+        port: buildEnv.BUILD_SERVER_PORT_PREVIEW,
         strictPort: true,
       },
     }
@@ -135,24 +141,13 @@ export default defineConfig(({ isSsrBuild }) => {
   return config
 })
 
-function fromBuildVariantToViteMode(
-  buildVariant: AppBuildEnv['SWAPI_BUILD_LEVEL'],
-): ViteMode {
-  switch (buildVariant) {
-    case 'development':
-      return 'development'
-    case 'release':
-      return 'production'
-  }
-}
-
 function createResolveConditions(
   defaultConditions: string[] | readonly string[],
 ): string[] {
   const sharedCondition =
-    buildEnv.SWAPI_SOURCE_MODE === 'source'
+    buildEnv.BUILD_SOURCE_MODE === 'source'
       ? '@swapi/shared/source'
-      : `@swapi/${buildEnv.SWAPI_BUILD_LEVEL}`
+      : `@swapi/${buildEnv.BUILD_PROFILE}`
 
   return [sharedCondition, ...defaultConditions]
 }

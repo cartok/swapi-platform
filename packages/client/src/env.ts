@@ -1,24 +1,20 @@
-// Those vite runner related imports had to be relative.
+// These imports have to be relative for bundling.
 import { parseEnv } from '../../shared/src/environment/env'
-import { AppBrowserEnvSchema, AppBuildEnvSchema } from './env.schema'
+import { AppBrowserBuildEnvSchema, AppBuildEnvSchema } from './env.schema'
 
-export const browserEnv = parseEnv(AppBrowserEnvSchema, {
-  SWAPI_BUILD_LEVEL: process.env['SWAPI_BUILD_LEVEL'],
-  SWAPI_LOCAL_E2E: process.env['SWAPI_LOCAL_E2E'],
-  SWAPI_LOG_LEVEL: process.env['SWAPI_LOG_LEVEL'],
-  SWAPI_TARGET_ENVIRONMENT: process.env['SWAPI_TARGET_ENVIRONMENT'],
-  SWAPI_USE_MOCK: process.env['SWAPI_USE_MOCK'],
+export const browserBuildEnv = parseEnv(AppBrowserBuildEnvSchema, {
+  BUILD_LOG_LEVEL: process.env['BUILD_LOG_LEVEL'],
+  BUILD_USE_SWAPI_MOCK: process.env['BUILD_USE_SWAPI_MOCK'],
 })
 
 export const buildEnv = parseEnv(AppBuildEnvSchema, {
-  SWAPI_BUILD_LEVEL: process.env['SWAPI_BUILD_LEVEL'],
-  SWAPI_CLIENT_PUBLIC_BASE_PATH: process.env['SWAPI_CLIENT_PUBLIC_BASE_PATH'],
-  SWAPI_CLIENT_SERVER_PORT_DEV: process.env['SWAPI_CLIENT_SERVER_PORT_DEV'],
-  SWAPI_CLIENT_SERVER_PORT_PREVIEW: process.env['SWAPI_CLIENT_SERVER_PORT_PREVIEW'],
-  SWAPI_LOCAL_E2E: process.env['SWAPI_LOCAL_E2E'],
-  SWAPI_LOG_LEVEL: process.env['SWAPI_LOG_LEVEL'],
-  SWAPI_MINIFY: process.env['SWAPI_MINIFY'],
-  SWAPI_SOURCE_MODE: process.env['SWAPI_SOURCE_MODE'],
-  SWAPI_TARGET_ENVIRONMENT: process.env['SWAPI_TARGET_ENVIRONMENT'],
-  SWAPI_VITE_SOURCE_MAPS: process.env['SWAPI_VITE_SOURCE_MAPS'],
+  BUILD_MINIFY: process.env['BUILD_MINIFY'],
+  BUILD_PROFILE: process.env['BUILD_PROFILE'],
+  BUILD_PUBLIC_BASE_PATH: process.env['BUILD_PUBLIC_BASE_PATH'],
+  BUILD_SERVER_PORT_DEV: process.env['BUILD_SERVER_PORT_DEV'],
+  BUILD_SERVER_PORT_PREVIEW: process.env['BUILD_SERVER_PORT_PREVIEW'],
+  BUILD_SOURCE_MAPS: process.env['BUILD_SOURCE_MAPS'],
+  BUILD_SOURCE_MODE: process.env['BUILD_SOURCE_MODE'],
+  BUILD_TARGET_ENVIRONMENT: process.env['BUILD_TARGET_ENVIRONMENT'],
+  NODE_ENV: process.env['NODE_ENV'],
 })

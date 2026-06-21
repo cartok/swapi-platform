@@ -9,49 +9,68 @@ shopt:
 output: prefixed
 
 vars:
-  T_GIT_COMMIT_SHA:
+  # Workaround for the Task include precedence issue documented in
+  # docs/taskfile-issues.md:
+  # "CLI Variables Do Not Override Root Variables When Running Included Tasks".
+  GIT_COMMIT_SHA:
     sh: |
-      if command -v git >/dev/null 2>&1; then
-        printf "%s" "$(git rev-parse --verify HEAD)"
+      if [ -n "${GIT_COMMIT_SHA:-}" ]; then
+        printf "%s" "${GIT_COMMIT_SHA}"
+      elif command -v git >/dev/null 2>&1; then
+        printf "%s" "$(git rev-parse --verify HEAD 2>/dev/null || true)"
       fi
-  T_GIT_COMMIT_SHA_SHORT:
+  GIT_COMMIT_SHA_SHORT:
     sh: |
-      if command -v git >/dev/null 2>&1; then
-        printf "%s" "$(git rev-parse --verify --short=12 HEAD)"
+      if [ -n "${GIT_COMMIT_SHA_SHORT:-}" ]; then
+        printf "%s" "${GIT_COMMIT_SHA_SHORT}"
+      elif command -v git >/dev/null 2>&1; then
+        printf "%s" "$(git rev-parse --verify --short=12 HEAD 2>/dev/null || true)"
       fi
-  T_SOURCES:
+
+  # Right now enums are not usable for interactive selection, so this is just reference
+  # to copy paste from.
+  ENUMS:
+    map:
+      NODE_ENV: [development, production]
+      TARGET_ENVIRONMENT: [local, ci, testing, production]
+      BUILD_PROFILE: [development, release]
+
+  MAPPINGS:
+    map:
+      BUILD_PROFILE_2_NODE_ENV:
+        development: development
+        release: production
+
+  SOURCES:
     map:
       lockfile: '{{.ROOT_DIR}}/bun.lock'
       tsconfigPackage: '{{.ROOT_DIR}}/packages/tsconfig/package.json'
       tsconfigs: '{{.ROOT_DIR}}/packages/tsconfig/src/**/*.json'
-  T_BUILD_LEVEL_TO_NODE_ENV:
-    map:
-      development: development
-      release: production
-  T_DOCKER_HOST:
-  T_DOCKER_PORT:
-  T_DOCKER_REGISTRY_PARTS:
-    - '{{.T_DOCKER_HOST}}'
-    - '{{.T_DOCKER_PORT}}'
-  T_DOCKER_REGISTRY:
-    ref: .T_DOCKER_REGISTRY_PARTS | compact | join ":"
-  T_DOCKER_NAMESPACE: cartok
-  T_DOCKER_REPOSITORY: swapi-platform
-  T_DOCKER_REPOSITORY_PATH_PARTS:
-    - '{{.T_DOCKER_NAMESPACE}}'
-    - '{{.T_DOCKER_REPOSITORY}}'
-  T_DOCKER_REPOSITORY_PATH:
-    ref: .T_DOCKER_REPOSITORY_PATH_PARTS | compact | join "/"
-  T_DOCKER_IMAGE_BASE_NAME_PARTS:
-    - '{{.T_DOCKER_REGISTRY}}'
-    - '{{.T_DOCKER_REPOSITORY_PATH}}'
-  T_DOCKER_IMAGE_BASE_NAME:
-    ref: .T_DOCKER_IMAGE_BASE_NAME_PARTS | compact | join "/"
-  T_DOCKER_IMAGE_LOCAL_TAG: 'local'
+
+  DOCKER_HOST:
+  DOCKER_PORT:
+  DOCKER_REGISTRY: '{{list .DOCKER_HOST .DOCKER_PORT | compact | join ":"}}'
+  DOCKER_NAMESPACE: cartok
+  DOCKER_REPOSITORY: swapi-platform
+  DOCKER_REPOSITORY_PATH: >-
+    {{
+      list
+      .DOCKER_NAMESPACE
+      .DOCKER_REPOSITORY
+      | join "/"
+    }}
+  DOCKER_IMAGE_BASE_NAME: >-
+    {{
+      list
+      .DOCKER_REGISTRY
+      .DOCKER_REPOSITORY_PATH
+      | compact | join "/"
+    }}
+  DOCKER_IMAGE_TAG_LOCAL: local
 
 includes:
   dev:
-    taskfile: ./Taskfile.local.yml
+    taskfile: ./Taskfile.dev.yml
     optional: true
     flatten: true
   tools:

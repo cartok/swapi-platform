@@ -1,7 +1,7 @@
 version: 3
 
 vars:
-  T_DIN_APP_WORKER: swapi-platform-app-worker
+  DIN_APP_WORKER: swapi-platform-app-worker
 
 tasks:
   clean:
@@ -22,9 +22,9 @@ tasks:
       - '{{.ROOT_DIR}}/packages/shared/src/**/*.ts'
       - '{{.ROOT_DIR}}/packages/hono/package.json'
       - '{{.ROOT_DIR}}/packages/hono/src/**/*.ts'
-      - '{{.T_SOURCES.tsconfigPackage}}'
-      - '{{.T_SOURCES.tsconfigs}}'
-      - '{{.T_SOURCES.lockfile}}'
+      - '{{.SOURCES.tsconfigPackage}}'
+      - '{{.SOURCES.tsconfigs}}'
+      - '{{.SOURCES.lockfile}}'
     deps:
       - task: typegen
       - task: :shared:generate
@@ -42,31 +42,26 @@ tasks:
           --check
 
   build:deps:
+    label: '{{.TASK}}@{{.BUILD_PROFILE}}'
     requires:
       vars:
-        - name: T_BUILD_LEVEL
+        - name: BUILD_PROFILE
           enum: [development, release]
     deps:
       - task: typegen
       - task: :hono:build
         vars:
-          T_BUILD_LEVEL:
-            ref: .T_BUILD_LEVEL
+          BUILD_PROFILE: '{{.BUILD_PROFILE}}'
       - task: :shared:build
         vars:
-          T_BUILD_LEVEL:
-            ref: .T_BUILD_LEVEL
+          BUILD_PROFILE: '{{.BUILD_PROFILE}}'
 
   build:bundle:
-    label: '{{.TASK}}:{{.T_TARGET_ENVIRONMENT}}'
+    label: '{{.TASK}}@{{.TARGET_ENVIRONMENT}}'
     requires:
       vars:
-        - name: T_TARGET_ENVIRONMENT
+        - name: TARGET_ENVIRONMENT
           enum: [local, ci]
-    vars:
-      T_TARGET_ENVIRONMENT:
-        ref: coalesce (env "TARGET_ENVIRONMENT") .T_TARGET_ENVIRONMENT "local"
-      T_DIST_DIR: './dist'
     sources:
       - './package.json'
       - './worker-configuration.d.ts'
@@ -74,107 +69,114 @@ tasks:
       - './src/**/*.ts'
       - './tsconfig/**/*.json'
       - '{{.ROOT_DIR}}/packages/shared/dist/release/**/*'
-      - '{{.T_SOURCES.tsconfigPackage}}'
-      - '{{.T_SOURCES.tsconfigs}}'
-      - '{{.T_SOURCES.lockfile}}'
+      - '{{.SOURCES.tsconfigPackage}}'
+      - '{{.SOURCES.tsconfigs}}'
+      - '{{.SOURCES.lockfile}}'
     generates:
-      - '{{.T_DIST_DIR}}/**/*'
+      - './dist/**/*'
     deps:
       - task: build:deps
         vars:
-          T_BUILD_LEVEL: release
+          BUILD_PROFILE: release
     cmds:
       - >
         bunx --no-install wrangler deploy
         --dry-run
-        --env {{.T_TARGET_ENVIRONMENT}}
-        --outdir {{.T_DIST_DIR}}
-        --metafile {{.T_DIST_DIR}}/bundle-meta.json
+        --env {{.TARGET_ENVIRONMENT}}
+        --outdir ./dist
+        --metafile ./dist/bundle-meta.json
+
+  build:bundle:dev:
+    cmds:
+      - task: build:bundle
+        vars:
+          TARGET_ENVIRONMENT: local
 
   build:docker:
-    label: '{{.TASK}}:{{.T_IMAGE_TAG}}'
+    label: '{{.TASK}}@{{.IMAGE_TAG}}:{{.TARGET_ENVIRONMENT}}:{{.DOCKER_TARGET}}'
     requires:
       vars:
-        - name: T_TARGET_ENVIRONMENT
+        - name: TARGET_ENVIRONMENT
           enum: [local, ci]
-        - name: T_DOCKER_TARGET
+        - name: DOCKER_TARGET
           enum: [runtime, base, build-deps, code, bundle, runtime-deps]
     vars:
-      T_TARGET_ENVIRONMENT:
-        ref: coalesce (env "TARGET_ENVIRONMENT") .T_TARGET_ENVIRONMENT "local"
-      T_IMAGE_TAG: '{{.T_DIN_APP_WORKER}}:local'
+      IMAGE_TAG: '{{.DIN_APP_WORKER}}:local'
     cmds:
       - >
         docker buildx build
         --load
         --file ./Dockerfile.app-worker
-        --build-arg TARGET_ENVIRONMENT={{.T_TARGET_ENVIRONMENT}}
-        {{if ne .T_DOCKER_TARGET "runtime"}}
-        --target {{.T_DOCKER_TARGET}}
+        --build-arg TARGET_ENVIRONMENT={{.TARGET_ENVIRONMENT}}
+        {{if ne .DOCKER_TARGET "runtime"}}
+        --target {{.DOCKER_TARGET}}
         {{end}}
-        --tag {{.T_IMAGE_TAG}}
+        --tag {{.IMAGE_TAG}}
         {{.ROOT_DIR}}
+
+  build:docker:dev:
+    cmds:
+      - task: build:bundle
+        vars:
+          TARGET_ENVIRONMENT: local
+          DOCKER_TARGET: runtime
 
   start:dev:
     vars:
-      T_ENV:
+      ENV:
         sh: yq '.env.local.vars' ./wrangler.jsonc
-      T_ENV_MAP:
-        ref: .T_ENV | fromJson
     deps:
       - task: build:deps
         vars:
-          T_BUILD_LEVEL: development
+          BUILD_PROFILE: development
     cmds:
       - >
         bunx --no-install wrangler dev
         --env local
-        --port {{.T_ENV_MAP.PORT}}
+        --port {{(.ENV | fromJson).PORT}}
 
   start:bundle:
     vars:
-      T_ENV:
+      ENV:
         sh: yq '.env.local.vars' ./wrangler.jsonc
-      T_ENV_MAP:
-        ref: .T_ENV | fromJson
     cmds:
       - task: build:bundle
         vars:
-          T_TARGET_ENVIRONMENT: local
+          TARGET_ENVIRONMENT: local
       - >
         bunx --no-install wrangler dev
         --env local
         --no-bundle
-        --port {{.T_ENV_MAP.PORT}}
+        --port {{(.ENV | fromJson).PORT}}
         ./dist/index.js
+
+  start:bundle:dev:
+    cmds:
+      - task: start:bundle
+        vars:
+          TARGET_ENVIRONMENT: local
 
   start:docker:
     interactive: true
     requires:
       vars:
-        - name: T_TARGET_ENVIRONMENT
+        - name: TARGET_ENVIRONMENT
           enum: [local, ci]
-        - name: T_DEV_MODE
+        - name: DEV_MODE
           enum: ['true', 'false']
     vars:
-      T_TARGET_ENVIRONMENT:
-        ref: coalesce (env "TARGET_ENVIRONMENT") .T_TARGET_ENVIRONMENT "local"
-      T_IMAGE_TAG: '{{.T_DIN_APP_WORKER}}:local'
-      T_ENV:
-        sh: yq '.env["{{.T_TARGET_ENVIRONMENT}}"].vars' ./wrangler.jsonc
-      T_ENV_MAP:
-        ref: .T_ENV | fromJson
+      ENV:
+        sh: yq '.env["{{.TARGET_ENVIRONMENT}}"].vars' ./wrangler.jsonc
     cmds:
       - task: build:docker
         vars:
-          T_TARGET_ENVIRONMENT:
-            ref: .T_TARGET_ENVIRONMENT
+          TARGET_ENVIRONMENT: '{{.TARGET_ENVIRONMENT}}'
       - >
         docker run
-        {{if ne .T_DEV_MODE "true"}}
+        {{if ne .DEV_MODE "true"}}
         --detach
         {{end}}
-        {{if eq .T_DEV_MODE "true"}}
+        {{if eq .DEV_MODE "true"}}
         --interactive
         --tty
         --entrypoint bash
@@ -182,30 +184,26 @@ tasks:
         --rm
         --init
         --ipc=host
-        --publish {{.T_ENV_MAP.PORT}}:{{.T_ENV_MAP.PORT}}
+        --publish {{(.ENV | fromJson).PORT}}:{{(.ENV | fromJson).PORT}}
         --ulimit nofile=65536:65536
         --ulimit core=0:0
         --ulimit memlock=-1:-1
-        --name={{.T_DIN_APP_WORKER}}
-        {{.T_IMAGE_TAG}}
-        {{if ne .T_DEV_MODE "true"}}
+        --name={{.DIN_APP_WORKER}}
+        {{.DIN_APP_WORKER}}:local
+        {{if ne .DEV_MODE "true"}}
         dev
-        --env {{.T_TARGET_ENVIRONMENT}}
+        --env {{.TARGET_ENVIRONMENT}}
         --no-bundle
         --ip 0.0.0.0
-        --port {{.T_ENV_MAP.PORT}}
+        --port {{(.ENV | fromJson).PORT}}
         ./index.js
         {{end}}
 
   deploy:
-    label: '{{.TASK}}:{{.T_TARGET_ENVIRONMENT}}'
     requires:
       vars:
-        - name: T_TARGET_ENVIRONMENT
+        - name: TARGET_ENVIRONMENT
           enum: [testing, production]
-    vars:
-      T_TARGET_ENVIRONMENT:
-        ref: coalesce (env "TARGET_ENVIRONMENT") .T_TARGET_ENVIRONMENT "testing"
     cmds:
-      - bunx --no-install wrangler deploy --env {{.T_TARGET_ENVIRONMENT}} --minify
-      - bunx --no-install wrangler deployments list --env {{.T_TARGET_ENVIRONMENT}}
+      - bunx --no-install wrangler deploy --env {{.TARGET_ENVIRONMENT}} --minify
+      - bunx --no-install wrangler deployments list --env {{.TARGET_ENVIRONMENT}}

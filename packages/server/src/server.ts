@@ -2,20 +2,29 @@ import fs from 'node:fs'
 import { availableParallelism, constants } from 'node:os'
 import process, { resourceUsage } from 'node:process'
 
-import { logEnv } from '@swapi/shared/environment/env'
 import { errorToString, logHeading, objectToString } from '@swapi/shared/log/log'
 
-import { DCE_SWAPI_LOCAL_E2E, DCE_SWAPI_TARGET_ENVIRONMENT, env } from '#internal/env'
+import {
+  buildEnv,
+  DCE_BUILD_TARGET_ENVIRONMENT,
+  runEnv,
+  validateRuntimeSecretEnv,
+} from '#internal/env'
 import { createHono } from '#internal/hono'
+import { logServerEnv, logSystemEnv } from '#internal/log/log-env'
 import { RenderWorkerPool } from '#internal/ssr/render-worker-pool'
 import type { RenderWorkerPoolConfig } from '#internal/ssr/render-worker-pool.types'
 import type { HonoRuntimeOptions, ServerRuntimeMetrics } from '#internal/types'
 
 console.info(`Process id is: ${process.pid}`)
-logEnv(env, 'App Server Runtime Environment Variables')
-if (DCE_SWAPI_TARGET_ENVIRONMENT !== 'local') {
-  console.info('Environment', process.env)
+if (
+  DCE_BUILD_TARGET_ENVIRONMENT !== 'local' &&
+  DCE_BUILD_TARGET_ENVIRONMENT !== 'production' &&
+  runEnv.RUN_LOG_LEVEL === 'debug'
+) {
+  logSystemEnv()
 }
+logServerEnv()
 
 // The timeout should be lower than the one defined in fly config for that health check.
 const FORCE_EXIT_TIMEOUT = 7_500
@@ -60,7 +69,11 @@ function resolveRenderWorkerPoolConfig(): RenderWorkerPoolConfig {
     return new URL(`./ssr/${renderWorkerFileName}`, import.meta.url)
   }
 
-  if (DCE_SWAPI_LOCAL_E2E) {
+  if (
+    DCE_BUILD_TARGET_ENVIRONMENT === 'local' &&
+    runEnv.RUN_IS_LOCAL_E2E &&
+    runEnv.RUN_USE_LOCAL_E2E_CACHE
+  ) {
     const cores = availableParallelism()
     const coresMaxPercent = 0.4
     const coresMax = Math.max(Math.floor(cores * coresMaxPercent), 1)
@@ -178,9 +191,9 @@ process.on('uncaughtException', (error) => {
     fs.writeSync(process.stderr.fd, logHeading('run context'))
     fs.writeSync(process.stderr.fd, objectToString(runtimeMetrics))
 
-    if (DCE_SWAPI_TARGET_ENVIRONMENT !== 'production') {
+    if (DCE_BUILD_TARGET_ENVIRONMENT !== 'production') {
       fs.writeSync(process.stderr.fd, logHeading('env'))
-      fs.writeSync(process.stderr.fd, objectToString(env))
+      fs.writeSync(process.stderr.fd, objectToString(buildEnv))
 
       fs.writeSync(process.stderr.fd, logHeading('resources'))
       const resources = objectToString(resourceUsage())
@@ -201,14 +214,16 @@ const server = await startServer()
 
 async function startServer(): Promise<Bun.Server<undefined>> {
   try {
+    validateRuntimeSecretEnv()
+
     const runtimeServices = await runtimeServicesPromise
     const hono = createHono({
       runtimeMetrics,
       runtimeServices,
     })
     const server = Bun.serve({
-      hostname: env.SWAPI_SERVER_HOST_INTERNAL,
-      port: env.SWAPI_APP_SERVER_PORT,
+      hostname: runEnv.RUN_HOST_INTERNAL,
+      port: runEnv.RUN_PORT,
       fetch: hono.fetch,
     })
     console.log(`Server running at: ${server.url.toString()}`)

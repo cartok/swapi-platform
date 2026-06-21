@@ -8,5 +8,5 @@
     "noEmit": true,
     "types": ["node"]
   },
-  "files": ["../vite.config.ts", "../src/env.ts"]
+  "files": ["../vite.config.ts", "../src/env.ts", "../src/env.schema.ts"]
 }

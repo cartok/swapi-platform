@@ -8,7 +8,7 @@ import { routes } from '@/app.routes'
 import { httpRetryInterceptor } from '@/http/http-retry.interceptor'
 
 const httpInterceptors = []
-if (SWAPI_USE_MOCK) {
+if (BUILD_USE_SWAPI_MOCK) {
   const { swapiMockInterceptor } = await import('@/api/swapi/swapi.mock.interceptor')
   httpInterceptors.push(swapiMockInterceptor)
 }

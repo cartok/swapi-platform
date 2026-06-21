@@ -6,7 +6,11 @@ import {
 import { CACHE_TAGS } from '@swapi/shared/cache/cache-tags'
 import { createCommitBasedWeakETagHeader } from '@swapi/shared/cache/etags'
 
-import { DCE_SWAPI_GIT_COMMIT_SHA, DCE_SWAPI_LOCAL_E2E } from '#internal/env'
+import {
+  DCE_BUILD_GIT_COMMIT_SHA,
+  DCE_BUILD_TARGET_ENVIRONMENT,
+  runEnv,
+} from '#internal/env'
 import { createAbortResponse } from '#internal/request/request-abort.handler'
 import {
   RenderPoolClosedError,
@@ -19,8 +23,10 @@ import type { HonoRuntimeOptions, ServerHonoEnv } from '#internal/types'
 
 let ssrCache: Map<string, string> | null = null
 
-// TODO: extra variable + E2E env union variable
-const useCache = DCE_SWAPI_LOCAL_E2E
+const useCache =
+  DCE_BUILD_TARGET_ENVIRONMENT === 'local' &&
+  runEnv.RUN_IS_LOCAL_E2E &&
+  runEnv.RUN_USE_LOCAL_E2E_CACHE
 
 if (useCache) {
   console.warn('SSR: Will use runtime cache.')
@@ -65,7 +71,7 @@ export const addSsrHandler: HonoHandler<ServerHonoEnv, HonoRuntimeOptions> = (
       return c.html(html, 200, {
         ...DOCUMENT_CACHE_HEADERS,
         'Cache-Tag': [CACHE_TAGS.HTML, CACHE_TAGS.SSR],
-        ...createCommitBasedWeakETagHeader(DCE_SWAPI_GIT_COMMIT_SHA),
+        ...createCommitBasedWeakETagHeader(DCE_BUILD_GIT_COMMIT_SHA),
       })
     } catch (error) {
       if (error instanceof RenderRequestTimeoutError) {

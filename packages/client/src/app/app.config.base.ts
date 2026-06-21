@@ -13,7 +13,7 @@ import {
 
 import { DeviceService } from '@/services/DeviceService'
 
-if (VITE_MODE === 'production') {
+if (import.meta.env.PROD) {
   enableProdMode()
 }
 

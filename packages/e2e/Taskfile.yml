@@ -1,7 +1,7 @@
 version: 3
 
 vars:
-  T_DIN_PLAYWRIGHT: swapi-platform-playwright
+  DIN_PLAYWRIGHT: swapi-platform-playwright
 
 tasks:
   clean:
@@ -16,18 +16,10 @@ tasks:
       - bunx --no-install playwright clear-cache
 
   install:
-    aliases:
-      - i
     preconditions:
       - command -v npx
     cmds:
       - npx playwright install chromium
-
-  update-screenshots:
-    cmds:
-      - task: test
-        vars:
-          CLI_ARGS: --grep '@screenshot' --update-snapshots --no-deps
 
   lint:tsc:
     sources:
@@ -37,9 +29,9 @@ tasks:
       - './tsconfig/**/*.json'
       - '{{.ROOT_DIR}}/packages/shared/package.json'
       - '{{.ROOT_DIR}}/packages/shared/src/**/*.ts'
-      - '{{.T_SOURCES.tsconfigPackage}}'
-      - '{{.T_SOURCES.tsconfigs}}'
-      - '{{.T_SOURCES.lockfile}}'
+      - '{{.SOURCES.tsconfigPackage}}'
+      - '{{.SOURCES.tsconfigs}}'
+      - '{{.SOURCES.lockfile}}'
     cmds:
       - bunx --no-install tsc --noEmit --project ./tsconfig/tsconfig.e2e.json
 
@@ -47,19 +39,56 @@ tasks:
     deps:
       - task: :shared:build
 
-  server:
+  build:docker:
+    requires:
+      vars:
+        - name: DOCKER_TARGET
+          enum: [runtime, base, deps, browsers, code]
+    vars:
+      IMAGE_TAG: '{{.DIN_PLAYWRIGHT}}:local'
     dotenv:
-      - './.env/.env.local'
+      - './.env/.env.ci'
     cmds:
-      - task: :server:start:bundle
-        silent: true
+      - >
+        docker buildx build
+        --load
+        --file ./Dockerfile.e2e
+        {{if ne .DOCKER_TARGET "runtime"}}
+        --target {{.DOCKER_TARGET}}
+        {{end}}
+        --tag {{.IMAGE_TAG}}
+        {{.ROOT_DIR}}
 
-  server:watch:
+  start:docker:
+    interactive: true
+    requires:
+      vars:
+        - name: DEV_MODE
+          enum: ['true', 'false']
     dotenv:
       - './.env/.env.local'
     cmds:
-      - task: :server:watch:start:bundle
-        silent: true
+      - >
+        docker run
+        {{if ne .DEV_MODE "true"}}
+        --detach
+        {{end}}
+        {{if eq .DEV_MODE "true"}}
+        --interactive
+        --tty
+        --entrypoint bash
+        {{end}}
+        --rm
+        --init
+        --ipc=host
+        --publish ${PORT}:${PORT}
+        --ulimit nofile=65536:65536
+        --ulimit core=0:0
+        --name={{.DIN_PLAYWRIGHT}}
+        {{.DIN_PLAYWRIGHT}}:local
+        {{if ne .DEV_MODE "true"}}
+        test
+        {{end}}
 
   test:
     dotenv:
@@ -76,7 +105,13 @@ tasks:
         --fail-on-flaky-tests
         {{.CLI_ARGS}}
 
-  generate:
+  update-screenshots:
+    cmds:
+      - task: test
+        vars:
+          CLI_ARGS: --grep '@screenshot' --update-snapshots --no-deps
+
+  codegen:
     desc: 'Requires server bundle to be ran manually atm.'
     dotenv:
       - './.env/.env.local'
@@ -87,57 +122,3 @@ tasks:
       - task: :server:build:bundle
     cmds:
       - bunx --no-install playwright codegen localhost:51000
-
-  build:docker:
-    label: '{{.TASK}}:{{.T_IMAGE_TAG}}'
-    requires:
-      vars:
-        - name: T_DOCKER_TARGET
-          enum: [runtime, base, deps, browsers, code]
-    vars:
-      T_IMAGE_TAG: '{{.T_DIN_PLAYWRIGHT}}:local'
-    dotenv:
-      - './.env/.env.ci'
-    cmds:
-      - >
-        docker buildx build
-        --load
-        --file ./Dockerfile.e2e
-        {{if ne .T_DOCKER_TARGET "runtime"}}
-        --target {{.T_DOCKER_TARGET}}
-        {{end}}
-        --tag {{.T_IMAGE_TAG}}
-        {{.ROOT_DIR}}
-
-  start:docker:
-    interactive: true
-    requires:
-      vars:
-        - name: T_DEV_MODE
-          enum: ['true', 'false']
-    vars:
-      T_IMAGE_TAG: '{{.T_DIN_PLAYWRIGHT}}:local'
-    dotenv:
-      - './.env/.env.local'
-    cmds:
-      - >
-        docker run
-        {{if ne .T_DEV_MODE "true"}}
-        --detach
-        {{end}}
-        {{if eq .T_DEV_MODE "true"}}
-        --interactive
-        --tty
-        --entrypoint bash
-        {{end}}
-        --rm
-        --init
-        --ipc=host
-        --publish ${SWAPI_E2E_PORT_PLAYWRIGHT}:${SWAPI_E2E_PORT_PLAYWRIGHT}
-        --ulimit nofile=65536:65536
-        --ulimit core=0:0
-        --name={{.T_DIN_PLAYWRIGHT}}
-        {{.T_IMAGE_TAG}}
-        {{if ne .T_DEV_MODE "true"}}
-        test
-        {{end}}

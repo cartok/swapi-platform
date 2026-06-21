@@ -4,6 +4,7 @@ import { Hono } from 'hono'
 import { addAssetHandler } from '#internal/assets/asset.handler'
 import { addDebugRoutesHandler } from '#internal/dev/debug-routes.handler'
 import { addFilterHandler } from '#internal/dev/filter.handler'
+import { DCE_BUILD_TARGET_ENVIRONMENT } from '#internal/env'
 import { addErrorHandler } from '#internal/error/error.handler'
 import { addHealthChecksHandler } from '#internal/health/health-checks.handler'
 import { addInFlightRequestsHandler } from '#internal/request/in-flight-requests.handler'
@@ -19,7 +20,7 @@ import type { HonoRuntimeOptions, ServerHonoEnv } from '#internal/types'
 export function createHono(runtimeOptions: HonoRuntimeOptions): Hono<ServerHonoEnv> {
   const hono = new Hono<ServerHonoEnv>({ strict: false })
 
-  if (DCE_SWAPI_TARGET_ENVIRONMENT === 'local') {
+  if (DCE_BUILD_TARGET_ENVIRONMENT === 'local') {
     addFilterHandler(hono)
     addDebugRoutesHandler(hono)
   }

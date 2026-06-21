@@ -10,7 +10,7 @@ import { serverRoutes } from '@/app.routes.server'
 import { ssrAbortInterceptor } from '@/http/ssr-abort.interceptor'
 
 const httpInterceptors = [ssrAbortInterceptor]
-if (SWAPI_USE_MOCK) {
+if (BUILD_USE_SWAPI_MOCK) {
   const { swapiMockInterceptor } = await import('@/api/swapi/swapi.mock.interceptor')
   httpInterceptors.push(swapiMockInterceptor)
 }

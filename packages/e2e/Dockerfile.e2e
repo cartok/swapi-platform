@@ -2,8 +2,8 @@
 
 ARG BUN_VERSION=1.3.14
 ARG NODE_VERSION=24.16
-ARG TARGETARCH
 ARG DISTRO=debian-trixie
+ARG TARGETARCH
 ARG CID_APT_CACHE=${TARGETARCH}-${DISTRO}-apt-cache
 ARG CID_APT_LIB=${TARGETARCH}-${DISTRO}-apt-lib
 ARG CID_BUN_CACHE=bun
@@ -28,9 +28,9 @@ EOF
 
 FROM base AS deps
 
-ARG CID_BUN_CACHE
-
 WORKDIR /app
+
+ARG CID_BUN_CACHE
 
 COPY --parents ./.npmrc ./
 COPY --parents ./.node-version ./
