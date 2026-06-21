@@ -17,10 +17,10 @@
     "../../../packages/shared/src/**/*.ts"
   ],
   "exclude": [
-    "../src/env.schema.ts",
-    "../src/env.ts",
     "../src/dist-paths.ts",
+    "../src/env.ts",
     "../src/**/*.spec.ts",
+    "../../../packages/shared/src/cache/etags.ts",
     "../../../packages/shared/src/**/*.d.ts"
   ]
 }

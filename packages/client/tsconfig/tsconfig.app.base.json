@@ -10,7 +10,8 @@
     "paths": {
       "@/*": ["../src/app/*"],
       "@/assets/*": ["../src/assets/*"],
-      "@/css/*": ["../src/css/*"]
+      "@/css/*": ["../src/css/*"],
+      "@/env": ["../src/env"]
     }
   }
 }
