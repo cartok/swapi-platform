@@ -36,7 +36,7 @@ tasks:
       - '{{.SOURCES.lockfile}}'
     cmds:
       - bunx --no-install tsc --noEmit --project ./tsconfig/tsconfig.app.json
-      - bunx --no-install tsc --noEmit --project ./tsconfig/tsconfig.vite.json
+      - bunx --no-install tsc --noEmit --project ./tsconfig/tsconfig.app.bundler.json
 
   build:dist-paths:
     label: '{{.TASK}}@{{.TARGET_ENVIRONMENT}}:{{.BUILD_PROFILE}}'

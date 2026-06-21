@@ -1,8 +1,8 @@
 {
   "files": [],
   "references": [
+    { "path": "./tsconfig/tsconfig.app.bundler.json" },
     { "path": "./tsconfig/tsconfig.app.json" },
-    { "path": "./tsconfig/tsconfig.dist-paths.json" },
-    { "path": "./tsconfig/tsconfig.vite.json" }
+    { "path": "./tsconfig/tsconfig.dist-paths.json" }
   ]
 }
