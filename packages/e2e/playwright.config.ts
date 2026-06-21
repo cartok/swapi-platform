@@ -248,14 +248,6 @@ export default defineConfig({
     navigationTimeout: env.CI ? 15 * 1000 : 5 * 1000,
     actionTimeout: env.CI ? 15 * 1000 : 5 * 1000,
   },
-  // webServer: env.SWAPI_LOCAL_E2E
-  //   ? {
-  //       command: 'task --dir ../../ --silent e2e:server',
-  //       url: serverBaseUrl,
-  //       reuseExistingServer: !env.CI,
-  //       timeout: 10 * 1000,
-  //     }
-  //   : undefined,
   projects: env.SWAPI_LOCAL_E2E
     ? [
         Projects.use('Chromium (desktop) - smoke'),
