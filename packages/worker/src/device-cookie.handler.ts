@@ -1,4 +1,5 @@
 import type { HonoHandler } from '@swapi/hono/types'
+import { NO_STORE_CACHE_HEADERS } from '@swapi/shared/cache/cache-control'
 import type { DeviceCookie } from '@swapi/shared/generated/types/device-cookie.types'
 import { validate } from '@swapi/shared/generated/validators/device-cookie.validator'
 import { env } from 'cloudflare:workers'
@@ -44,7 +45,11 @@ export const addDeviceCookieHandler: HonoHandler<WorkerHonoEnv> = (hono) => {
         requestBody = await c.req.json()
       } catch (error) {
         console.error('Invalid request body:', error)
-        return c.json({ message: 'Invalid request body: Could not parse JSON.' }, 400)
+        return c.json(
+          { message: 'Invalid request body: Could not parse JSON.' },
+          400,
+          NO_STORE_CACHE_HEADERS,
+        )
       }
 
       try {
@@ -55,6 +60,7 @@ export const addDeviceCookieHandler: HonoHandler<WorkerHonoEnv> = (hono) => {
         return c.json(
           { message: `Invalid request body: ${JSON.stringify(requestBody)}` },
           400,
+          NO_STORE_CACHE_HEADERS,
         )
       }
 

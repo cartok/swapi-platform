@@ -1,4 +1,5 @@
 import type { HonoHandler } from '@swapi/hono/types'
+import { NO_STORE_CACHE_HEADERS } from '@swapi/shared/cache/cache-control'
 import { errorToString } from '@swapi/shared/log/log'
 
 import { DCE_SWAPI_TARGET_ENVIRONMENT, secretEnv } from '#internal/env'
@@ -17,7 +18,7 @@ export const addHealthChecksHandler: HonoHandler<ServerHonoEnv, HonoRuntimeOptio
         secretEnv.SWAPI_SECRET_HEALTH_CHECK_TOKEN !==
           c.req.header('X-Secret-Health-Check-Token')
       ) {
-        return c.body(null, 400)
+        return c.body(null, 403, NO_STORE_CACHE_HEADERS)
       }
       return next()
     })
@@ -48,7 +49,7 @@ export const addHealthChecksHandler: HonoHandler<ServerHonoEnv, HonoRuntimeOptio
         `Unhandled Exceptions: ${runtimeMetrics.hono.caughtExceptions}`,
         `SSR Worker Failures: ${runtimeMetrics.ssrWorkerPool.workerFailures}`,
       ].join(', ')
-      return c.text(text, 503)
+      return c.text(text, 503, NO_STORE_CACHE_HEADERS)
     }
   })
 
@@ -58,7 +59,7 @@ export const addHealthChecksHandler: HonoHandler<ServerHonoEnv, HonoRuntimeOptio
       return c.body(null, 200)
     } catch (error) {
       console.error(error)
-      return c.body(errorToString(error), 503)
+      return c.body(errorToString(error), 503, NO_STORE_CACHE_HEADERS)
     }
   })
 
@@ -68,7 +69,7 @@ export const addHealthChecksHandler: HonoHandler<ServerHonoEnv, HonoRuntimeOptio
       return c.body(null, 200)
     } catch (error) {
       console.error(error)
-      return c.text(errorToString(error), 503)
+      return c.text(errorToString(error), 503, NO_STORE_CACHE_HEADERS)
     }
   })
 }

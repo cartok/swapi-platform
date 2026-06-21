@@ -1,5 +1,8 @@
 import type { HonoHandler } from '@swapi/hono/types'
-import { DOCUMENT_CACHE_HEADERS } from '@swapi/shared/cache/cache-control'
+import {
+  DOCUMENT_CACHE_HEADERS,
+  NO_STORE_CACHE_HEADERS,
+} from '@swapi/shared/cache/cache-control'
 import { CACHE_TAGS } from '@swapi/shared/cache/cache-tags'
 import { createCommitBasedWeakETagHeader } from '@swapi/shared/cache/etags'
 
@@ -74,16 +77,16 @@ export const addSsrHandler: HonoHandler<ServerHonoEnv, HonoRuntimeOptions> = (
         error instanceof RenderQueueFullError ||
         error instanceof RenderQueueTimeoutError
       ) {
-        return c.text('SSR capacity exceeded', 503)
+        return c.text('SSR capacity exceeded', 503, NO_STORE_CACHE_HEADERS)
       }
 
       if (error instanceof RenderTimeoutError) {
-        return c.text('SSR render timeout', 503)
+        return c.text('SSR render timeout', 503, NO_STORE_CACHE_HEADERS)
       }
 
       runtimeMetrics.hono.caughtExceptions++
       console.error(error)
-      return c.text('SSR render failed', 500)
+      return c.text('SSR render failed', 500, NO_STORE_CACHE_HEADERS)
     }
   })
 }

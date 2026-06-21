@@ -34,7 +34,7 @@ hono.get('*', (c) => {
 hono.onError((error, c) => {
   console.error(error)
   if (isErrorPagePath(c.req.path)) {
-    return c.text('Internal Server Error', 500, { 'Cache-Control': 'no-store' })
+    return c.text('Internal Server Error', 500, NO_STORE_CACHE_HEADERS)
   }
 
   return c.redirect(`/${PATHS.SSG.ERROR_PATH}`)
