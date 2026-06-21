@@ -10,6 +10,7 @@ import {
   runEnv,
   validateRuntimeSecretEnv,
 } from '#internal/env'
+import { validateBuildEnvManifest } from '#internal/env.manifest'
 import { createHono } from '#internal/hono'
 import { logServerEnv, logSystemEnv } from '#internal/log/log-env'
 import { RenderWorkerPool } from '#internal/ssr/render-worker-pool'
@@ -215,6 +216,7 @@ const server = await startServer()
 async function startServer(): Promise<Bun.Server<undefined>> {
   try {
     validateRuntimeSecretEnv()
+    await validateBuildEnvManifest()
 
     const runtimeServices = await runtimeServicesPromise
     const hono = createHono({

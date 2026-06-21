@@ -107,8 +107,7 @@ COPY --from=bundle --parents /app/packages/client/dist/${VARIANT_DIR}/browser/ /
 COPY --from=bundle --parents /app/packages/client/dist/${VARIANT_DIR}/ssr/.vite/ /
 
 # Copy server files:
-# - To start the server we additionally need the server's environment files and the
-# server bundle.
+# - To start the server we additionally need the server's environment files and the bundle.
 # - The variant bundle is copied into a dedicated folder in the working directory, so
 # that the entrypoint can be executed in the CMD by exit form, in order to ensure
 # correct process signal behavior.

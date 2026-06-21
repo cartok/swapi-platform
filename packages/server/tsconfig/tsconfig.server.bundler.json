@@ -8,5 +8,5 @@
     "noEmit": true,
     "types": ["node"]
   },
-  "files": ["../rolldown.config.ts"]
+  "files": ["../rolldown.config.ts", "../src/@types/env.d.ts"]
 }

@@ -3,10 +3,12 @@ import angularLinkerBabelPlugin from '@angular/compiler-cli/linker/babel'
 import type { TransformOptions } from '@babel/core'
 import { transformAsync } from '@babel/core'
 import { envToOxcDefine } from '@swapi/shared/environment/globals'
+import type { Plugin } from 'rolldown'
 import { defineConfig } from 'rolldown'
 
 // These imports have to be relative for bundling.
 import { buildEnv } from './src/env'
+import { BUILD_ENV_MANIFEST_FILE_NAME } from './src/env.manifest'
 import { logServerEnv } from './src/log/log-env'
 
 logServerEnv()
@@ -14,7 +16,6 @@ logServerEnv()
 const buildVariantPath = `${buildEnv.BUILD_TARGET_ENVIRONMENT}/${buildEnv.BUILD_PROFILE}`
 const isMinifyEnabled = buildEnv.BUILD_MINIFY
 const externalDependencies = new Set(['@swapi/client/dist-paths'])
-
 const serverBundleConfig = defineConfig({
   input: {
     server: `./dist/${buildVariantPath}/build/server.js`,
@@ -23,6 +24,7 @@ const serverBundleConfig = defineConfig({
   tsconfig: './tsconfig/tsconfig.server.bundler.json',
   platform: 'node',
   plugins: [
+    createBuildEnvManifestPlugin(),
     createAngularLinkerAotPlugin({
       sourceMaps: fromRolldownSourceMapsToBabelSourceMaps(buildEnv.BUILD_SOURCE_MAPS),
     }),
@@ -102,6 +104,19 @@ function createAngularLinkerAotPlugin(babelTransformOptions: TransformOptions) {
           map: result.map ?? null,
         }
       },
+    },
+  }
+}
+
+function createBuildEnvManifestPlugin(): Plugin {
+  return {
+    name: 'build-env-manifest',
+    generateBundle() {
+      this.emitFile({
+        type: 'asset',
+        fileName: BUILD_ENV_MANIFEST_FILE_NAME,
+        source: JSON.stringify(buildEnv),
+      })
     },
   }
 }
