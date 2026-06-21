@@ -225,11 +225,11 @@ async function startServer(): Promise<Bun.Server<undefined>> {
 
 async function shutdown(reason: string, code = 1) {
   if (runtimeMetrics.server.shutdownStarted) return
-  console.error(`Shutdown started by: ${reason}`)
-
   runtimeMetrics.server.shutdownStarted = true
   runtimeMetrics.server.ready = false
   runtimeMetrics.server.ssrReady = false
+
+  console.error(`Shutdown started by: ${reason}`)
 
   const forceExit = setTimeout(() => {
     console.error(`Forced shutdown after ${FORCE_EXIT_TIMEOUT}ms timeout.`)
