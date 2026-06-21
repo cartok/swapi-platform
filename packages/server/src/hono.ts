@@ -12,6 +12,7 @@ import { addRobotsHandler } from '#internal/robots/robots.handler'
 import { addRequestGuardHandler } from '#internal/security/request-guard-security.handler'
 import { addSecureHeadersHandler } from '#internal/security/secure-headers-security.handler'
 import { addSsgHandler } from '#internal/ssg/ssg.handler'
+import { addSsgRenderHandler } from '#internal/ssg/ssg-render.handler'
 import { addSsrHandler } from '#internal/ssr/ssr.handler'
 import type { HonoRuntimeOptions, ServerHonoEnv } from '#internal/types'
 
@@ -24,6 +25,8 @@ export function createHono(runtimeOptions: HonoRuntimeOptions): Hono<ServerHonoE
   }
 
   addInFlightRequestsHandler(hono, runtimeOptions)
+  addSsgRenderHandler(hono)
+
   addAbortHandler(hono)
 
   addHealthChecksHandler(hono, runtimeOptions)

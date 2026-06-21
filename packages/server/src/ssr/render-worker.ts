@@ -141,7 +141,7 @@ function handleAbort(message: WorkerAbortRequest): void {
 
 async function handleWarmup(_message: WorkerWarmupRequest): Promise<void> {
   try {
-    const angularRenderContext = await getAngularRenderContext()
+    const angularRenderContext = await getAngularRenderContext({ ssg: false })
     engine = angularRenderContext.engine
     indexHtml = angularRenderContext.indexHtml
     ssrAbortSignalToken = angularRenderContext.ssrAbortSignalToken

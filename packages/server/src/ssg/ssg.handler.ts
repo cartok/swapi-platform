@@ -7,6 +7,7 @@ import { DOCUMENT_CACHE_HEADERS } from '@swapi/shared/cache/cache-control'
 import { CACHE_TAGS } from '@swapi/shared/cache/cache-tags'
 import { createCommitBasedWeakETagHeader } from '@swapi/shared/cache/etags'
 import { isAbortLikeError } from '@swapi/shared/errors/abort-error'
+import { errorToString } from '@swapi/shared/log/log'
 
 import { DCE_SWAPI_GIT_COMMIT_SHA, DCE_SWAPI_LOCAL_E2E } from '#internal/env'
 import { isErrorCode, SERVER_ERROR_CODES } from '#internal/error/error'
@@ -20,29 +21,31 @@ const useCache = DCE_SWAPI_LOCAL_E2E
 
 if (useCache) {
   console.warn('SSG: Will use runtime cache.')
-  const ssgDirents = await readdir(ssgDistPath, {
-    recursive: true,
-    withFileTypes: true,
-  })
+  async function preloadSsgFiles() {
+    const ssgDirents = await readdir(ssgDistPath, {
+      recursive: true,
+      withFileTypes: true,
+    })
 
-  Bun.gc(true)
-  console.info('SSG: Memory usage BEFORE cache load:', getMemoryStatistics())
-  const ssgEntries = await Promise.all(
-    ssgDirents
-      .filter((x) => x.isFile())
-      .map(async (x): Promise<[string, string]> => {
-        const path = `${x.parentPath}/${x.name}`
-        const html = await Bun.file(path).text()
+    Bun.gc(true)
+    console.info('SSG: Memory usage BEFORE cache load:', getMemoryStatistics())
+    const ssgEntries = await Promise.all(
+      ssgDirents
+        .filter((x) => x.isFile())
+        .map(async (x): Promise<[string, string]> => {
+          const path = `${x.parentPath}/${x.name}`
+          const html = await Bun.file(path).text()
 
-        return [path, html]
-      }),
-  )
+          return [path, html]
+        }),
+    )
 
-  ssgCache = new Map(ssgEntries)
+    ssgCache = new Map(ssgEntries)
 
-  Bun.gc(true)
-  console.info('SSG: Memory usage AFTER cache load:', getMemoryStatistics())
-  console.info(`SSG: Created runtime cache. Loaded ${ssgEntries.length} HTML files.`)
+    Bun.gc(true)
+    console.info('SSG: Memory usage AFTER cache load:', getMemoryStatistics())
+    console.info(`SSG: Created runtime cache. Loaded ${ssgEntries.length} HTML files.`)
+  }
 
   function getMemoryStatistics() {
     const memory = process.memoryUsage()
@@ -57,6 +60,21 @@ if (useCache) {
 
   function bytesToMb(bytes: number): string {
     return `${(bytes / 1024 / 1024).toFixed(2)} MB`
+  }
+
+  try {
+    await preloadSsgFiles()
+  } catch (error) {
+    if (isErrorCode(error, SERVER_ERROR_CODES.ENOENT)) {
+      console.warn(
+        [
+          'SSG: Files could not be preloaded.',
+          'If this is the initial start you can ignore this warning',
+        ].join(' '),
+      )
+    } else {
+      console.error(errorToString(error))
+    }
   }
 }
 

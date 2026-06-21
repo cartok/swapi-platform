@@ -2,44 +2,51 @@ import { mkdir, rm, writeFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 
 import { indexHtmlPath, ssgDistPath } from '@swapi/client/dist-paths'
-import { logEnv } from '@swapi/shared/environment/env'
 import { PATHS } from '@swapi/shared/routing/paths'
 import { SSG_PATHS } from '@swapi/shared/routing/ssg-paths'
 
-import { enableAngularServerMode } from '#internal/angular/angular-server-mode'
-import { allowedHosts, env } from '#internal/env'
+import { runEnv } from '#internal/env'
+import { logServerEnv } from '#internal/log/log-env'
+import { formatDuration } from '#internal/time'
 
-logEnv(env, 'App Server SSG Environment Variables')
-
-// Load Angular in correct order.
-enableAngularServerMode()
 await import('@angular/compiler')
-const { CommonEngine } = await import('@angular/ssr/node')
-const { bootstrap } = await import('@swapi/client/main.server')
-const { ɵSERVER_CONTEXT } = await import('@angular/platform-server')
-const angular = new CommonEngine({
-  bootstrap,
-  allowedHosts,
-  // TODO: fix token is overwritten by provideServerRendering in the server config
-  // could create a workaround either via env var or by creating a ssg entry point & config
-  providers: [{ provide: ɵSERVER_CONTEXT, useValue: 'ssg' }],
-})
+const { getAngularRenderContext } =
+  await import('#internal/angular/angular-render-context')
+const { engine, indexHtml } = await getAngularRenderContext({ ssg: true })
 
-// Clear dist directory.
-await rm(ssgDistPath, { force: true, recursive: true })
+export async function updateSsgPages(signal?: AbortSignal) {
+  const startTime = performance.now()
+  logServerEnv()
 
-// Render SSG pages.
-const origin = `http://${env.SWAPI_SERVER_HOST}:${env.SWAPI_APP_SERVER_PORT}`
-for (const path of SSG_PATHS) {
-  const html = await angular.render({
-    url: new URL(`/${path}`, origin).toString(),
-    documentFilePath: indexHtmlPath,
-  })
-  const indexPath = path === PATHS.SSG.HOME_PATH ? './index.html' : `./${path}/index.html`
-  const outputFilePath = resolve(ssgDistPath, indexPath)
-  console.log('SSG: Rendered', indexPath.replace(/^\./, ''))
-  await mkdir(dirname(outputFilePath), { recursive: true })
-  await writeFile(outputFilePath, html, 'utf8')
+  signal?.throwIfAborted()
+  await rm(ssgDistPath, { force: true, recursive: true })
+
+  const origin = `http://${runEnv.RUN_HOST}:${runEnv.RUN_PORT}`
+
+  for (const path of SSG_PATHS) {
+    const renderStartTime = performance.now()
+
+    signal?.throwIfAborted()
+    const html = await engine.render({
+      url: new URL(`/${path}`, origin).toString(),
+      document: indexHtml,
+      documentFilePath: indexHtmlPath,
+    })
+    signal?.throwIfAborted()
+
+    const indexPath =
+      path === PATHS.SSG.HOME_PATH ? './index.html' : `./${path}/index.html`
+    const outputFilePath = resolve(ssgDistPath, indexPath)
+
+    console.log('SSG: Rendered', indexPath.replace(/^\./, ''))
+    const renderEndTime = performance.now()
+    console.log('Took', formatDuration(renderEndTime - renderStartTime))
+
+    await mkdir(dirname(outputFilePath), { recursive: true })
+    await writeFile(outputFilePath, html, 'utf8')
+  }
+
+  console.log(`Prerendered ${String(SSG_PATHS.length)} routes into ${ssgDistPath}`)
+  const endTime = performance.now()
+  console.log('Took', formatDuration(endTime - startTime))
 }
-
-console.log(`Prerendered ${String(SSG_PATHS.length)} routes into ${ssgDistPath}`)

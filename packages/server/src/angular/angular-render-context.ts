@@ -32,22 +32,36 @@ export interface AngularRenderingDependencies {
   ssrAbortSignalToken: InjectionToken<AbortSignal | null>
 }
 
-async function awaitDependencies(): Promise<void> {
+interface AngularRenderContextConfig {
+  ssg: boolean
+}
+
+async function awaitDependencies(config: AngularRenderContextConfig): Promise<void> {
   const [{ CommonEngine }, { bootstrap, SSR_ABORT_SIGNAL }, document] = await Promise.all(
     [angularSsrModulePromise, mainServerModulePromise, indexHtmlPromise],
   )
 
   ssrAbortSignalToken = SSR_ABORT_SIGNAL
 
-  engine = new CommonEngine({
-    bootstrap,
-    allowedHosts,
-  })
+  if (config.ssg) {
+    const { ɵSERVER_CONTEXT } = await import('@angular/platform-server')
+    engine = new CommonEngine({
+      bootstrap,
+      allowedHosts,
+      providers: [{ provide: ɵSERVER_CONTEXT, useValue: 'ssg' }],
+    })
+  } else {
+    engine = new CommonEngine({
+      bootstrap,
+      allowedHosts,
+    })
+  }
 
   indexHtml = document
 }
 
-export async function getAngularRenderContext(): Promise<AngularRenderingDependencies> {
-  await awaitDependencies()
-  return { indexHtml, engine, ssrAbortSignalToken }
+export async function getAngularRenderContext(config: AngularRenderContextConfig) {
+  await awaitDependencies({ ssg: config.ssg })
+
+  return { indexHtml, engine, ssrAbortSignalToken } satisfies AngularRenderingDependencies
 }
