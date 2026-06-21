@@ -1,6 +1,6 @@
 import type { ConsoleMessage } from '@playwright/test'
 import { expect, test } from '@playwright/test'
-import type { NonEmptyArray } from '@swapi/shared/types/shared.types'
+import type { NonEmptyArray } from '@swapi/shared/types/types'
 
 import type { RegExpOrString } from './monitoring.js'
 import { matchesRegExpOrString } from './monitoring.js'
