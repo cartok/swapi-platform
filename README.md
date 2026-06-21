@@ -86,7 +86,7 @@ As of **May 2026**, the public `swapi.dev` API is unstable due to an expired TLS
 To keep the app reliably usable across environments, the client currently serves SWAPI responses from local mock data.
 
 - Mock source: SWAPI fixture data (`Juriy/swapi`) transformed to SWAPI-compatible `films`, `people`, and `planets` API responses
-- Activation: `SWAPI_USE_MOCK=true` in client environment files
+- Activation: `USE_SWAPI_MOCK=true` in client environment files
 - Mock transport behavior: includes an artificial per-request delay (`150-450ms`) for both success and `404` responses
 
 This is a temporary fallback until the app is switched to its own backend.
@@ -136,22 +136,22 @@ Local URLs:
 
 ### Build Matrix
 
-Use `T_BUILD_LEVEL` and `T_TARGET_ENVIRONMENT` explicitly when needed:
+Use BUILD_PROFILE` and BUILD_TARGET_ENVIRONMENT` explicitly when needed:
 
-- `T_BUILD_LEVEL`: `development`, `release`
-- `T_TARGET_ENVIRONMENT`: `local`, `ci`, `testing`, `production`
+- BUILD_PROFILE`: `development`, `release`
+- BUILD_TARGET_ENVIRONMENT`: `local`, `ci`, `testing`, `production`
 
 #### Environment Variables
 
 Taskfiles derive the app environment variables from the Build Matrix variables:
 
-- `T_BUILD_LEVEL`: `SWAPI_BUILD_LEVEL`
-- `T_TARGET_ENVIRONMENT`: `SWAPI_TARGET_ENVIRONMENT`
+- BUILD_PROFILE`: `BUILD_PROFILE`
+- BUILD_TARGET_ENVIRONMENT`: `BUILD_TARGET_ENVIRONMENT`
 
 Taskfiles load the remaining environment variables via dotenv from `.env` files like:
 
-- `packages/client/.env/.env.<T_TARGET_ENVIRONMENT>.<T_BUILD_LEVEL>`
-- `packages/server/.env/.env.<T_TARGET_ENVIRONMENT>.<T_BUILD_LEVEL>`
+- `packages/client/.env/.env.BUILD_TARGET_ENVIRONMENT>.BUILD_PROFILE>`
+- `packages/server/.env/.env.BUILD_TARGET_ENVIRONMENT>.BUILD_PROFILE>`
 
 ## Documentation
 

@@ -17,7 +17,8 @@
 - [ ] Unify smoke test code, less repetition & timeouts should be configurable in one place.
 - [x] Environment variables for things like timeouts that are referred to in the code.
   - [ ] Make use of them.
-- [ ] Is it possible to have the node server use sourcemaps to keep SWAPI_MINIFY in server env active so that runtime code is minified but still get good error logs?
+- [ ] Is it possible to have the node server use sourcemaps to keep MINIFY in server env active so that runtime code is minified but still get good error logs?
+- [x] Create a secret check utility
 
 ## Stability
 

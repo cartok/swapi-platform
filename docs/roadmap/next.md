@@ -1,8 +1,33 @@
 # Next
 
+## Create Taskfile github issues
+
+See [Taskfile Issues](../taskfile-issues.md).
+
 ## Wait for bun fix
 
 - Fix situation in development server task: Could not add node condition for @swapi/hono/source, due to a [bun bug](https://github.com/oven-sh/bun/issues/30619) with more than 3 node conditions and temporarily added @swapi/server/source conditions to the hono package.json as a workaround.
+
+## Fly
+
+Investigate deployments if issue persists: Maybe shutdown not working as expected or fly behaves different from I thought it would. Error below appeared with [default `rolling` strategy](https://fly.io/docs/reference/configuration/#picking-a-deployment-strategy).
+
+```
+2026-06-20 09:41:19.118
+Process exits with code 1.
+
+
+2026-06-20 09:41:19.118
+      at Un (/app/server-variant-bundle/server.js:4:3987)
+2026-06-20 09:41:19.118
+    code: "EADDRINUSE"
+2026-06-20 09:41:19.118
+   errno: 0,
+2026-06-20 09:41:19.118
+ syscall: "listen",
+2026-06-20 09:41:19.118
+error: Failed to start server. Is port 51000 in use?
+```
 
 ## Environment Variables
 
@@ -23,14 +48,20 @@ The (vite) app has no real runtime variables, only those that are statically bui
 
 ### App Server Runtime Variables could be more flexible
 
-Generally: For runtime variables fly secrets can be used.
-
-It would make sense to be able to change port, host and the list of allowed hosts through runtime variables, but at the moment the SSG rendering is done statically during build process only and it depends on host and port variables.
+Generally reminder: For runtime variables fly secrets can be used. But build variables that affect the code logic output, should not get changed! Should create a build manifest for these variables and validate it.
 
 ## Important Angular Update
 
 Angular 22 is out and it supports TS6, so the update would bring more ease to the project as it right now it uses TS5 and TS5.
 With the new Angular version the `CommonEngine` got deprecated. Will have to take a look if the new one can be integrated well. There is also that `ɵSERVER_CONTEXT` issue where the SSG-rendered pages get rendered with `app-root[ng-server-context="ssr"]`, which might be fixed afterwards. Additional care should be taken to also update Analog.js. Both of these updates might also allow the tsconfig and vite bundling workarounds in the app code.
+
+## App Server & Worker
+
+Consider adding /ssg POST route also on app-worker
+
+## Logging
+
+Integrate a logging package. Right now the log levels are just strings and not really usable. Would also get better standards and have less custom logging code.
 
 ## Maintainance
 

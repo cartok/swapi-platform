@@ -10,13 +10,13 @@ The goal is not to create the simplest possible Playwright setup, but a maintain
 
 Generally:
 
-Local E2E runs are identified with the project-wide `SWAPI_LOCAL_E2E` environment variable. The variable is part of `@swapi/shared/environment/env` through `CommonEnvSchema`, so the E2E package, client, and server can all read the same signal with the same default value.
+Local E2E-runs are identified with the project-wide `IS_LOCAL_E2E` environment variable. It allows optimizing parameters for faster local e2e tests.
 
-`SWAPI_LOCAL_E2E` intentionally describes the test harness, not the deployment target. `SWAPI_TARGET_ENVIRONMENT == 'local' && !CI` only says that the app runs in a local target outside CI; it does not say that Playwright is currently driving the app. A normal local development server, a local manual smoke check, and a local E2E run can all use the same target but need different operational behavior.
+`IS_LOCAL_E2E` intentionally describes the test harness, not the deployment target. `TARGET_ENVIRONMENT == 'local' && !CI` only says that the app runs in a local target outside CI; it does not say that Playwright is currently driving the app. A normal local development server, a local manual smoke check, and a local E2E run can all use the same target but need different operational behavior.
 
 Current responsibilities:
 
-- Playwright uses `SWAPI_LOCAL_E2E` to decide whether it should start the local app server through `webServer`.
+- Playwright uses `IS_LOCAL_E2E` to decide whether it should start the local app server through `webServer`.
 - The E2E package uses it to select the local project set.
 - The server uses it for E2E-specific operational tuning, for example the SSR worker-pool configuration used during local Playwright runs.
 

@@ -7,6 +7,8 @@ Talk to me in german, even if I sometimes talk in english or mix both up, but wr
 
 When I ask a question, answer the question! DO NOT straightly go ahead and change some code, when it is not clear that the question implies that you should change / fix things.
 
+Ignore the /.dev directory and the /Taskfile.dev.yml. At least do not change contents of these paths.
+
 # Best Practices
 
 ## For code in general

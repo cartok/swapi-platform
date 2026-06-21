@@ -4,6 +4,11 @@
 
 ---
 
+- [ ] load .env.override files
+- [ ] Lint the Taskfiles in the root lint task
+
+---
+
 ## Direnv
 
 - [ ] Make `swapi-workspaces` script run in any directory, currently path resolution issue on package.json
