@@ -2,8 +2,8 @@ import { addDocumentRequestContextHandler } from '@swapi/hono/request/document-r
 import { Hono } from 'hono'
 
 import { addAssetHandler } from '#internal/assets/asset.handler'
-import { addDebugRoutesHandler } from '#internal/debug/debug-routes.handler'
-import { DCE_SWAPI_TARGET_ENVIRONMENT } from '#internal/env'
+import { addDebugRoutesHandler } from '#internal/dev/debug-routes.handler'
+import { addFilterHandler } from '#internal/dev/filter.handler'
 import { addErrorHandler } from '#internal/error/error.handler'
 import { addHealthChecksHandler } from '#internal/health/health-checks.handler'
 import { addInFlightRequestsHandler } from '#internal/request/in-flight-requests.handler'
@@ -19,10 +19,7 @@ export function createHono(runtimeOptions: HonoRuntimeOptions): Hono<ServerHonoE
   const hono = new Hono<ServerHonoEnv>({ strict: false })
 
   if (DCE_SWAPI_TARGET_ENVIRONMENT === 'local') {
-    hono.get(
-      '/.well-known/appspecific/com.chrome.devtools.json',
-      () => new Response(null, { status: 204 }),
-    )
+    addFilterHandler(hono)
     addDebugRoutesHandler(hono)
   }
 
@@ -30,6 +27,7 @@ export function createHono(runtimeOptions: HonoRuntimeOptions): Hono<ServerHonoE
   addAbortHandler(hono)
 
   addHealthChecksHandler(hono, runtimeOptions)
+
   addDocumentRequestContextHandler(hono)
   addSecureHeadersHandler(hono)
   addRequestGuardHandler(hono)
