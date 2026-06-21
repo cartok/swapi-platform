@@ -30,15 +30,6 @@ This repository started as a successful job application challenge implementation
 
 ### Monorepo Packages
 
-<!--
-TODO: incomplete
-TODO: split workspace packages:
-- ./packages/app/*: e2e
-- ./packages/lib/*: app (client), app-server (server), app-worker
-- ./packages/bin/*: hono, shared, tsconfig
-- ./packages/test/*: maintainance (has swapi-workspaces.zsh)
--->
-
 <!-- prettier-ignore -->
 | Package | Responsibility |
 | --- | --- |
