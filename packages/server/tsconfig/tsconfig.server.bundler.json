@@ -6,7 +6,7 @@
   ],
   "compilerOptions": {
     "noEmit": true,
-    "types": ["node", "bun"]
+    "types": ["node"]
   },
   "files": ["../rolldown.config.ts"]
 }
