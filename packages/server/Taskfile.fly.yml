@@ -19,6 +19,25 @@ tasks:
         fi
       '
 
+  stage-secrets:
+    silent: true
+    dotenv:
+      - '{{.ROOT_DIR}}/.env.fly.secret'
+    preconditions:
+      - command -v openssl
+      - command -v fly
+      - test -s {{.APP_SERVER_FLY_CONFIG}}
+      - test -n "${SECRET_HEALTH_CHECK_TOKEN}"
+      - test -n "${SECRET_SSG_RENDER_TOKEN}"
+      - printf '%s' "${SECRET_HEALTH_CHECK_TOKEN}" | openssl base64 -d -A >/dev/null 2>&1
+      - printf '%s' "${SECRET_SSG_RENDER_TOKEN}" | openssl base64 -d -A >/dev/null 2>&1
+    cmds:
+      - |
+        {
+          printf 'SECRET_HEALTH_CHECK_TOKEN=%s\n' "${SECRET_HEALTH_CHECK_TOKEN}"
+          printf 'SECRET_SSG_RENDER_TOKEN=%s\n' "${SECRET_SSG_RENDER_TOKEN}"
+        } | fly secrets import --config {{.APP_SERVER_FLY_CONFIG}} --stage
+
   build-config:
     silent: true
     requires:

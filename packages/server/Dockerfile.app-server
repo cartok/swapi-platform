@@ -1,16 +1,18 @@
 # syntax=docker/dockerfile:1.23
 
 ARG BUN_VERSION=${BUN_VERSION:-1.3.14}
-ARG RUNTIME_IMAGE_VARIANT=distroless
+ARG DOCKER_IMAGE_VARIANT=distroless
 ARG NODE_ENV
-ARG SWAPI_BUILD_LEVEL
-ARG SWAPI_TARGET_ENVIRONMENT
-ARG SWAPI_GIT_COMMIT_SHA
-ARG VARIANT_DIR=${SWAPI_TARGET_ENVIRONMENT}/${SWAPI_BUILD_LEVEL}
-ARG VARIANT_ENV_FILE=.env.${SWAPI_TARGET_ENVIRONMENT}.${SWAPI_BUILD_LEVEL}
+ARG BUILD_PROFILE
+ARG TARGET_ENVIRONMENT
+ARG GIT_COMMIT_SHA
+ARG VARIANT_DIR=${TARGET_ENVIRONMENT}/${BUILD_PROFILE}
+ARG VARIANT_ENV_FILE=.env.${TARGET_ENVIRONMENT}.${BUILD_PROFILE}
 ARG CID_BUN_CACHE=bun
 
 FROM oven/bun:${BUN_VERSION}-slim AS base
+
+WORKDIR /app
 
 ENTRYPOINT ["dash"]
 
@@ -18,8 +20,6 @@ SHELL ["/bin/dash", "-euo", "pipefail", "-c"]
 
 ENV DO_NOT_TRACK=1
 ENV BUN_FEATURE_FLAG_NO_ORPHANS=1
-
-WORKDIR /app
 
 FROM base AS deps
 
@@ -39,7 +39,6 @@ EOF
 FROM deps AS code
 
 ARG VARIANT_ENV_FILE
-ARG VARIANT_ENV_FILE_DOCKER
 
 COPY --parents ./.taskrc.yml ./
 COPY --parents ./packages/tsconfig/ ./
@@ -59,37 +58,36 @@ COPY --parents ./packages/*/Taskfile.*.yml ./
 
 FROM code AS bundle
 
+ARG GIT_COMMIT_SHA
+
+# Workaround for the Task include precedence issue documented in
+# docs/taskfile-issues.md:
+# "CLI Variables Do Not Override Root Variables When Running Included Tasks".
+# Keep the build arg available as environment so Task dynamic `sh:` variables
+# can read it while resolving included tasks.
+ENV GIT_COMMIT_SHA=${GIT_COMMIT_SHA}
+
+ARG BUILD_PROFILE
 ARG NODE_ENV
-ARG SWAPI_BUILD_LEVEL
-ARG SWAPI_GIT_COMMIT_SHA
-ARG SWAPI_TARGET_ENVIRONMENT
+ARG TARGET_ENVIRONMENT
 
-ENV NODE_ENV=${NODE_ENV}
-ENV SWAPI_BUILD_LEVEL=${SWAPI_BUILD_LEVEL}
-ENV SWAPI_GIT_COMMIT_SHA=${SWAPI_GIT_COMMIT_SHA}
-ENV SWAPI_SOURCE_MODE=dist
-ENV SWAPI_TARGET_ENVIRONMENT=${SWAPI_TARGET_ENVIRONMENT}
+RUN <<EOF
+bunx --no-install task server:build:bundle \
+	BUILD_PROFILE=${BUILD_PROFILE} \
+	TARGET_ENVIRONMENT=${TARGET_ENVIRONMENT} \
+	GIT_COMMIT_SHA=${GIT_COMMIT_SHA} \
+	NODE_ENV=${NODE_ENV}
+EOF
 
-RUN bunx --no-install task server:build:bundle
+FROM oven/bun:${BUN_VERSION}-${DOCKER_IMAGE_VARIANT} AS runtime
 
-FROM oven/bun:${BUN_VERSION}-${RUNTIME_IMAGE_VARIANT} AS runtime
+WORKDIR /app
 
-ARG NODE_ENV
-ARG SWAPI_BUILD_LEVEL
-ARG SWAPI_TARGET_ENVIRONMENT
-ARG SWAPI_GIT_COMMIT_SHA
-ARG VARIANT_ENV_FILE
 ARG VARIANT_DIR
+ARG VARIANT_ENV_FILE
 
 ENV DO_NOT_TRACK=1
 ENV BUN_FEATURE_FLAG_NO_ORPHANS=0
-ENV NODE_ENV=${NODE_ENV}
-ENV SWAPI_BUILD_LEVEL=${SWAPI_BUILD_LEVEL}
-ENV SWAPI_GIT_COMMIT_SHA=${SWAPI_GIT_COMMIT_SHA}
-ENV SWAPI_TARGET_ENVIRONMENT=${SWAPI_TARGET_ENVIRONMENT}
-ENV SWAPI_SERVER_HOST_INTERNAL=0.0.0.0
-
-WORKDIR /app
 
 # Neccessary for SSR-Worker termination, see: https://github.com/oven-sh/bun/issues/31281
 COPY --from=deps --parents /usr/lib/x86_64-linux-gnu/libgcc_s.so.1 /
@@ -98,7 +96,7 @@ COPY --from=deps --parents /usr/lib/x86_64-linux-gnu/libgcc_s.so.1 /
 # - The client's dist-dirs.js has to stay in it's dist dir, must not be bundled and
 # the root and client package.json's have to exist aswell to have it resolvable.
 # To resolve unbundled monorepo files we also need to copy the symlinks in node_modules.
-# - The client's browser build and the SSG files also need to be available for the server
+# - The client's browser build files also need to be available for the server
 #   runtime.
 # - The vite manifests for SSR.
 COPY --from=deps --parents /app/package.json /
@@ -106,7 +104,6 @@ COPY --from=deps --parents /app/packages/client/package.json /
 COPY --from=deps --parents /app/node_modules/@swapi/ /
 COPY --from=bundle --parents /app/packages/client/dist/${VARIANT_DIR}/dist-paths.js /
 COPY --from=bundle --parents /app/packages/client/dist/${VARIANT_DIR}/browser/ /
-COPY --from=bundle --parents /app/packages/client/dist/${VARIANT_DIR}/ssg/ /
 COPY --from=bundle --parents /app/packages/client/dist/${VARIANT_DIR}/ssr/.vite/ /
 
 # Copy server files:
@@ -119,9 +116,18 @@ COPY --from=code /app/packages/server/.env/ ./.env/
 COPY --from=bundle /app/packages/server/dist/${VARIANT_DIR}/bundle/ ./bundle/
 
 # As this is the distroless bun image, the bun parameters are set by environment variable.
+ARG BUILD_PROFILE
+ARG TARGET_ENVIRONMENT
+ARG GIT_COMMIT_SHA
+ARG NODE_ENV
+
+ENV BUILD_PROFILE=${BUILD_PROFILE}
+ENV BUILD_TARGET_ENVIRONMENT=${TARGET_ENVIRONMENT}
+ENV BUILD_GIT_COMMIT_SHA=${GIT_COMMIT_SHA}
+ENV NODE_ENV=${NODE_ENV}
 ENV BUN_OPTIONS="\
 --conditions @swapi/${VARIANT_DIR} \
---conditions @swapi/${SWAPI_BUILD_LEVEL} \
+--conditions @swapi/${BUILD_PROFILE} \
 --env-file ./.env/${VARIANT_ENV_FILE} \
 "
 
