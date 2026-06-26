@@ -137,6 +137,10 @@
         {
           "when": "**/{Dockerfile,*.Dockerfile,Dockerfile.*}",
           "value": "${workspace}"
+        },
+        {
+          "when": "**/{compose,compose.*}.{yml,yaml}",
+          "value": "${workspace}"
         }
       ]
     }
