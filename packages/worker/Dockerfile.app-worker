@@ -1,13 +1,17 @@
 # syntax=docker/dockerfile:1.23
 
-ARG BUN_VERSION=1.3.14
+ARG BUN_VERSION=${BUN_VERSION:-1.3.14}
+ARG NODE_VERSION=${NODE_VERSION:-24.16}
+ARG DISTRO=debian-trixie
 ARG CID_BUN_CACHE=bun
+ARG CID_NPM_CACHE=npm
 
-FROM oven/bun:${BUN_VERSION}-slim AS base
+FROM node:${NODE_VERSION}-trixie-slim AS base
 
 WORKDIR /app
 
-ARG CID_BUN_CACHE
+ARG BUN_VERSION
+ARG CID_NPM_CACHE
 
 ENV DO_NOT_TRACK=1
 ENV WRANGLER_SEND_METRICS=false
@@ -17,7 +21,13 @@ ENTRYPOINT ["dash"]
 
 SHELL ["/bin/dash", "-euo", "pipefail", "-c"]
 
+RUN --mount=type=cache,target=/root/.npm,id=${CID_NPM_CACHE} <<EOF
+npm install --global bun@${BUN_VERSION}
+EOF
+
 FROM base AS build-deps
+
+ARG CID_BUN_CACHE
 
 COPY --parents ./.npmrc ./
 COPY --parents ./.node-version ./
@@ -52,10 +62,8 @@ FROM code AS bundle
 
 ARG TARGET_ENVIRONMENT
 
-ENV TARGET_ENVIRONMENT=${TARGET_ENVIRONMENT}
-
 RUN <<EOF
-bunx --no-install task worker:build:bundle
+bunx --no-install task worker:build:bundle TARGET_ENVIRONMENT=${TARGET_ENVIRONMENT}
 EOF
 
 FROM base AS runtime-deps
@@ -73,13 +81,18 @@ COPY --parents ./packages/*/package.json ./
 
 RUN --mount=type=cache,target=/root/.bun/install/cache,id=${CID_BUN_CACHE} <<EOF
 bun install --frozen-lockfile --link-native-bins --no-progress --filter=@swapi/worker --production
+ln -s "$(bun pm bin)/wrangler" /usr/local/bin
 EOF
 
 FROM runtime-deps AS runtime
 
-ENV BUN_FEATURE_FLAG_NO_ORPHANS=0
+WORKDIR /app/dist
 
 COPY --from=code /app/packages/worker/wrangler.jsonc ./
 COPY --from=bundle /app/packages/worker/dist/index.js ./
 
-ENTRYPOINT ["bunx", "--no-install", "wrangler"]
+RUN cat <<-EOF >.env
+ORIGIN_HOST=app-server
+EOF
+
+ENTRYPOINT ["wrangler"]
